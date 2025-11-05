@@ -7,102 +7,293 @@ export const ValidateLogin = Joi.object({
 
 export const ValidateSignup = Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().min(6).required()
+    password: Joi.string().min(6).required(),
+    otp: Joi.string().min(6).max(6).required()
+});
+
+export const ValidateVerifyOtp = Joi.object({
+    email: Joi.string().email().required(),
+    otp: Joi.string().min(6).max(6).required()
+});
+
+export const validateEmailOtp = Joi.object({
+    email: Joi.string().email().required()
+})
+
+export const ValidateResetPassword = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+    otp: Joi.string().min(6).max(6).required()
+    
 });
 // ############ AUTH Validation END ################
 
 
 // ############ PROFILE Validation ################
+// export const ValidateProfileUpdate = Joi.object({
+//     programDetails: Joi.object({
+//         program: Joi.string().allow(null),
+//         validity: Joi.date().allow(null)
+//     }).allow(null),
+//     phoneNumber: Joi.string()
+//         .pattern(/^\+([1-9]{1}[0-9]{1,2})\d{10}$/)
+//         .required()
+//         .trim()
+//         .messages({
+//             'string.pattern.base': 'Phone number must start with a country code (e.g., +918388656625)',
+//             'string.empty': 'Phone number is required',
+//             'any.required': 'Phone number is required',
+//         }),
+//     personalDetails: Joi.object({
+//         dob: Joi.date().allow(null),
+//         gender: Joi.string().valid('MALE', 'FEMALE', 'OTHER').allow(null),
+//         address: Joi.string().allow(null),
+//         profession: Joi.string().allow(null)
+//     }).allow(null),
+//     name: Joi.string()
+//         .min(1)
+//         .max(100)
+//         .optional()
+//         .messages({
+//             'string.empty': 'Name cannot be empty',
+//             'string.min': 'Name must be at least 1 character long',
+//             'string.max': 'Name must be at most 100 characters long',
+//         }),
+//     profilePicture: Joi.string()
+//         .uri()
+//         .optional()
+//         .messages({
+//             'string.uri': 'Profile picture must be a valid URL',
+//         }),
+//     email: Joi.string()
+//         .email()
+//         .optional()
+//         .messages({
+//             'string.email': 'Please provide a valid email address',
+//         }),
+//     collegeDetails: Joi.object({
+//         branch: Joi.string().allow(null),
+//         highestDegree: Joi.string().allow(null),
+//         university: Joi.string().allow(null),
+//         college: Joi.string().allow(null),
+//         gpa: Joi.number().allow(null),
+//         toppersGPA: Joi.number().allow(null),
+//         noOfBacklogs: Joi.number().allow(null),
+//         admissionTerm: Joi.string().allow(null),
+//         coursesApplying: Joi.array().items(Joi.string()).allow(null)
+//     }).allow(null),
+//     greDetails: Joi.object({
+//         grePlane: Joi.date().allow(null),
+//         greDate: Joi.date().allow(null),
+//         greScoreCard: Joi.string().allow(null),
+//         greScore: Joi.object({
+//             verbal: Joi.number().allow(null),
+//             quant: Joi.number().allow(null),
+//             awa: Joi.number().allow(null)
+//         }).allow(null),
+//         retakingGRE: Joi.string().allow(null)
+//     }).allow(null),
+//     ieltsDetails: Joi.object({
+//         ieltsPlan: Joi.date().allow(null),
+//         ieltsDate: Joi.date().allow(null),
+//         ieltsScore: Joi.object({
+//             reading: Joi.number().allow(null),
+//             writing: Joi.number().allow(null),
+//             speaking: Joi.number().allow(null),
+//             listening: Joi.number().allow(null)
+//         }).allow(null),
+//         retakingIELTS: Joi.string().allow(null)
+//     }).allow(null),
+//     toeflDetails: Joi.object({
+//         toeflPlan: Joi.date().allow(null),
+//         toeflDate: Joi.date().allow(null),
+//         toeflScore: Joi.object({
+//             reading: Joi.number().allow(null),
+//             writing: Joi.number().allow(null),
+//             speaking: Joi.number().allow(null)
+//         }).allow(null),
+//         retakingTOEFL: Joi.string().allow(null)
+//     }).allow(null),
+//     visa: Joi.object({
+//         countriesPlanningToApply: Joi.array().items(Joi.string()).allow(null),
+//         visaInterviewDate: Joi.date().allow(null),
+//         visaInterviewLocation: Joi.string().allow(null)
+//     }).allow(null)
+// }).unknown(false);
+
+// validation/student.validation.js
+
+
+// validation/student.update.validation.js
+
+import { EAuthProvider } from '../constant/application.js';
+
+// Reusable atoms
+const urlString = Joi.string().uri().messages({ 'string.uri': 'Must be a valid URL' });
+
+const phoneWithCountry = Joi.string()
+  .pattern(/^\+([1-9]{1}[0-9]{1,2})\d{10}$/)
+  .trim()
+  .messages({
+    'string.pattern.base': 'Phone number must start with a country code (e.g., +918388656625)',
+  });
+
+const degreeEnum = Joi.string().valid('BACHELOR', 'MASTER', 'MBA', 'PHD', 'OTHER').allow(null);
+const genderEnum = Joi.string().valid('MALE', 'FEMALE', 'OTHER').allow(null);
+const statusEnum = Joi.string().valid('PENDING', 'ACTIVE', 'COMPLETE', 'REJECTED');
+const providerEnum = Joi.string().valid(...Object.values(EAuthProvider));
+
+// Reusable nested blocks (all optional & null-friendly to allow clearing fields)
+const programDetails = Joi.object({
+  program: Joi.string().allow(null),
+  validity: Joi.date().allow(null),
+}).allow(null);
+
+const personalDetails = Joi.object({
+  dob: Joi.date().allow(null),
+  gender: genderEnum,
+  address: Joi.string().allow(null),
+  profession: Joi.string().allow(null),
+}).allow(null);
+
+const schoolDetails = Joi.object({
+  schoolName: Joi.string().allow(null),
+  board: Joi.string().allow(null),
+  yearOfPassing: Joi.number().integer().allow(null),
+  percentage: Joi.number().allow(null),
+}).allow(null);
+
+const satDetails = Joi.object({
+  satPlan: Joi.date().allow(null),
+  satDate: Joi.date().allow(null),
+  satScoreCard: Joi.string().allow(null),
+  satScore: Joi.object({
+    readingWriting: Joi.number().allow(null),
+    math: Joi.number().allow(null),
+    total: Joi.number().allow(null),
+  }).allow(null),
+}).allow(null);
+
+const actDetails = Joi.object({
+  actPlan: Joi.date().allow(null),
+  actDate: Joi.date().allow(null),
+  actScoreCard: Joi.string().allow(null),
+  actScore: Joi.object({
+    english: Joi.number().allow(null),
+    math: Joi.number().allow(null),
+    total: Joi.number().allow(null),
+  }).allow(null),
+}).allow(null);
+
+const collegeDetails = Joi.object({
+  branch: Joi.string().allow(null),
+  highestDegree: Joi.string().allow(null),
+  university: Joi.string().allow(null),
+  college: Joi.string().allow(null),
+  gpa: Joi.number().allow(null),
+  toppersGPA: Joi.number().allow(null),
+  noOfBacklogs: Joi.number().allow(null),
+  admissionTerm: Joi.string().allow(null),
+  coursesApplying: Joi.array().items(Joi.string()).allow(null),
+}).allow(null);
+
+const greDetails = Joi.object({
+  grePlan: Joi.date().allow(null),    // ✅ matches model
+  greDate: Joi.date().allow(null),
+  greScoreCard: Joi.string().allow(null),
+  greScore: Joi.object({
+    verbal: Joi.number().allow(null),
+    quant: Joi.number().allow(null),
+    awa: Joi.number().allow(null),
+  }).allow(null),
+  retakingGRE: Joi.string().allow(null),
+}).allow(null);
+
+const ieltsDetails = Joi.object({
+  ieltsPlan: Joi.date().allow(null),
+  ieltsDate: Joi.date().allow(null),
+  ieltsScore: Joi.object({
+    reading: Joi.number().allow(null),
+    writing: Joi.number().allow(null),
+    speaking: Joi.number().allow(null),
+    listening: Joi.number().allow(null),
+  }).allow(null),
+  retakingIELTS: Joi.string().allow(null),
+}).allow(null);
+
+const toeflDetails = Joi.object({
+  toeflPlan: Joi.date().allow(null),
+  toeflDate: Joi.date().allow(null),
+  toeflScore: Joi.object({
+    reading: Joi.number().allow(null),
+    writing: Joi.number().allow(null),
+    speaking: Joi.number().allow(null),
+  }).allow(null),                      // ✅ no listening in model
+  retakingTOEFL: Joi.string().allow(null),
+}).allow(null);
+
+const visa = Joi.object({
+  countriesPlanningToApply: Joi.array().items(Joi.string()).allow(null),
+  visaInterviewDate: Joi.date().allow(null),
+  visaInterviewLocation: Joi.string().allow(null),
+}).allow(null);
+
+const planDetails = Joi.object({
+  course: Joi.string().allow(null),
+  planId: Joi.string().allow(null),
+  planName: Joi.string().allow(null),
+  planPrice: Joi.number().allow(null),
+  planBuyDate: Joi.date().allow(null),
+  receiptLink: urlString.allow(null),
+}).allow(null);
+
+// ---------- UPDATE VALIDATOR (PATCH) ----------
 export const ValidateProfileUpdate = Joi.object({
-    programDetails: Joi.object({
-        program: Joi.string().allow(null),
-        validity: Joi.date().allow(null)
-    }).allow(null),
-    phoneNumber: Joi.string()
-        .pattern(/^\+([1-9]{1}[0-9]{1,2})\d{10}$/)
-        .required()
-        .trim()
-        .messages({
-            'string.pattern.base': 'Phone number must start with a country code (e.g., +918388656625)',
-            'string.empty': 'Phone number is required',
-            'any.required': 'Phone number is required',
-        }),
-    personalDetails: Joi.object({
-        dob: Joi.date().allow(null),
-        gender: Joi.string().valid('MALE', 'FEMALE', 'OTHER').allow(null),
-        address: Joi.string().allow(null),
-        profession: Joi.string().allow(null)
-    }).allow(null),
-    name: Joi.string()
-        .min(1)
-        .max(100)
-        .optional()
-        .messages({
-            'string.empty': 'Name cannot be empty',
-            'string.min': 'Name must be at least 1 character long',
-            'string.max': 'Name must be at most 100 characters long',
-        }),
-    profilePicture: Joi.string()
-        .uri()
-        .optional()
-        .messages({
-            'string.uri': 'Profile picture must be a valid URL',
-        }),
-    email: Joi.string()
-        .email()
-        .optional()
-        .messages({
-            'string.email': 'Please provide a valid email address',
-        }),
-    collegeDetails: Joi.object({
-        branch: Joi.string().allow(null),
-        highestDegree: Joi.string().allow(null),
-        university: Joi.string().allow(null),
-        college: Joi.string().allow(null),
-        gpa: Joi.number().allow(null),
-        toppersGPA: Joi.number().allow(null),
-        noOfBacklogs: Joi.number().allow(null),
-        admissionTerm: Joi.string().allow(null),
-        coursesApplying: Joi.array().items(Joi.string()).allow(null)
-    }).allow(null),
-    greDetails: Joi.object({
-        grePlane: Joi.date().allow(null),
-        greDate: Joi.date().allow(null),
-        greScoreCard: Joi.string().allow(null),
-        greScore: Joi.object({
-            verbal: Joi.number().allow(null),
-            quant: Joi.number().allow(null),
-            awa: Joi.number().allow(null)
-        }).allow(null),
-        retakingGRE: Joi.string().allow(null)
-    }).allow(null),
-    ieltsDetails: Joi.object({
-        ieltsPlan: Joi.date().allow(null),
-        ieltsDate: Joi.date().allow(null),
-        ieltsScore: Joi.object({
-            reading: Joi.number().allow(null),
-            writing: Joi.number().allow(null),
-            speaking: Joi.number().allow(null),
-            listening: Joi.number().allow(null)
-        }).allow(null),
-        retakingIELTS: Joi.string().allow(null)
-    }).allow(null),
-    toeflDetails: Joi.object({
-        toeflPlan: Joi.date().allow(null),
-        toeflDate: Joi.date().allow(null),
-        toeflScore: Joi.object({
-            reading: Joi.number().allow(null),
-            writing: Joi.number().allow(null),
-            speaking: Joi.number().allow(null)
-        }).allow(null),
-        retakingTOEFL: Joi.string().allow(null)
-    }).allow(null),
-    visa: Joi.object({
-        countriesPlanningToApply: Joi.array().items(Joi.string()).allow(null),
-        visaInterviewDate: Joi.date().allow(null),
-        visaInterviewLocation: Joi.string().allow(null)
-    }).allow(null)
-}).unknown(false);
+  // Core identity (optional on update)
+  email: Joi.string().email().messages({
+    'string.email': 'Please provide a valid email address',
+  }),
+  password: Joi.string().min(6).messages({
+    'string.min': 'Password must be at least 6 characters long',
+  }),
+  name: Joi.string().min(1).max(100).messages({
+    'string.min': 'Name must be at least 1 character long',
+    'string.max': 'Name must be at most 100 characters long',
+  }),
+  profilePicture: urlString.messages({
+    'string.uri': 'Profile picture must be a valid URL',
+  }),
+
+  // Model-aligned optionals
+  degree: degreeEnum,
+  programDetails,
+  phoneNumber: phoneWithCountry,     // not required on update
+  personalDetails,
+  schoolDetails,
+  satDetails,
+  actDetails,
+  collegeDetails,
+  greDetails,
+  ieltsDetails,
+  toeflDetails,
+  visa,
+
+  status: statusEnum,
+  isFeePaid: Joi.boolean(),
+  planDetails,
+
+  isVerified: Joi.boolean(),
+  googleId: Joi.string().allow(null),
+  facebookId: Joi.string().allow(null),
+  provider: providerEnum,
+  role: Joi.string().valid('STUDENT'),
+  lastLogin: Joi.date().allow(null),
+})
+  .unknown(false)                     // block fields not in the model
+  .min(1)                             // require at least one field to update
+  .prefs({ abortEarly: false });      // collect all errors in one go
+
+
 // ############ PROFILE Validation END ################
 
 
@@ -115,10 +306,10 @@ export const ValidateMemberCreate = Joi.object({
     password: Joi.string().min(6).required(),
     role: Joi.string().valid('ADMIN', 'EDITOR', 'VIEWER').required(),
     status: Joi.string().valid('ACTIVE', 'INACTIVE', 'INVITED').default('INVITED'),
-    bio: Joi.string().trim().allow(null),
-    phone: Joi.string().trim().allow(null),
-    address: Joi.string().trim().allow(null),
-    profilePicture: Joi.string().allow(null)
+     bio: Joi.string().trim().allow('', null),
+  phone: Joi.string().trim().allow('', null),
+  address: Joi.string().trim().allow('', null),
+  profilePicture: Joi.string().allow('', null),
 });
 
 export const ValidateMemberUpdate = Joi.object({
@@ -248,7 +439,7 @@ export const ValidateUniversityUpdate = Joi.object({
 
 export const ValidateUniversityQuery = Joi.object({
     page: Joi.number().integer().min(1).default(1),
-    limit: Joi.number().integer().min(1).max(100).default(10),
+    limit: Joi.number().integer().min(1).max(500).default(10),
     name: Joi.string().trim().optional(),
     program: Joi.string().trim().optional(),
     university_type: Joi.string().trim().optional(),
@@ -871,7 +1062,7 @@ export const ValidateGetStudentActivities = Joi.object({
         'number.integer': 'Page must be an integer',
         'number.min': 'Page must be at least 1'
     }),
-    limit: Joi.number().integer().min(1).max(100).default(10).messages({
+    limit: Joi.number().integer().min(1).max(500).default(10).messages({
         'number.base': 'Limit must be a number',
         'number.integer': 'Limit must be an integer',
         'number.min': 'Limit must be at least 1',

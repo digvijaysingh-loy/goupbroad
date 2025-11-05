@@ -1,6 +1,0 @@
-{
-    "ext": "js",            
-    "ignore": ["dist", "node_modules"], 
-    "exec": "node src/server.js" 
-  }
-  

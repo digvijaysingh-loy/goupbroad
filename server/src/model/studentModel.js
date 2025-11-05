@@ -17,6 +17,11 @@ const studentSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    degree: {
+        type: String,
+        enum: ['BACHELOR', 'MASTER', 'MBA', 'PHD', 'OTHER'],
+        default: null
+    },
     programDetails: {
         program: {
             type: String,
@@ -49,6 +54,82 @@ const studentSchema = new mongoose.Schema({
             type: String,
             default: null
         }
+    },
+    schoolDetails: {
+        schoolName: {
+            type: String,
+            default: null
+        },
+        board: {
+            type: String,
+            default: null
+        },
+        yearOfPassing: {
+            type: Number,
+            default: null
+        },
+        percentage: {
+            type: Number,
+            default: null
+        }
+    },
+    satDetails: {
+        satPlan: {
+            type: Date,
+            default: null
+        },
+        satDate: {
+            type: Date,
+            default: null
+        },
+        satScoreCard: {
+            type: String,
+            default: null
+        },
+        satScore: {
+            readingWriting: {
+                type: Number,
+                default: null
+            },
+            math: {
+                type: Number,
+                default: null
+            },
+            total: {
+                type: Number,
+                default: null
+            }
+        }
+
+    },
+    actDetails: {
+        actPlan: {
+            type: Date,
+            default: null
+        },
+        actDate: {
+            type: Date,
+            default: null
+        },
+        actScoreCard: {
+            type: String,
+            default: null
+        },
+        actScore: {
+            english: {
+                type: Number,
+                default: null
+            },
+            math: {
+                type: Number,
+                default: null
+            },
+            total: {
+                type: Number,
+                default: null
+            }
+        }
+
     },
     collegeDetails: {
         branch: {
@@ -89,7 +170,7 @@ const studentSchema = new mongoose.Schema({
         }
     },
     greDetails: {
-        grePlane: {
+        grePlan: {
             type: Date,
             default: null
         },

@@ -1,0 +1,1 @@
+RESPOND ONLY in JSON format with proper key value pair with these as keys - University , Program , Length , Tuition , Location , STEM , F-1 , Chance 

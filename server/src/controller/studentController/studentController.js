@@ -12,6 +12,7 @@ import Response from '../../model/responseModel.js';
 import StudentActivity from '../../model/studentActivitySchema.js';
 import { ACTIVITY_STATUSES, ACTIVITY_TYPES } from '../../constant/application.js';
 import StudentTaskAssignment from '../../model/studentTaskAssignmentModel.js';
+import { getUniversitiesAccurate, getUniversitiesFast, } from '../../util/universityFinder.js';
 
 export default {
     getSelfData: async (req, res, next) => {
@@ -27,7 +28,7 @@ export default {
         }
     },
 
-    updateProfile: async (req, res, next) => {
+     updateProfile: async (req, res, next) => {
         try {
             const studentId = req.authenticatedStudent._id;
             const updateData = req.body;
@@ -102,6 +103,31 @@ export default {
             httpResponse(req, res, 200, responseMessage.SUCCESS, {
                 assignments,
                 pagination
+            });
+        } catch (err) {
+            httpError(next, err, req, 500);
+        }
+    },
+
+    getLlmAssignedUniversity: async (req, res, next) => {
+        try {
+            const studentId = req.authenticatedStudent._id;
+            const { preferredSpeed } = req.query;
+            if (!preferredSpeed || !['FAST', 'ACCURATE'].includes(preferredSpeed)) {
+                return httpError(next, new Error(responseMessage.CUSTOM_MESSAGE("preferredSpeed query parameter is required and must be either 'FAST' or 'ACCURATE'")), req, 422);
+            }
+            const student = await Student.findById(studentId).lean();
+            if (!student) {
+                return httpError(next, new Error(responseMessage.NOT_FOUND('Student')), req, 404);
+            }
+            let universityResults;
+            if (preferredSpeed === 'FAST') {
+                universityResults = await getUniversitiesFast(student, student.degree);
+            } else {
+                universityResults = await getUniversitiesAccurate(student, student.degree);
+            }
+            httpResponse(req, res, 200, responseMessage.SUCCESS, {
+                universityResults
             });
         } catch (err) {
             httpError(next, err, req, 500);

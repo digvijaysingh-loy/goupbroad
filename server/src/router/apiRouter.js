@@ -38,7 +38,11 @@ router.route('/universities/find').get(apiController.findUniversities);
 router.route('/plans').get(apiController.getPlanDetails);
 // auth routes
 router.route('/auth/login').post(authController.login);
+router.route('/auth/send-email-otp').post(authController.sendEmailOtp);
 router.route('/auth/signup').post(authController.signup);
+router.route('/auth/forgot-password').post(authController.forgotPassword);
+router.route('/auth/verify-otp').post(authController.verifyOtp);
+router.route('/auth/reset-password').post(authController.resetPassword);
 
 router.route('/auth/google').get(passport.authenticate('google', { scope: ['profile', 'email'] }))
 router.route('/auth/google/callback').get(
@@ -272,6 +276,9 @@ router.route('/admin/student-activities').get(memberAccess, adminController.getS
 // ********************  STUDENT UNIVERSITY ASSIGNMENT ROUTES  ***********************************
 router.route('/student/assigned-universities')
     .get(authentication, studentController.getAssignedUniversities);
+
+router.route('/student/llm-assigned-university/')
+    .get(authentication, studentController.getLlmAssignedUniversity);
 
 router.route('/student/assigned-universities/:assignmentId')
     .put(authentication, studentController.updateAssignedUniversityStatus);

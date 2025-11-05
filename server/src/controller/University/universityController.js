@@ -73,7 +73,7 @@ export default {
             }
 
             const universities = await University.find(query)
-                .sort({ createdDate: -1 })
+                .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit);
 

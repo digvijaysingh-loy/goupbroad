@@ -30,8 +30,8 @@ const rbacMiddleware = (requiredRoles = []) => {
             }
 
             req.authenticatedMember = member;
-
-            next();
+            console.log("user authorised")
+            next();         
         } catch (err) {
             httpError(next, err?.message ? new Error(err.message) : new Error(responseMessage.UNAUTHORIZED), req, 401);
         }

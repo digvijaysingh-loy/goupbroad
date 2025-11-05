@@ -98,7 +98,7 @@ const CollegeFinderResults = () => {
   const CollegeCard = ({ college }) => {
     const tierInfo = tierConfig[college.tier];
     const TierIcon = tierInfo.icon;
-
+    console.log("college", college)
     return (
       <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-primary-200 group">
         {/* Header */}

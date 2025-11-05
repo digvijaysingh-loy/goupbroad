@@ -56,8 +56,9 @@ export default {
     // Admin-only: Add new member
     addNewMember: async (req, res, next) => {
         try {
-
+            
             const validationResult = validateJoiSchema(ValidateMemberCreate, req.body);
+
             if (validationResult.error) {
                 return httpError(next, validationResult.error, req, 422);
             }
