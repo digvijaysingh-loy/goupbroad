@@ -23,7 +23,8 @@ const Navigation = () => {
   const navItems = [
     { name: 'University Finder', href: '/university-finder' },
     // { name: 'Scholarships', href: '#scholarships' },
-    // { name: 'Community', href: '/community' },
+    // { name: 'Communit'y', href: '/community' },
+    {name:'CGPA To GPA', href:'/cgp-to-gpa-converter'},
     { name: 'About', href: '/about' },
     {name: 'Pricing Plan' , href: '/pricing'}
   ];
