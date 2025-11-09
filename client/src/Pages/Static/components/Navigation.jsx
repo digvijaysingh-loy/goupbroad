@@ -1,43 +1,73 @@
-
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import logo from '../../../assets/logo.svg'
-
+import { isAuthenticated, subscribeToAuth, logout } from '@/lib/auth'; // ← add logout import
+import logo from '../../../assets/logo.svg';
 
 const Navigation = () => {
-  const navigator = useNavigate()
+  const navigator = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+
+    const unsubscribe = subscribeToAuth((authenticated) => {
+      setIsLoggedIn(authenticated);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const navItems = [
-    { name: 'University Finder', href: '/college-finder' },
-    // { name: 'Scholarships', href: '#scholarships' },
-    { name: 'Community', href: '/community' },
+    { name: 'University Finder', href: '/university-finder' },
     { name: 'About', href: '/about' },
-    { name: 'Pricing Plan' , href: '/pricing'}
-
+    { name: 'Pricing Plan', href: '/pricing' },
   ];
+
+  const isPricingPage = location.pathname === '/pricing';
+
+  // ---------- CTA LOGIC ----------
+  // Default (non-pricing pages)
+  let buttonText = isLoggedIn ? 'Dashboard' : 'Get Started';
+  let buttonPath = isLoggedIn ? '/dashboard' : '/signin';
+  let buttonOnClick = undefined;
+
+  // Override when we are on the Pricing page
+  if (isPricingPage) {
+    if (isLoggedIn) {
+      buttonText = 'Logout';
+      buttonPath = '#';               
+      buttonOnClick = () => {
+        logout();                     
+        navigator('/');              
+      };
+    } else {
+      buttonText = 'Get Started';
+      buttonPath = '/signin';
+    }
+  }
+
+  // --------------------------------
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0" onClick={() => {
-            navigator('/')
-          }}>
-            <div className='flex items-center justify-center gap-2'>
-
-            <img src={logo} alt="GoupBroad logo" className='w-[50px] h-[50px]' />
-            <h1 className="text-3xl font-bold text-[#145044] ">GoupBroad</h1>
+          <div className="flex-shrink-0 cursor-pointer" onClick={() => navigator('/')}>
+            <div className="flex items-center justify-center gap-2">
+              <img src={logo} alt="GoupBroad logo" className="w-[50px] h-[50px]" />
+              <h1 className="text-3xl font-bold text-[#145044]">GoupBroad</h1>
             </div>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              {navItems.map((item) => (
+              {navItems.map((item) =>
                 item.href.startsWith('/') ? (
                   <Link
                     key={item.name}
@@ -55,17 +85,26 @@ const Navigation = () => {
                     {item.name}
                   </a>
                 )
-              ))}
+              )}
             </div>
           </div>
 
-          {/* CTA Button */}
+          {/* CTA Button – Desktop */}
           <div className="hidden md:block">
-            <Link to="/signin">
-              <Button className="bg-primary-700 text-white">
-                Get Started
+            {buttonOnClick ? (
+              <Button
+                onClick={buttonOnClick}
+                className="bg-primary-700 text-white"
+              >
+                {buttonText}
               </Button>
-            </Link>
+            ) : (
+              <Link to={buttonPath}>
+                <Button className="bg-primary-700 text-white">
+                  {buttonText}
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -83,7 +122,7 @@ const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-              {navItems.map((item) => (
+              {navItems.map((item) =>
                 item.href.startsWith('/') ? (
                   <Link
                     key={item.name}
@@ -103,14 +142,33 @@ const Navigation = () => {
                     {item.name}
                   </a>
                 )
-              ))}
-              <div className="pt-2">
-                <Link to="/signin">
-                  <Button className="w-full bg-primary-700 text-white">
-                    Get Started
+              )}
+
+              {/* Mobile CTA */}
+              {buttonOnClick ? (
+                <div className="pt-2">
+                  <Button
+                    onClick={() => {
+                      buttonOnClick();
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full bg-primary-700 text-white"
+                  >
+                    {buttonText}
                   </Button>
-                </Link>
-              </div>
+                </div>
+              ) : (
+                <div className="pt-2">
+                  <Link
+                    to={buttonPath}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Button className="w-full bg-primary-700 text-white">
+                      {buttonText}
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}

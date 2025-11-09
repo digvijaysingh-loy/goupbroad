@@ -23,8 +23,8 @@ const Footer = () => {
     {
       title: 'Services',
       links: [
-        {title :'University Finder', href:'/college-finder'},
-        {title :'Community', href:'/community'}
+        {title :'University Finder', href:'/university-finder'},
+        // {title :'Community', href:'/community'}
         
       ]
     },

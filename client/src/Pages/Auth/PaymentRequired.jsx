@@ -85,9 +85,9 @@ const PaymentRequired = () => {
                             const currentUser = getUser();
                             
                             // Clear auth tokens
-                            localStorage.removeItem('user');
-                            localStorage.removeItem('authToken');
-                            Cookies.remove('accessToken');
+                            // localStorage.removeItem('user');
+                            // localStorage.removeItem('authToken');
+                            // Cookies.remove('accessToken');
                             
                             // Navigate to order confirmation with payment details
                             navigate('/order-confirmation', {

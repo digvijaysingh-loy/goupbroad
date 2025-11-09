@@ -57,7 +57,7 @@ const Documents = ({ studentId }) => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState({}); // Track individual action loading states
-  
+
   const hasEditPermission = () => {
     const currentUser = getUser();
     return currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'EDITOR');
@@ -72,11 +72,11 @@ const Documents = ({ studentId }) => {
   const [dateTo, setDateTo] = useState('');
   const [sortBy, setSortBy] = useState('created');
   const [sortOrder, setSortOrder] = useState('asc');
-  
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [documentPagination, setDocumentPagination] = useState({});
-  
+
   // Upload dialog states
   const [tasks, setTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(false);
@@ -191,7 +191,7 @@ const Documents = ({ studentId }) => {
     try {
       setLoading(true);
       const response = await getDocuments(fetchParams);
-      
+
       if (!response?.data?.documents) {
         throw new Error('Invalid response from server');
       }
@@ -317,7 +317,7 @@ const Documents = ({ studentId }) => {
 
       await uploadDocument(documentData);
       await fetchDocuments();
-      
+
       setIsUploadDialogOpen(false);
       toast.success('Document uploaded successfully');
       resetUploadForm();
@@ -337,9 +337,9 @@ const Documents = ({ studentId }) => {
 
     try {
       setTasksLoading(true);
-      const response = await getTasksByStudentId({studentId});
+      const response = await getTasksByStudentId({ studentId });
       const tasksData = response.data?.task || [];
-      
+
       if (!Array.isArray(tasksData)) {
         throw new Error('Invalid tasks data received');
       }
@@ -373,7 +373,7 @@ const Documents = ({ studentId }) => {
       setSubtasksLoading(true);
       const response = await getSubtasksByTaskAndStudent(taskId, selectedStudent);
       const subtasksData = response.subTasks || [];
-      
+
       if (!Array.isArray(subtasksData)) {
         throw new Error('Invalid subtasks data received');
       }
@@ -389,7 +389,7 @@ const Documents = ({ studentId }) => {
         } else {
           title = String(subtask.subtaskId);
         }
-        
+
         return {
           _id: subtask.subtaskId,
           id: subtask.subtaskId,
@@ -401,7 +401,7 @@ const Documents = ({ studentId }) => {
           title
         };
       });
-      
+
       setSubtasks(mappedSubtasks);
     } catch (err) {
       setSubtasks([]);
@@ -475,7 +475,7 @@ const Documents = ({ studentId }) => {
           Total: {documentPagination.total || 0} documents
         </div>
       </div>
-      
+
       {/* Enhanced Filters Section */}
       <div className="bg-background border rounded-lg p-4 space-y-4">
         <div className="flex flex-wrap gap-2 items-center justify-between">
@@ -522,7 +522,7 @@ const Documents = ({ studentId }) => {
           {/* File Type Filter */}
           <div>
             <Select
-            className="w-full"
+              className="w-full"
               value={selectedFileType}
               onValueChange={(value) => handleFilterChange(setSelectedFileType, value)}
             >
@@ -562,27 +562,27 @@ const Documents = ({ studentId }) => {
               className="pl-8"
             />
           </div> */}
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm font-medium">Sort by:</span>
-          <Select
-            value={sortBy}
-            onValueChange={(value) => {
-              setSortBy(value);
-              setCurrentPage(1);
-            }}
-          >
-            <SelectTrigger className="w-fit">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {sortOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium">Sort by:</span>
+            <Select
+              value={sortBy}
+              onValueChange={(value) => {
+                setSortBy(value);
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="w-fit">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -656,7 +656,7 @@ const Documents = ({ studentId }) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead 
+                  <TableHead
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleSortChange('name')}
                   >
@@ -665,7 +665,7 @@ const Documents = ({ studentId }) => {
                       {getSortIcon('name')}
                     </div>
                   </TableHead>
-                  <TableHead 
+                  <TableHead
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleSortChange('size')}
                   >
@@ -677,7 +677,7 @@ const Documents = ({ studentId }) => {
                   <TableHead>Student</TableHead>
                   <TableHead>Task</TableHead>
                   <TableHead>Subtask</TableHead>
-                  <TableHead 
+                  <TableHead
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleSortChange('uploaded')}
                   >
@@ -686,7 +686,7 @@ const Documents = ({ studentId }) => {
                       {getSortIcon('uploaded')}
                     </div>
                   </TableHead>
-                  <TableHead 
+                  <TableHead
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleSortChange('status')}
                   >
@@ -743,8 +743,8 @@ const Documents = ({ studentId }) => {
                         <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold
                           ${doc.status === 'VERIFIED' ? 'bg-green-100 text-green-700' :
                             doc.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-                            doc.status === 'PENDING' ? 'bg-gray-100 text-gray-700':
-                           'bg-gray-100 text-gray-700'
+                              doc.status === 'PENDING' ? 'bg-gray-100 text-gray-700' :
+                                'bg-gray-100 text-gray-700'
                           }`}
                           style={{ minWidth: 70, justifyContent: 'center' }}>
                           {doc.status === 'VERIFIED' && 'VERIFIED'}
@@ -754,25 +754,37 @@ const Documents = ({ studentId }) => {
                       </TableCell>
                       <TableCell className="text-center" style={{ verticalAlign: 'middle', padding: 0 }}>
                         <div className="flex items-center gap-4 justify-center" style={{ height: '100%' }}>
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={() => window.open(doc.fileUrl, '_blank')} 
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => window.open(doc.fileUrl, '_blank')}
                             title="View"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={() => {
-                              const link = document.createElement('a');
-                              link.href = doc.fileUrl;
-                              link.download = doc.name || 'document';
-                              document.body.appendChild(link);
-                              link.click();
-                              document.body.removeChild(link);
-                            }} 
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch(doc.fileUrl);
+                                if (!response.ok) throw new Error('Network error');
+
+                                const blob = await response.blob();
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = doc.name || 'document';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                              } catch (err) {
+                                console.error('Download failed:', err);
+                                toast.error('Failed to download. Opening in new tab...');
+                                window.open(doc.fileUrl, '_blank');
+                              }
+                            }}
                             title="Download"
                           >
                             <Download className="h-4 w-4" />
@@ -780,16 +792,16 @@ const Documents = ({ studentId }) => {
                           {hasEditPermission() && (
                             <>
                               <div className="relative" style={{ display: 'inline-block' }}>
-                                <Button 
-                                  size="icon" 
-                                  variant="ghost" 
-                                  title="More Actions" 
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  title="More Actions"
                                   disabled={actionLoading[`status_${doc.id}`]}
                                   onClick={e => {
                                     const rect = e.currentTarget.getBoundingClientRect();
-                                    setDropdownPosition({ 
-                                      top: rect.bottom + window.scrollY, 
-                                      left: rect.right + window.scrollX - 160 
+                                    setDropdownPosition({
+                                      top: rect.bottom + window.scrollY,
+                                      left: rect.right + window.scrollX - 160
                                     });
                                     setOpenDropdownId(openDropdownId === doc.id ? null : doc.id);
                                   }}
@@ -804,9 +816,9 @@ const Documents = ({ studentId }) => {
                                   <div className="fixed bg-white border rounded shadow-md min-w-[160px] mt-2" style={{ zIndex: 99999, top: dropdownPosition.top, left: dropdownPosition.left }}>
                                     <button
                                       className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                                      onClick={() => { 
-                                        handleStatusChange(doc.id, 'verified'); 
-                                        setOpenDropdownId(null); 
+                                      onClick={() => {
+                                        handleStatusChange(doc.id, 'verified');
+                                        setOpenDropdownId(null);
                                       }}
                                       disabled={actionLoading[`status_${doc.id}`]}
                                     >
@@ -814,9 +826,9 @@ const Documents = ({ studentId }) => {
                                     </button>
                                     <button
                                       className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                                      onClick={() => { 
-                                        handleStatusChange(doc.id, 'pending'); 
-                                        setOpenDropdownId(null); 
+                                      onClick={() => {
+                                        handleStatusChange(doc.id, 'pending');
+                                        setOpenDropdownId(null);
                                       }}
                                       disabled={actionLoading[`status_${doc.id}`]}
                                     >
@@ -824,9 +836,9 @@ const Documents = ({ studentId }) => {
                                     </button>
                                     <button
                                       className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 cursor-pointer"
-                                      onClick={() => { 
-                                        handleStatusChange(doc.id, 'rejected'); 
-                                        setOpenDropdownId(null); 
+                                      onClick={() => {
+                                        handleStatusChange(doc.id, 'rejected');
+                                        setOpenDropdownId(null);
                                       }}
                                       disabled={actionLoading[`status_${doc.id}`]}
                                     >
@@ -836,10 +848,10 @@ const Documents = ({ studentId }) => {
                                   document.body
                                 )}
                               </div>
-                              <Button 
-                                size="icon" 
-                                variant="ghost" 
-                                onClick={() => handleDeleteDocument(doc.id)} 
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => handleDeleteDocument(doc.id)}
                                 title="Delete"
                                 disabled={actionLoading[`delete_${doc.id}`]}
                               >
@@ -890,8 +902,8 @@ const Documents = ({ studentId }) => {
       </Tabs>
 
       {/* Upload Dialog */}
-      <Dialog open={isUploadDialogOpen} onOpenChange={(open) => {  
-        if (!open) resetUploadForm();  
+      <Dialog open={isUploadDialogOpen} onOpenChange={(open) => {
+        if (!open) resetUploadForm();
         setIsUploadDialogOpen(open);
       }}>
         <DialogContent className="max-w-md">
@@ -901,7 +913,7 @@ const Documents = ({ studentId }) => {
               Upload a document for a student&apos;s task or subtask.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {!studentId && (
               <div>
@@ -935,8 +947,8 @@ const Documents = ({ studentId }) => {
                     ) : (
                       students.map(student => (
                         <SelectItem key={student._id} value={student._id}>
-                          {student.firstName || student.lastName ? 
-                            `${student.firstName || ''} ${student.lastName || ''}`.trim() : 
+                          {student.firstName || student.lastName ?
+                            `${student.firstName || ''} ${student.lastName || ''}`.trim() :
                             student.email
                           }
                         </SelectItem>
@@ -1008,7 +1020,7 @@ const Documents = ({ studentId }) => {
 
             <div>
               <Label>Document File</Label>
-              <Input 
+              <Input
                 type="file"
                 onChange={handleFileChange}
                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"

@@ -1,3 +1,4 @@
+// lib/universityDataLoader.js (unchanged, as it supports validation and can be extended for Bachelor data if needed in future)
 import { data } from './data.js';
 
 // Extract unique programs from the data

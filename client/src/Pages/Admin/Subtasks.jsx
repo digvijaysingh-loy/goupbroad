@@ -20,7 +20,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Search, Filter, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Search, Filter, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     createSubtask,
@@ -33,7 +33,7 @@ import { getQuestionnaires } from '@/services/questionnaireService';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getUser } from '@/lib/auth';
 
-const Subtasks = () => {    
+const Subtasks = () => {
     const [subtasks, setSubtasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -44,19 +44,22 @@ const Subtasks = () => {
     const [isEditSubtaskOpen, setIsEditSubtaskOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSubtask, setSelectedSubtask] = useState(null);
-    const [questionnairesPagination , setQuestionnairesPagination] = useState({});
-    const [questionnaireCurrentPage , setQuestionnaireCurrentPage] = useState(1)
-    
+    const [questionnairesPagination, setQuestionnairesPagination] = useState({});
+    const [questionnaireCurrentPage, setQuestionnaireCurrentPage] = useState(1);
+
     // Permission check functions
     const hasEditPermission = () => {
         const currentUser = getUser();
         return currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'EDITOR');
     };
-    
+
     const [newSubtask, setNewSubtask] = useState({
         title: '',
         description: '',
-        logo: '',
+        logo: '',           // uploaded URL (after save)
+        logoUrl: '',        // existing URL (edit mode only)
+        logoFile: null,     // new file selected
+        logoPreview: undefined, // data URL for instant preview
         priority: 'MEDIUM',
         questionnaireIds: []
     });
@@ -80,7 +83,7 @@ const Subtasks = () => {
         const fetchSubtasks = async () => {
             try {
                 setLoading(true);
-                const response = await getSubtasks(page, limit );
+                const response = await getSubtasks(page, limit);
                 if (response.success) {
                     setSubtasks(Array.isArray(response.data.subtasks) ? response.data.subtasks : []);
                     setTotalPages(response.data.pagination.totalPages || 1);
@@ -98,13 +101,13 @@ const Subtasks = () => {
         };
 
         fetchSubtasks();
-    }, [page, limit ]);
+    }, [page, limit]);
 
     useEffect(() => {
         const fetchQuestionnaires = async () => {
-            let questionnairsFilter = { page : questionnaireCurrentPage}
+            let questionnairsFilter = { page: questionnaireCurrentPage }
             try {
-                const response = await getQuestionnaires({questionnairsFilter});
+                const response = await getQuestionnaires({ questionnairsFilter });
                 if (response.success) {
                     setAvailableQuestionnaires(response.data.questionnaires);
                     setQuestionnairesPagination(response.data.pagination)
@@ -118,13 +121,21 @@ const Subtasks = () => {
         fetchQuestionnaires();
     }, [questionnaireCurrentPage]);
 
+    // Cleanup preview URL
+    useEffect(() => {
+        return () => {
+            if (newSubtask.logoPreview) {
+                URL.revokeObjectURL(newSubtask.logoPreview);
+            }
+        };
+    }, [newSubtask.logoPreview]);
+
     const handleCreateSubtask = async () => {
         if (!newSubtask.title.trim()) {
             toast.error('Please enter a subtask title');
             return;
         }
 
-        // Check if user has permission to create subtasks
         if (!hasEditPermission()) {
             toast.error('You don\'t have permission to create subtasks');
             return;
@@ -132,13 +143,32 @@ const Subtasks = () => {
 
         try {
             setLoading(true);
+            let logoUrl = newSubtask.logo;
+
+            // Upload new file if selected
+            if (newSubtask.logoFile) {
+                setFileUploading(true);
+                const formData = new FormData();
+                formData.append('file', newSubtask.logoFile);
+                formData.append('category', 'profile-pic');
+                const uploadRes = await uploadFile(formData);
+                if (uploadRes.success) {
+                    logoUrl = uploadRes.data.url;
+                } else {
+                    throw new Error(uploadRes.message || 'Failed to upload logo');
+                }
+                setFileUploading(false);
+            }
+
             const createResponse = await createSubtask({
                 title: newSubtask.title,
                 description: newSubtask.description,
-                logo: newSubtask.logo,
+                logo: logoUrl,
                 priority: newSubtask.priority.toUpperCase(),
                 questionnaireIds: newSubtask.questionnaireIds
-            }); if (createResponse.success) {
+            });
+
+            if (createResponse.success) {
                 const response = await getSubtasks(page, limit);
                 if (response.success) {
                     setSubtasks(Array.isArray(response.data.subtasks) ? response.data.subtasks : []);
@@ -154,13 +184,13 @@ const Subtasks = () => {
             toast.error(err.response?.data?.message || 'Failed to create subtask');
         } finally {
             setLoading(false);
+            setFileUploading(false);
         }
-    };    
-    
+    };
+
     const handleEditSubtask = async () => {
         if (!selectedSubtask) return;
 
-        // Check if user has permission to edit subtasks
         if (!hasEditPermission()) {
             toast.error('You don\'t have permission to edit subtasks');
             return;
@@ -168,13 +198,32 @@ const Subtasks = () => {
 
         try {
             setLoading(true);
+            let logoUrl = newSubtask.logo || newSubtask.logoUrl;
+
+            // Upload new file if selected
+            if (newSubtask.logoFile) {
+                setFileUploading(true);
+                const formData = new FormData();
+                formData.append('file', newSubtask.logoFile);
+                formData.append('category', 'profile-pic');
+                const uploadRes = await uploadFile(formData);
+                if (uploadRes.success) {
+                    logoUrl = uploadRes.data.url;
+                } else {
+                    throw new Error(uploadRes.message || 'Failed to upload logo');
+                }
+                setFileUploading(false);
+            }
+
             const updateResponse = await updateSubtask(selectedSubtask._id, {
                 title: newSubtask.title,
                 description: newSubtask.description,
-                logo: newSubtask.logo,
+                logo: logoUrl,
                 priority: newSubtask.priority.toUpperCase(),
                 questionnaireIds: newSubtask.questionnaireIds
-            }); if (updateResponse.success) {
+            });
+
+            if (updateResponse.success) {
                 const response = await getSubtasks(page, limit);
                 if (response.success) {
                     setSubtasks(Array.isArray(response.data.subtasks) ? response.data.subtasks : []);
@@ -189,29 +238,38 @@ const Subtasks = () => {
             toast.error(err.response?.data?.message || 'Failed to update subtask');
         } finally {
             setLoading(false);
+            setFileUploading(false);
             setSelectedSubtask(null);
         }
     };
+
     const resetSubtaskForm = () => {
         setNewSubtask({
             title: '',
             description: '',
             logo: '',
+            logoUrl: '',
+            logoFile: null,
+            logoPreview: undefined,
             priority: 'MEDIUM',
             questionnaireIds: []
         });
-    };    const handleOpenEditSubtask = (subtask) => {
-        // Check if user has permission to edit subtasks
+    };
+
+    const handleOpenEditSubtask = (subtask) => {
         if (!hasEditPermission()) {
             toast.error('You don\'t have permission to edit subtasks');
             return;
         }
-        
+
         setSelectedSubtask(subtask);
         setNewSubtask({
             title: subtask.title,
             description: subtask.description,
             logo: subtask.logo || '',
+            logoUrl: subtask.logo || '',
+            logoFile: null,
+            logoPreview: undefined,
             priority: subtask.priority,
             questionnaireIds: subtask.questionnaires?.map(q => q._id) || []
         });
@@ -219,19 +277,19 @@ const Subtasks = () => {
     };
 
     const handleDeleteSubtask = async (subtaskId) => {
-        // Check if user has permission to delete subtasks
         if (!hasEditPermission()) {
             toast.error('You don\'t have permission to delete subtasks');
             return;
         }
-        
+
         if (!confirm('Are you sure you want to delete this subtask?')) {
             return;
         }
 
         try {
             setLoading(true);
-            const deleteResponse = await deleteSubtask(subtaskId); if (deleteResponse.success) {
+            const deleteResponse = await deleteSubtask(subtaskId);
+            if (deleteResponse.success) {
                 const response = await getSubtasks(page, limit);
                 if (response.success) {
                     setSubtasks(Array.isArray(response.data.subtasks) ? response.data.subtasks : []);
@@ -247,40 +305,30 @@ const Subtasks = () => {
         }
     };
 
-    const handleFileUpload = async (e) => {
-        // Check if user has permission to upload files
+    const handleFileUpload = (e) => {
         if (!hasEditPermission()) {
             toast.error('You don\'t have permission to upload files');
             e.target.value = '';
             return;
         }
-        
-        const file = e.target.files[0];
-        if (file) {
-            try {
-                setFileUploading(true);
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('category', 'profile-pic');
-                const response = await uploadFile(formData);
-                if (response.success) {
-                    setNewSubtask(prev => ({
-                        ...prev,
-                        logo: response.data.url
-                    }));
-                    toast.success('Logo uploaded successfully!');
-                } else {
-                    throw new Error(response.message || 'Failed to upload logo');
-                }
-            } catch (err) {
-                console.error('Error uploading logo:', err);
-                toast.error(err.response?.data?.message || 'Failed to upload logo');
 
-                e.target.value = '';
-            } finally {
-                setFileUploading(false);
-            }
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please upload a valid image');
+            e.target.value = '';
+            return;
         }
+
+        // Instant preview
+        const previewUrl = URL.createObjectURL(file);
+        setNewSubtask(prev => ({
+            ...prev,
+            logoFile: file,
+            logoPreview: previewUrl,
+            logo: '' // clear old uploaded URL
+        }));
     };
 
     const handleQuestionnaireChange = (questionnaire) => {
@@ -335,70 +383,44 @@ const Subtasks = () => {
                                         <CardTitle>All Subtasks</CardTitle>
                                         <CardDescription>View and manage subtasks for assignments</CardDescription>
                                     </div>
-                                    <div className="flex gap-2">
-                                        {/* <div className="relative max:w-[280px]">
-                                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                type="search"
-                                                placeholder="Search subtasks..."
-                                                className="pl-8"
-                                                value={searchTerm}
-                                                onChange={(e) => setSearchTerm(e.target.value)}
-                                            />
-                                        </div> */}
-                                        {/* <Button variant="outline" size="icon">
-                                            <Filter className="h-4 w-4" />
-                                        </Button> */}
-                                    </div>
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <Table>                  <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[300px]">Title</TableHead>
-                                        <TableHead className="w-[100px]">Priority</TableHead>
-                                        <TableHead className="w-[300px]">Questionnaires</TableHead>
-                                        <TableHead className="w-[100px] text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[300px]">Title</TableHead>
+                                            <TableHead className="w-[100px]">Priority</TableHead>
+                                            <TableHead className="w-[300px]">Questionnaires</TableHead>
+                                            <TableHead className="w-[100px] text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
                                     <TableBody>
                                         {subtasks.map((subtask) => (
                                             <TableRow key={subtask._id}>
                                                 <TableCell className="font-medium">{subtask.title}</TableCell>
                                                 <TableCell>{priorityBadge(subtask.priority)}</TableCell>
-                                                {/* <TableCell>                                                    {subtask.questionnaires && subtask.questionnaires.length > 0 ? (
-                                                        <div className="flex gap-1 flex-wrap">
-                                                            {subtask.questionnaires.map(questionnaire => (
+                                                <TableCell>
+                                                    {subtask.questionnaires && subtask.questionnaires.length > 0 ? (
+                                                        <div className="flex gap-1 flex-nowrap" title={subtask.questionnaires.map((q) => q.title).join(', ')}>
+                                                            {subtask.questionnaires.slice(0, 3).map((questionnaire) => (
                                                                 <Badge key={questionnaire._id} variant="outline">
                                                                     {questionnaire.title}
                                                                 </Badge>
                                                             ))}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-sm text-muted-foreground">No questionnaires assigned</span>
-                                                    )}
-                                                </TableCell> */}
-                                                <TableCell>
-                                                    {subtask.questionnaires && subtask.questionnaires.length > 0 ? (
-                                                        <div className="flex gap-1 flex-nowrap"  title={subtask.questionnaires.map((q) => q.title).join(', ')}>
-                                                        {subtask.questionnaires.slice(0, 3).map((questionnaire) => (
-                                                            <Badge key={questionnaire._id} variant="outline">
-                                                            {questionnaire.title}
-                                                            </Badge>
-                                                        ))}
 
-                                                        {subtask.questionnaires.length > 3 && (
-                                                            <span
-                                                            className="text-sm font-bold text-muted-foreground cursor-pointer"
-                                                            title={subtask.questionnaires.map((q) => q.title).join(', ')}
-                                                            >
-                                                            ...
-                                                            </span>
-                                                        )}
+                                                            {subtask.questionnaires.length > 3 && (
+                                                                <span
+                                                                    className="text-sm font-bold text-muted-foreground cursor-pointer"
+                                                                    title={subtask.questionnaires.map((q) => q.title).join(', ')}
+                                                                >
+                                                                    ...
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     ) : (
                                                         <span className="text-sm text-muted-foreground">
-                                                        No questionnaires assigned
+                                                            No questionnaires assigned
                                                         </span>
                                                     )}
                                                 </TableCell>
@@ -430,7 +452,7 @@ const Subtasks = () => {
                                             </TableRow>
                                         ))}
                                     </TableBody>
-                                </Table>                {/* Pagination Controls */}
+                                </Table>
                                 <div className="flex flex-wrap items-center justify-between space-x-2 py-4">
                                     <div className="text-sm text-muted-foreground">
                                         {subtasks.length > 0 ? (
@@ -467,7 +489,6 @@ const Subtasks = () => {
                         </Card>
                     )}
 
-
                     <Dialog
                         open={isCreateSubtaskOpen || isEditSubtaskOpen}
                         onOpenChange={() => {
@@ -475,7 +496,8 @@ const Subtasks = () => {
                             if (isEditSubtaskOpen) setIsEditSubtaskOpen(false);
                             resetSubtaskForm();
                         }}
-                    >            <DialogContent className="max-w-[600px] h-[80vh] grid grid-rows-[auto,1fr,auto]">
+                    >
+                        <DialogContent className="max-w-[600px] h-[80vh] grid grid-rows-[auto,1fr,auto]">
                             <DialogHeader>
                                 <DialogTitle>{isEditSubtaskOpen ? 'Edit Subtask' : 'Create New Subtask'}</DialogTitle>
                             </DialogHeader>
@@ -535,23 +557,23 @@ const Subtasks = () => {
                                         ))}
                                         {questionnairesPagination && questionnairesPagination.totalPages > 1 && (
                                             <div className="flex justify-center my-1 text-xs gap-2">
-                                            <Button
-                                                variant="outline"
-                                                disabled={!questionnairesPagination.hasPreviousPage}
-                                                onClick={()=> setQuestionnaireCurrentPage(questionnairesPagination.currentPage - 1)}
-                                            >
-                                                Previous
-                                            </Button>
-                                            <span className="px-4 py-2">
-                                                Page {questionnairesPagination.currentPage} of {questionnairesPagination.totalPages}
-                                            </span>
-                                            <Button
-                                                variant="outline"
-                                                disabled={!questionnairesPagination.hasNextPage}
-                                                onClick={() => setQuestionnaireCurrentPage(questionnairesPagination.currentPage + 1)}
-                                            >
-                                                Next
-                                            </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    disabled={!questionnairesPagination.hasPreviousPage}
+                                                    onClick={() => setQuestionnaireCurrentPage(questionnairesPagination.currentPage - 1)}
+                                                >
+                                                    Previous
+                                                </Button>
+                                                <span className="px-4 py-2">
+                                                    Page {questionnairesPagination.currentPage} of {questionnairesPagination.totalPages}
+                                                </span>
+                                                <Button
+                                                    variant="outline"
+                                                    disabled={!questionnairesPagination.hasNextPage}
+                                                    onClick={() => setQuestionnaireCurrentPage(questionnairesPagination.currentPage + 1)}
+                                                >
+                                                    Next
+                                                </Button>
                                             </div>
                                         )}
                                         {availableQuestionnaires?.length === 0 && (
@@ -559,20 +581,62 @@ const Subtasks = () => {
                                         )}
                                     </div>
                                 </div>
-                                <div>                  <Label htmlFor="logo" className="mb-2">Logo</Label>
-                                    <div className="flex gap-2 items-center">
-                                        <Input
-                                            id="logo"
-                                            type="file"
-                                            onChange={handleFileUpload}
-                                            accept="image/*"
-                                            disabled={fileUploading}
-                                        />
-                                        {fileUploading && (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
+
+                                {/* === LOGO SECTION WITH PREVIEW === */}
+                                <div>
+                                    <Label htmlFor="logo" className="mb-2">Logo</Label>
+                                    <div className="flex flex-col gap-3">
+                                        {/* Preview */}
+                                        {(newSubtask.logoPreview || (isEditSubtaskOpen && newSubtask.logoUrl)) && (
+                                            <div className="relative w-full max-w-[200px] h-[100px] border rounded-md overflow-hidden bg-gray-50">
+                                                <img
+                                                    src={newSubtask.logoPreview || newSubtask.logoUrl}
+                                                    alt="Logo preview"
+                                                    className="w-full h-full object-contain"
+                                                />
+                                                {newSubtask.logoPreview && (
+                                                    <button
+                                                        onClick={() => {
+                                                            if (newSubtask.logoPreview) {
+                                                                URL.revokeObjectURL(newSubtask.logoPreview);
+                                                            }
+                                                            setNewSubtask(prev => ({
+                                                                ...prev,
+                                                                logoPreview: undefined,
+                                                                logoFile: null,
+                                                            }));
+                                                        }}
+                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-600"
+                                                        title="Remove image"
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                )}
+                                            </div>
                                         )}
+
+                                        {/* File Input */}
+                                        <div className="flex gap-2 items-center">
+                                            <Input
+                                                id="logo"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileUpload}
+                                                disabled={fileUploading}
+                                                className="flex-1"
+                                            />
+                                            {fileUploading && <Loader2 className="h-4 w-4 animate-spin" />}
+                                        </div>
+
+                                        <p className="text-xs text-muted-foreground">
+                                            {isEditSubtaskOpen && newSubtask.logoUrl && !newSubtask.logoPreview
+                                                ? 'Current logo shown above. Select a new file to replace.'
+                                                : 'Upload an image (optional)'}
+                                        </p>
                                     </div>
                                 </div>
+                                {/* === END LOGO SECTION === */}
+
                             </div>
                             <DialogFooter>
                                 <Button variant="outline" onClick={() => {

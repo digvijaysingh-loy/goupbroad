@@ -73,7 +73,7 @@ const SignIn = () => {
     try {
       const userData = { email, password };
       const response = await loginUser(userData);
-      
+      console.log(response)
       if (response.success) {
         setAuth({
           accessToken: response.data.accessToken,

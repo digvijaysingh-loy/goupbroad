@@ -310,7 +310,7 @@ const Chat = () => {
                                     {selectedRoom.chatRoomId ? (
                                         <>
                                             {/* Chat Header */}
-                                            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                                            <div className="p-4 border-b border-gray-100 flex  items-center justify-between">
                                                 <div className="flex items-center gap-3">
                                                     <img
                                                         src={selectedRoom.adminInfo?.profilePicture || defaultUser}
@@ -356,10 +356,10 @@ const Chat = () => {
                                                                                         className="max-w-xs max-h-48 rounded-md my-1"
                                                                                     />
                                                                                 ) : (
-                                                                                    <div className="flex items-center gap-2 p-2 rounded-md bg-black bg-opacity-20">
-                                                                                        <FileText className="h-6 w-6" />
+                                                                                    <div className="flex items-center gap-2 p-2 rounded-md text-white bg-black bg-opacity-20">
+                                                                                        <FileText className="h-6 w-6 text-white" />
                                                                                         <div className="flex-1">
-                                                                                            <p className="text-sm font-medium truncate">
+                                                                                            <p className="text-sm font-medium text-white truncate">
                                                                                                 {msg.file.name}
                                                                                             </p>
                                                                                             <p className="text-xs opacity-80">

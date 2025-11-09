@@ -530,7 +530,7 @@ const [isEditTaskDropdownOpen, setIsEditTaskDropdownOpen] = useState(false);
                                     <TableBody>
                                         {filteredApplications.map((app) => {
                                             const student = app.student || app.studentId || {}
-                                            const email = app.studentId.email || ''
+                                            const email = app?.studentId?.email || ''
                                             const university = app.university || app.universityId || {}
                                             const program = university.program || app.program || ''
                                             const status = app.status || ''

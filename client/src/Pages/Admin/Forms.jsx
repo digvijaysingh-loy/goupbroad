@@ -32,12 +32,12 @@ const Forms = () => {
   const [questionnaires, setQuestionnaires] = useState([]);
   const [selectedQuestionnaire, setSelectedQuestionnaire] = useState(null);
   const [loans, setLoans] = useState([]);
-  
+
   const hasEditPermission = () => {
     const currentUser = getUser();
     return currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'EDITOR');
   };
-  
+
   const [loanFilters, setLoanFilters] = useState({
     page: 1,
     limit: 10,
@@ -50,16 +50,16 @@ const Forms = () => {
     totalPages: 0,
     totalItems: 0,
     itemsPerPage: 10
-  });  const [isLoadingLoans, setIsLoadingLoans] = useState(false);
-  const [selectedLoan, setSelectedLoan] = useState(null);  const [isViewLoanOpen, setIsViewLoanOpen] = useState(false);
+  }); const [isLoadingLoans, setIsLoadingLoans] = useState(false);
+  const [selectedLoan, setSelectedLoan] = useState(null); const [isViewLoanOpen, setIsViewLoanOpen] = useState(false);
 
-  const [questionnairsFilter , setQuestionnairesFilter] = useState({
+  const [questionnairsFilter, setQuestionnairesFilter] = useState({
     page: 1,
     limit: 10,
     search: '',
     status: ''
   })
-  const [questionnairesPagination , setQuestionnairesPagination] = useState({})
+  const [questionnairesPagination, setQuestionnairesPagination] = useState({})
 
 
   const fetchLoans = useCallback(async () => {
@@ -80,9 +80,9 @@ const Forms = () => {
   }, [loanFilters]);
   const fetchQuestionnaires = useCallback(async () => {
     try {
-      const response = await getQuestionnaires({questionnairsFilter});
+      const response = await getQuestionnaires({ questionnairsFilter });
       setQuestionnaires(response.data?.questionnaires || []);
-      setQuestionnairesPagination(response.data?.pagination )
+      setQuestionnairesPagination(response.data?.pagination)
     } catch (error) {
       toast.error(`Failed to fetch questionnaires: ${error.response?.data?.message}`);
     }
@@ -97,7 +97,7 @@ const Forms = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formTitle, setFormTitle] = useState('');
   const [formDescription, setFormDescription] = useState('');
-  const [formStatus , setFormStatus] = useState('ACTIVE')
+  const [formStatus, setFormStatus] = useState('ACTIVE')
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [questionType, setQuestionType] = useState('TEXT');
@@ -169,7 +169,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to add questions');
       return;
     }
-    
+
     if (!newQuestion.trim()) {
       toast.error('Please enter question text');
       return;
@@ -188,6 +188,7 @@ const Forms = () => {
       setQuestions([...questions, newQuestionObj]);
       setCurrentEditingQuestion(newQuestionObj);
       toast.info('Please add at least 2 options for this question');
+      return;
     } else {
       setQuestions([...questions, newQuestionObj]);
       setNewQuestion('');
@@ -200,7 +201,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to add options');
       return;
     }
-    
+
     if (!optionText.trim()) {
       toast.error('Option text cannot be empty');
       return;
@@ -225,7 +226,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to remove options');
       return;
     }
-    
+
     const question = questions.find(q => q.id === questionId);
     if (question && question.options && question.options.length <= 2) {
       toast.error('Multiple choice questions must have at least 2 options');
@@ -249,7 +250,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to edit questions');
       return;
     }
-    
+
     setCurrentEditingQuestion(question);
     setNewQuestion(question.text);
     setQuestionType(question.type);
@@ -261,7 +262,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to update questions');
       return;
     }
-    
+
     if (currentEditingQuestion && newQuestion.trim()) {
       const updatedQuestions = questions.map(q => {
         if (q.id === currentEditingQuestion.id) {
@@ -286,7 +287,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to remove questions');
       return;
     }
-    
+
     const updatedQuestions = questions.filter(q => q.id !== questionId);
     setQuestions(updatedQuestions);
     if (currentEditingQuestion?.id === questionId) {
@@ -302,13 +303,13 @@ const Forms = () => {
       toast.error('You don\'t have permission to create or edit forms');
       return;
     }
-    
+
     if (formTitle.trim() === '') {
       toast.error('Please enter a form title');
       return;
     }
 
-    if(formStatus.trim === ''){
+    if (formStatus.trim === '') {
       toast.error('Please select Status')
       return;
     }
@@ -337,7 +338,7 @@ const Forms = () => {
       const formData = {
         title: formTitle,
         description: formDescription,
-        status: formStatus ,
+        status: formStatus,
         questions: questions.map(q => {
           const questionType = q.type.toUpperCase();
           return {
@@ -371,7 +372,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to create or assign forms');
       return;
     }
-    
+
     if (formTitle.trim() === '' || !selectedMainTask || !selectedSubtask) {
       toast.error('Please fill all required fields');
       return;
@@ -401,7 +402,7 @@ const Forms = () => {
       toast.error('You don\'t have permission to proceed');
       return;
     }
-    
+
     if (currentStep === 1 && formTitle.trim() === '') {
       toast.error('Please enter a form title');
       return;
@@ -446,28 +447,28 @@ const Forms = () => {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  onChange={(e)=> setQuestionnairesFilter(prevFilters => ({...prevFilters ,status:'' ,page:1 ,search : e.target.value}))}
+                  onChange={(e) => setQuestionnairesFilter(prevFilters => ({ ...prevFilters, status: '', page: 1, search: e.target.value }))}
                   placeholder="Search questionnaires..."
                   className="pl-8 w-full"
                 />
               </div>
-             
-               <div>
-                      <Select
-                          defaultValue="ACTIVE"
-                          value={questionnairsFilter.status}
-                          onValueChange={(e) => setQuestionnairesFilter(prevFilters => ({...prevFilters , page: 1 , status: e}))}
-                      >
-                          <SelectTrigger>
-                              <SelectValue  placeholder="Select by Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                              <SelectItem value="ACTIVE">Active</SelectItem>
-                              <SelectItem value="DRAFT">Draft</SelectItem>
-                              <SelectItem value="ARCHIVED">Archived</SelectItem>
-                          </SelectContent>
-                      </Select>
-                  </div>
+
+              <div>
+                <Select
+                  defaultValue="ACTIVE"
+                  value={questionnairsFilter.status}
+                  onValueChange={(e) => setQuestionnairesFilter(prevFilters => ({ ...prevFilters, page: 1, status: e }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select by Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="DRAFT">Draft</SelectItem>
+                    <SelectItem value="ARCHIVED">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <Card>
@@ -514,7 +515,7 @@ const Forms = () => {
                                     toast.error('You don\'t have permission to edit forms');
                                     return;
                                   }
-                                  
+
                                   try {
                                     const response = await getQuestionnaireById(form._id);
                                     setSelectedQuestionnaire(response.data);
@@ -541,7 +542,7 @@ const Forms = () => {
                                     toast.error('You don\'t have permission to delete forms');
                                     return;
                                   }
-                                  
+
                                   try {
                                     await deleteQuestionnaire(form._id);
                                     toast.success('Form deleted successfully');
@@ -561,29 +562,29 @@ const Forms = () => {
                   </TableBody>
                 </Table>
                 {questionnairesPagination && (
-                          <div className="flex justify-center my-6 gap-2">
-                            <Button
-                              variant="outline"
-                              disabled={!questionnairesPagination.hasPreviousPage}
-                              onClick={()=> setQuestionnairesFilter(prevFilters =>  ({
-                                  ...prevFilters,
-                                  page: questionnairesPagination.currentPage - 1
-                              }))}
-                            >
-                              Previous
-                            </Button>
-                            <span className="px-4 py-2">
-                              Page {questionnairesPagination.currentPage} of {questionnairesPagination.totalPages}
-                            </span>
-                            <Button
-                              variant="outline"
-                              disabled={!questionnairesPagination.hasNextPage}
-                              onClick={() => setQuestionnairesFilter(prevFilters => ({ ...prevFilters , page:questionnairesPagination.currentPage + 1}))}
-                            >
-                              Next
-                            </Button>
-                          </div>
-                        )}
+                  <div className="flex justify-center my-6 gap-2">
+                    <Button
+                      variant="outline"
+                      disabled={!questionnairesPagination.hasPreviousPage}
+                      onClick={() => setQuestionnairesFilter(prevFilters => ({
+                        ...prevFilters,
+                        page: questionnairesPagination.currentPage - 1
+                      }))}
+                    >
+                      Previous
+                    </Button>
+                    <span className="px-4 py-2">
+                      Page {questionnairesPagination.currentPage} of {questionnairesPagination.totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      disabled={!questionnairesPagination.hasNextPage}
+                      onClick={() => setQuestionnairesFilter(prevFilters => ({ ...prevFilters, page: questionnairesPagination.currentPage + 1 }))}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -853,23 +854,23 @@ const Forms = () => {
                   />
                 </div>
 
-                  <div>
-                      <Label htmlFor="Status" className="mb-2">Status</Label>
-                      <Select
-                          defaultValue="ACTIVE"
-                          value={formStatus}
-                          onValueChange={(e) => setFormStatus(e)}
-                      >
-                          <SelectTrigger>
-                              <SelectValue  placeholder="Select priority" />
-                          </SelectTrigger>
-                          <SelectContent>
-                              <SelectItem value="ACTIVE">Active</SelectItem>
-                              <SelectItem value="DRAFT">Draft</SelectItem>
-                              <SelectItem value="ARCHIVED">Archived</SelectItem>
-                          </SelectContent>
-                      </Select>
-                  </div>
+                <div>
+                  <Label htmlFor="Status" className="mb-2">Status</Label>
+                  <Select
+                    defaultValue="ACTIVE"
+                    value={formStatus}
+                    onValueChange={(e) => setFormStatus(e)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="DRAFT">Draft</SelectItem>
+                      <SelectItem value="ARCHIVED">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
 
@@ -963,12 +964,16 @@ const Forms = () => {
                               />
                             </div>
                             <div className="grid grid-cols-2 gap-2 mb-2">
-                              <Select value={questionType} onValueChange={(value) => {
-                                setQuestionType(value);
-                                if (value === 'MULTIPLE_CHOICE' || value === 'CHECKBOX') {
-                                  toast.info('Remember to add at least 2 options');
-                                }
-                              }}>
+                              <Select
+                                value={questionType}
+                                onValueChange={(value) => {
+                                  setQuestionType(value);
+                                  if (value === 'MULTIPLE_CHOICE' || value === 'CHECKBOX') {
+                                    toast.info('Remember to add at least 2 options');
+                                  }
+                                }}
+                                disabled={!hasEditPermission()}
+                              >
                                 <SelectTrigger>
                                   <SelectValue placeholder="Question type" />
                                 </SelectTrigger>
@@ -982,7 +987,10 @@ const Forms = () => {
                                 </SelectContent>
                               </Select>
 
-                              <Button onClick={handleUpdateQuestion}>Update Question</Button>
+                              {/* <Button onClick={handleUpdateQuestion}>Update Question</Button> */}
+                              {/* <Button onClick={handleUpdateQuestion} disabled={!newQuestion.trim() || !hasEditPermission()}>
+                                Update Question
+                              </Button> */}
                             </div>
                             {(questionType === 'MULTIPLE_CHOICE' || questionType === 'CHECKBOX') && (
                               <div className="mt-4 p-4 border rounded-md bg-muted/50">
@@ -1049,18 +1057,22 @@ const Forms = () => {
                   </div>
 
                   <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium mb-2">Add New Question</h4>
+                    <h4 className="text-sm font-medium mb-2">
+                      {currentEditingQuestion ? 'Edit Question' : 'Add New Question'}
+                    </h4>
                     <div className="grid gap-2 mb-2">
                       <Input
                         placeholder="Enter question text"
                         value={newQuestion}
                         onChange={(e) => setNewQuestion(e.target.value)}
-                        disabled={!hasEditPermission()}
+                        disabled={!!currentEditingQuestion || !hasEditPermission()}
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
-                      <Select value={questionType} onValueChange={setQuestionType} disabled={!hasEditPermission()}>
+                      <Select value={questionType} onValueChange={setQuestionType}
+                        disabled={!!currentEditingQuestion || !hasEditPermission()}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Question type" />
                         </SelectTrigger>
@@ -1073,13 +1085,28 @@ const Forms = () => {
                           <SelectItem value="FILE">File Upload</SelectItem>
                         </SelectContent>
                       </Select>
-
-                      <Button 
+                      {/* 
+                      <Button
                         onClick={handleAddQuestion}
                         disabled={!hasEditPermission()}
                       >
                         Add Question
-                      </Button>
+                      </Button> */}
+                      {currentEditingQuestion ? (
+                        <Button
+                          onClick={handleUpdateQuestion}
+                          disabled={!newQuestion.trim() || !hasEditPermission()}
+                        >
+                          Update Question
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleAddQuestion}
+                          disabled={!newQuestion.trim() || !hasEditPermission()}
+                        >
+                          Add Question
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1153,7 +1180,7 @@ const Forms = () => {
                 </Button>
 
                 {currentStep < 2 ? (
-                  <Button 
+                  <Button
                     onClick={nextStep}
                     disabled={!hasEditPermission()}
                   >
@@ -1162,8 +1189,8 @@ const Forms = () => {
                   </Button>
                 ) : (
                   <>
-                    <Button 
-                      variant="default" 
+                    <Button
+                      variant="default"
                       onClick={handleSaveForm}
                       disabled={!hasEditPermission()}
                     >
@@ -1171,7 +1198,7 @@ const Forms = () => {
                       Save Form
                     </Button>
                     {selectedMainTask && selectedSubtask && (
-                      <Button 
+                      <Button
                         onClick={handleSaveAndAssign}
                         disabled={!hasEditPermission()}
                       >

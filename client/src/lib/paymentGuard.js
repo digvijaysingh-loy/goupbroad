@@ -2,6 +2,7 @@ import { getUser } from './auth';
 
 export function canAccessDashboard() {
   const user = getUser();
+  console.log(user)
   if (!user) return false;
   
   return user.isFeePaid && user.isVerified;

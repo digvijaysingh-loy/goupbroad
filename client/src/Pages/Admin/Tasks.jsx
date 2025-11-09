@@ -168,11 +168,11 @@ const Tasks = () => {
       setLoading(prev => ({ ...prev, students: false }));
     }
   };
- 
-  useEffect(()=>{
+
+  useEffect(() => {
     fetchStudents()
-  },[studentSearch])
-  
+  }, [studentSearch])
+
   useEffect(() => {
     let isMounted = true;
 
@@ -187,7 +187,7 @@ const Tasks = () => {
           ...task,
           status: task.subtasks.length > 0 ?
             task.subtasks.every(st => st.status === 'COMPLETED') ? 'COMPLETED' :
-            task.subtasks.some(st => st.status === 'IN_PROGRESS') ? 'IN_PROGRESS' : 'PENDING'
+              task.subtasks.some(st => st.status === 'IN_PROGRESS') ? 'IN_PROGRESS' : 'PENDING'
             : 'PENDING',
           studentNames: task.students?.map(s => s?.name || s?.email).join(', '),
           subtaskCount: task.subtasks?.length || 0
@@ -199,7 +199,7 @@ const Tasks = () => {
 
       } catch (error) {
         console.error('Error fetching tasks:', error);
-        toast.error('Failed to fetch tasks : '+ error.response?.data?.message);
+        toast.error('Failed to fetch tasks : ' + error.response?.data?.message);
       } finally {
         setLoading(prev => ({ ...prev, tasks: false }));
       }
@@ -247,7 +247,7 @@ const Tasks = () => {
         }
       } catch (error) {
         console.error('Error fetching subtasks:', error);
-        if (isMounted) toast.error('Failed to fetch subtasks: '+ error.response?.data?.message);
+        if (isMounted) toast.error('Failed to fetch subtasks: ' + error.response?.data?.message);
       } finally {
         if (isMounted) setLoading(prev => ({ ...prev, subtasks: false }));
       }
@@ -290,35 +290,35 @@ const Tasks = () => {
   }, []);
 
   // Standalone fetch functions for use throughout the component
-   const fetchTasks = async (page = 1) => {
-      try {
-        setLoading(prev => ({ ...prev, tasks: true }));
+  const fetchTasks = async (page = 1) => {
+    try {
+      setLoading(prev => ({ ...prev, tasks: true }));
 
-        const response = await getTasks({ page: page, limit: 10 });
+      const response = await getTasks({ page: page, limit: 10 });
 
-        const { tasks, pagination } = response.data;
+      const { tasks, pagination } = response.data;
 
-        const transformedTasks = tasks.map(task => ({
-          ...task,
-          status: task.subtasks.length > 0 ?
-            task.subtasks.every(st => st.status === 'COMPLETED') ? 'COMPLETED' :
+      const transformedTasks = tasks.map(task => ({
+        ...task,
+        status: task.subtasks.length > 0 ?
+          task.subtasks.every(st => st.status === 'COMPLETED') ? 'COMPLETED' :
             task.subtasks.some(st => st.status === 'IN_PROGRESS') ? 'IN_PROGRESS' : 'PENDING'
-            : 'PENDING',
-          studentNames: task.students?.map(s => s?.name || s?.email).join(', '),
-          subtaskCount: task.subtasks?.length || 0
-        }));
+          : 'PENDING',
+        studentNames: task.students?.map(s => s?.name || s?.email).join(', '),
+        subtaskCount: task.subtasks?.length || 0
+      }));
 
-        setTasks(transformedTasks);
-        setPaginationData(pagination);
-        setCurrentPage(page);
+      setTasks(transformedTasks);
+      setPaginationData(pagination);
+      setCurrentPage(page);
 
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-        toast.error('Failed to fetch tasks: '+ error.response?.data?.message);
-      } finally {
-        setLoading(prev => ({ ...prev, tasks: false }));
-      }
-    };
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      toast.error('Failed to fetch tasks: ' + error.response?.data?.message);
+    } finally {
+      setLoading(prev => ({ ...prev, tasks: false }));
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -330,7 +330,7 @@ const Tasks = () => {
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
-      toast.error('Failed to fetch categories: '+ error.response?.data?.message);
+      toast.error('Failed to fetch categories: ' + error.response?.data?.message);
     } finally {
       setLoading(prev => ({ ...prev, categories: false }));
     }
@@ -775,12 +775,12 @@ const Tasks = () => {
             {loading.categories ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 22v-2"/><path d="m17 20.66-1-1.73"/><path d="M11 10.27 7 3.34"/><path d="m20.66 17-1.73-1"/><path d="m3.34 7 1.73 1"/><path d="M14 12h8"/><path d="M2 12h2"/><path d="m20.66 7-1.73 1"/><path d="m3.34 17 1.73-1"/><path d="m17 3.34-1 1.73"/><path d="m7 20.66 1-1.73"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" /><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" /><path d="M12 2v2" /><path d="M12 22v-2" /><path d="m17 20.66-1-1.73" /><path d="M11 10.27 7 3.34" /><path d="m20.66 17-1.73-1" /><path d="m3.34 7 1.73 1" /><path d="M14 12h8" /><path d="M2 12h2" /><path d="m20.66 7-1.73 1" /><path d="m3.34 17 1.73-1" /><path d="m17 3.34-1 1.73" /><path d="m7 20.66 1-1.73" /></svg>
             )}
             Manage Categories
           </Button>
           <Button
-            onClick={() => {setIsAddTaskOpen(true) ; resetTaskForm()}}
+            onClick={() => { setIsAddTaskOpen(true); resetTaskForm() }}
             disabled={loading.add || !hasEditPermission()}
             title={hasEditPermission() ? 'Add a new task' : 'You don\'t have permission to add tasks'}
           >
@@ -844,8 +844,16 @@ const Tasks = () => {
                     </div>
                   </td>
                   {/* <td className="px-4 py-3">{task.mainTask || '-'}</td> */}
-                  <td className="px-4 py-3 max-w-[250px] truncate" title={task.students?.map(student => student?.email).join(', ') || '-'}>
+                  {/* <td className="px-4 py-3 max-w-[250px] truncate" title={task.students?.map(student => student?.email).join(', ') || '-'}>
                     {task.students?.map(student => student?.email).join(', ') || '-'}
+                  </td> */}
+                  <td
+                    className="px-4 py-3 max-w-[250px] truncate"
+                    title={
+                      task.students?.map(s => s?.name ?? s?.email ?? '-').join(', ') || '-'
+                    }
+                  >
+                    {task.students?.map(s => s?.name ?? s?.email ?? '-').join(', ') || '-'}
                   </td>
                   <td className="px-4 py-3">
                     {task.assignee ? teamMembers.find(m => m.id === task.assignee)?.name : '-'}
@@ -853,7 +861,7 @@ const Tasks = () => {
                   <td className="px-4 py-3">
                     <Badge
                       variant={task.priority === 'HIGH' ? 'destructive' :
-                              task.priority === 'MEDIUM' ? 'warning' : 'secondary'}
+                        task.priority === 'MEDIUM' ? 'warning' : 'secondary'}
                     >
                       {task.priority}
                     </Badge>
@@ -863,24 +871,24 @@ const Tasks = () => {
                       {hasEditPermission() && (
                         <>
                           <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedTask(task);
-                                const currentStudents = task.students || [];
-                                // Set the simple ID array
-                                setSelectedStudents(currentStudents.map(s => s._id));
-                                // Set the detailed object array
-                                setSelectedStudentDetails(currentStudents.map(s => ({
-                                  id: s._id,
-                                  name: s.name || s.email,
-                                  email: s.email
-                                })));
-                                setIsAssignStudentOpen(true);
-                              }}
-                            >
-                              Assign
-                            </Button>
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedTask(task);
+                              const currentStudents = task.students || [];
+                              // Set the simple ID array
+                              setSelectedStudents(currentStudents.map(s => s._id));
+                              // Set the detailed object array
+                              setSelectedStudentDetails(currentStudents.map(s => ({
+                                id: s._id,
+                                name: s.name || s.email,
+                                email: s.email
+                              })));
+                              setIsAssignStudentOpen(true);
+                            }}
+                          >
+                            Assign
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -918,36 +926,36 @@ const Tasks = () => {
             )}
           </tbody>
         </table>
-</div>
-                {paginationData && (
-          <div className="flex justify-center my-6 gap-2">
-            <Button
-              variant="outline"
-              disabled={!paginationData.hasPrevPage}
-              onClick={()=> fetchTasks(paginationData.page - 1)}
-            >
-              Previous
-            </Button>
-            <span className="px-4 py-2">
-              Page {paginationData.page} of {paginationData.totalPages}
-            </span>
-            <Button
-              variant="outline"
-              disabled={!paginationData.hasNextPage}
-              onClick={() => fetchTasks(paginationData.page + 1)}
-            >
-              Next
-            </Button>
-          </div>
-        )}
+      </div>
+      {paginationData && (
+        <div className="flex justify-center my-6 gap-2">
+          <Button
+            variant="outline"
+            disabled={!paginationData.hasPrevPage}
+            onClick={() => fetchTasks(paginationData.page - 1)}
+          >
+            Previous
+          </Button>
+          <span className="px-4 py-2">
+            Page {paginationData.page} of {paginationData.totalPages}
+          </span>
+          <Button
+            variant="outline"
+            disabled={!paginationData.hasNextPage}
+            onClick={() => fetchTasks(paginationData.page + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      )}
 
       {/* Add Task Dialog */}
       <Dialog open={isAddTaskOpen} onOpenChange={(open) => {
-            setIsAddTaskOpen(open);
-            if (!open) {
-              resetTaskForm();
-            }
-          }}>
+        setIsAddTaskOpen(open);
+        if (!open) {
+          resetTaskForm();
+        }
+      }}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add New Task</DialogTitle>
@@ -1006,7 +1014,7 @@ const Tasks = () => {
                       <Input
                         placeholder="Search students..."
                         value={studentSearch}
-                        onChange={(e)=>setStudentSearch(e.target.value)}
+                        onChange={(e) => setStudentSearch(e.target.value)}
                       />
                     </div>
                     <ul>
@@ -1025,7 +1033,7 @@ const Tasks = () => {
                           }}
                         >
                           {student.name} ({student.email})
-                        </li>   
+                        </li>
                       ))}
                     </ul>
                     <div className="flex justify-center p-2">
@@ -1075,22 +1083,22 @@ const Tasks = () => {
                               }}
                               title="View subtasks"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
                             </Button>
                             <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-4 w-4 ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Remove from both state arrays
-                              setSelectedStudents(selectedStudents.filter(id => id !== student.id));
-                              setSelectedStudentDetails(selectedStudentDetails.filter(s => s.id !== student.id));
-                            }}
-                            title="Remove student"
-                          >
-                            <X className="h-2 w-2" />
-                          </Button>
+                              variant="ghost"
+                              size="icon"
+                              className="h-4 w-4 ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Remove from both state arrays
+                                setSelectedStudents(selectedStudents.filter(id => id !== student.id));
+                                setSelectedStudentDetails(selectedStudentDetails.filter(s => s.id !== student.id));
+                              }}
+                              title="Remove student"
+                            >
+                              <X className="h-2 w-2" />
+                            </Button>
                           </div>
                         </Badge>
                       );
@@ -1188,7 +1196,7 @@ const Tasks = () => {
                   onValueChange={(val) => setNewTask({ ...newTask, priority: val })}
                 >
                   <SelectTrigger>
-                    <SelectValue  placeholder="Select priority" />
+                    <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="HIGH">High</SelectItem>
@@ -1421,62 +1429,62 @@ const Tasks = () => {
 
           <div className="grid gap-4 py-4">
             <div className="relative text-xs">
-                <button
-                  className="w-full border rounded-md p-2 text-left"
-                  onClick={() => setIsStudentDropdownOpen(!isStudentDropdownOpen)}
-                >
-                  Select students
-                </button>
-                {isStudentDropdownOpen && (
-                  <div className=" z-10 w-full bg-white border rounded-md mt-1">
-                    <div className="p-2">
-                      <Input
-                        placeholder="Search students..."
-                        value={studentSearch}
-                        onChange={(e)=>setStudentSearch(e.target.value)}
-                      />
-                    </div>
-                    <ul>
-                      {students.map(student => (
-                       <li
-                          key={student.id}
-                          className="p-2 ml-2 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => {
-                            // Check if the student is already selected
-                            if (!selectedStudents.includes(student.id)) {
-                              // Add the ID to the simple array
-                              setSelectedStudents([...selectedStudents, student.id]);
-                              // Add the full student object to our new details array
-                              setSelectedStudentDetails([...selectedStudentDetails, student]);
-                            }
-                          }}
-                        >
-                          {student.name} ({student.email})
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex justify-center p-2">
-                      <Button
-                        variant="outline"
-                        disabled={!studentPagination.hasPrev}
-                        onClick={() => fetchStudents(studentSearch, studentPagination.currentPage - 1)}
-                      >
-                        Previous
-                      </Button>
-                      <span className="px-4 py-2">
-                        {studentPagination.currentPage} of {studentPagination.totalPages}
-                      </span>
-                      <Button
-                        variant="outline"
-                        disabled={!studentPagination.hasNext}
-                        onClick={() => fetchStudents(studentSearch, studentPagination.currentPage + 1)}
-                      >
-                        Next
-                      </Button>
-                    </div>
+              <button
+                className="w-full border rounded-md p-2 text-left"
+                onClick={() => setIsStudentDropdownOpen(!isStudentDropdownOpen)}
+              >
+                Select students
+              </button>
+              {isStudentDropdownOpen && (
+                <div className=" z-10 w-full bg-white border rounded-md mt-1">
+                  <div className="p-2">
+                    <Input
+                      placeholder="Search students..."
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                    />
                   </div>
-                )}
-              </div>
+                  <ul>
+                    {students.map(student => (
+                      <li
+                        key={student.id}
+                        className="p-2 ml-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          // Check if the student is already selected
+                          if (!selectedStudents.includes(student.id)) {
+                            // Add the ID to the simple array
+                            setSelectedStudents([...selectedStudents, student.id]);
+                            // Add the full student object to our new details array
+                            setSelectedStudentDetails([...selectedStudentDetails, student]);
+                          }
+                        }}
+                      >
+                        {student.name} ({student.email})
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex justify-center p-2">
+                    <Button
+                      variant="outline"
+                      disabled={!studentPagination.hasPrev}
+                      onClick={() => fetchStudents(studentSearch, studentPagination.currentPage - 1)}
+                    >
+                      Previous
+                    </Button>
+                    <span className="px-4 py-2">
+                      {studentPagination.currentPage} of {studentPagination.totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      disabled={!studentPagination.hasNext}
+                      onClick={() => fetchStudents(studentSearch, studentPagination.currentPage + 1)}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {selectedStudentDetails.length > 0 && (
               <div className="border rounded-md p-2">
@@ -1491,7 +1499,7 @@ const Tasks = () => {
                         className="pl-2 pr-1 py-1 flex items-center gap-1"
                       >
                         {student?.email}
-                         <Button
+                        <Button
                           variant="ghost"
                           size="icon"
                           className="h-4 w-4 ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full"
@@ -1537,8 +1545,8 @@ const Tasks = () => {
           <DialogHeader>
             <DialogTitle>Task Details</DialogTitle>
             <DialogDescription>
-              {selectedTask?.title && selectedStudentForTask?.name 
-                ? `Subtasks for "${selectedTask.title}" assigned to ${selectedStudentForTask.name}` 
+              {selectedTask?.title && selectedStudentForTask?.name
+                ? `Subtasks for "${selectedTask.title}" assigned to ${selectedStudentForTask.name}`
                 : 'Task details'}
             </DialogDescription>
           </DialogHeader>
@@ -1568,18 +1576,18 @@ const Tasks = () => {
                       </div>
                       <Badge variant={subtask.priority.toLowerCase()}>{subtask.priority}</Badge>
                     </div>
-                    
+
                     {subtask.description && (
                       <div className="text-sm text-muted-foreground mt-1">{subtask.description}</div>
                     )}
-                    
+
                     <div className="flex items-center justify-between mt-3">
                       <div className="text-sm">
-                        Status: 
+                        Status:
                         <Badge variant={
-                          subtask.status === 'COMPLETED' ? 'success' : 
-                          subtask.status === 'IN_PROGRESS' ? 'warning' : 
-                          'secondary'
+                          subtask.status === 'COMPLETED' ? 'success' :
+                            subtask.status === 'IN_PROGRESS' ? 'warning' :
+                              'secondary'
                         } className="ml-2">
                           {subtask.status.replace('_', ' ')}
                         </Badge>
@@ -1587,9 +1595,9 @@ const Tasks = () => {
                           <Badge variant="outline" className="ml-1">🔒 Locked</Badge>
                         )}
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
-                        <Select 
+                        <Select
                           value={subtask.status}
                           onValueChange={(value) => handleUpdateSubtaskStatus(subtask.assignmentId, value, subtask.isLocked)}
                           disabled={subtask.isLocked}
@@ -1681,7 +1689,7 @@ const Tasks = () => {
                             onClick={() => handleOpenCategoryManage(category)}
                             className="h-7 w-7 p-0"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
                           </Button>
                           <Button
                             variant="ghost"
@@ -1693,7 +1701,7 @@ const Tasks = () => {
                             }}
                             className="h-7 w-7 p-0 text-destructive hover:text-destructive"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
                           </Button>
                         </div>
                       </li>

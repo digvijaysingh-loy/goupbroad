@@ -1,33 +1,60 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { GraduationCap, Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { registerUser } from '@/services/api.services';
-import { isAuthenticated } from '@/lib/auth';
+import { GraduationCap, Mail, Lock, Eye, EyeOff, RefreshCw, Edit2 } from 'lucide-react';
+import OTPInput from 'react-otp-input';
+import { sendEmailOtp, registerUser } from '@/services/api.services';
+import { setAuth, isAuthenticated } from '@/lib/auth';
 import logo from '../../assets/logo.svg'
+import { toast } from 'sonner';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+  const [otpError, setOtpError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [countdown, setCountdown] = useState(30);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
   });
+  const [otp, setOtp] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated()) {
       navigate('/dashboard');
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (otpSent && !editingEmail) {
+      setCountdown(30);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    } else {
+      setCountdown(30);
+    }
+  }, [otpSent, editingEmail]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,48 +71,123 @@ const SignUp = () => {
     }
   };
 
+  const handleResendOtp = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setOtpError('');
+    const result = await sendEmailOtp(formData.email);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success('OTP resent successfully');
+      setOtp('');
+      // Restart countdown
+      setCountdown(30);
+    } else {
+      setOtpError(result.error);
+    }
+  };
+
+  const handleEditEmail = () => {
+    setEditingEmail(true);
+    setOtpSent(false);
+    setOtpError('');
+    setOtp('');
+    setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+    setTermsAccepted(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setPasswordError('');
+    setOtpError('');
     setApiError('');
 
-    if (formData.password !== formData.confirmPassword) {
-      setPasswordError('Passwords do not match');
-      return;
-    }
-
-    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
-    if (!passwordRegex.test(formData.password)) {
-      setPasswordError('Password must be at least 8 characters with a number and a special character');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-
-      const userData = {
-        email: formData.email,
-        password: formData.password,
-      };
-
-      const response = await registerUser(userData);
-
-      if (response.success) {
-        navigate('/signin', { state: { message: 'Account created successfully! Please log in.' } });
+    if (!otpSent) {
+      // Step 1: Validate and send OTP
+      if (formData.password !== formData.confirmPassword) {
+        setPasswordError('Passwords do not match');
+        return;
       }
-    } catch (error) {
-      console.error('Signup failed:', error);
 
-      if (error.response && error.response.data) {
-        setApiError(error.response.data.message || 'Signup failed. Please try again.');
-      } else {
-        setApiError('Network error. Please check your connection and try again.');
+      const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+      if (!passwordRegex.test(formData.password)) {
+        setPasswordError('Password must be at least 8 characters with a number and a special character');
+        return;
       }
-    } finally {
-      setIsLoading(false);
+      if (!termsAccepted) {
+        toast.error('You must agree to the Terms of Service and Privacy Policy');
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const result = await sendEmailOtp(formData.email);
+        if (result.success) {
+          setOtpSent(true);
+          setEditingEmail(false);
+          toast.success('OTP sent to your email');
+        } else {
+          setApiError(result.error);
+        }
+      } catch (error) {
+        setApiError('Failed to send OTP. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // Step 2: Validate OTP and register
+      if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+        setOtpError('Please enter a valid 6-digit OTP');
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const userData = {
+          email: formData.email,
+          password: formData.password,
+          otp: otp,
+        };
+
+        const registerResult = await registerUser(userData);
+        console.log(registerResult)
+        if (registerResult.success) {
+          // Auto-login using register response
+          setAuth({
+            accessToken: registerResult?.data?.data?.accessToken,
+            user: registerResult?.data?.data?.user
+          });
+
+          const userRole = registerResult?.data?.data?.user?.role;
+
+          if (userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'VIEWER') {
+            navigate('/admin/dashboard');
+          } else {
+            if (!registerResult?.data?.data?.user?.isFeePaid || !registerResult?.data?.data?.user?.isVerified) {
+              navigate('/pricing', { state: { fromAuth: true, user: registerResult?.data?.data?.user } });
+            } else {
+              const redirectPath = location.state?.from || '/dashboard';
+              navigate(redirectPath);
+            }
+          }
+        } else {
+          setApiError(registerResult.error);
+        }
+      } catch (error) {
+        console.error('Signup failed:', error);
+        if (error.response && error.response.data) {
+          setApiError(error.response?.data?.message || 'Signup failed. Please try again.');
+        } else {
+          setApiError('Network error. Please check your connection and try again.');
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
+
+  const isResendDisabled = isLoading || countdown > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
@@ -140,9 +242,14 @@ const SignUp = () => {
                 </div>
                 <span className="text-xl font-bold text-primary">StudyAbroad</span>
               </div>
-              <CardTitle className="text-2xl font-bold text-gray-800">Create Account</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-800">
+                {otpSent && !editingEmail ? 'Verify OTP' : 'Create Account'}
+              </CardTitle>
               <CardDescription className="text-gray-600">
-                Enter your details to create your account
+                {otpSent && !editingEmail 
+                  ? 'Enter the 6-digit code sent to your email' 
+                  : 'Enter your details to create your account'
+                }
               </CardDescription>
             </CardHeader>
 
@@ -170,11 +277,12 @@ const SignUp = () => {
                       onChange={handleChange}
                       className="pl-10 h-12 border-gray-200 focus:border-primary"
                       required
+                      disabled={otpSent && !editingEmail}
                     />
                   </div>
                 </div>
 
-                {/* Password Field */}
+                {/* Password Field - Disabled after OTP sent unless editing */}
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-sm font-medium text-gray-700">
                     Password
@@ -190,11 +298,13 @@ const SignUp = () => {
                       onChange={handleChange}
                       className="pl-10 pr-10 h-12 border-gray-200 focus:border-primary"
                       required
+                      disabled={otpSent && !editingEmail}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      disabled={otpSent && !editingEmail}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -204,49 +314,127 @@ const SignUp = () => {
                   </p>
                 </div>
 
-                {/* Confirm Password Field */}
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                    Confirm Password
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="Confirm your password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="pl-10 pr-10 h-12 border-gray-200 focus:border-primary"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+                {/* Confirm Password Field - Only show if not otpSent or editing */}
+                {!otpSent || editingEmail ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                      Confirm Password
+                    </Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder="Confirm your password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="pl-10 pr-10 h-12 border-gray-200 focus:border-primary"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
                   </div>
-                  {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
-                </div>
+                ) : null}
 
-                {/* Terms and Conditions */}
-                <div className="flex items-start space-x-2">
-                  <Checkbox id="terms" />
-                  <Label htmlFor="terms" className="text-sm text-gray-600 leading-tight">
-                    I agree to the <Link to="#" className="text-primary hover:underline">Terms of Service</Link> and <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>
-                  </Label>
-                </div>
+                {/* OTP Field - Only show if otpSent and not editing */}
+                {otpSent && !editingEmail ? (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Verification Code
+                    </Label>
+                    <div className="flex justify-center mb-4">
+                      <OTPInput
+                        value={otp}
+                        onChange={setOtp}
+                        numInputs={6}
+                        inputStyle={{
+                          width: '3rem',
+                          height: '3rem',
+                          margin: '0 0.5rem',
+                          fontSize: '1.25rem',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '0.5rem',
+                          textAlign: 'center',
+                          outline: 'none',
+                        }}
+                        inputType="text"
+                        containerStyle={{ justifyContent: 'center' }}
+                        inputMode="numeric"
+                        renderInput={(props) => <input {...props} />}
+                      />
+                    </div>
+                    {otpError && <p className="text-xs text-red-500 text-center">{otpError}</p>}
+                  </div>
+                ) : null}
 
-                {/* Sign Up Button */}
+                {/* Terms and Conditions - Only show if not otpSent or editing */}
+                {!otpSent || editingEmail ? (
+                  <div className="flex items-start space-x-2">
+                    <Checkbox
+                      id="terms"
+                      checked={termsAccepted}
+                      onCheckedChange={setTermsAccepted}
+                    />
+                    <Label htmlFor="terms" className="text-sm text-gray-600 leading-tight">
+                      I agree to the <Link to="#" className="text-primary hover:underline">Terms of Service</Link> and <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>
+                    </Label>
+                  </div>
+                ) : null}
+
+                {/* Edit Email and Resend OTP Buttons - Side by side if otpSent and not editing */}
+                {otpSent && !editingEmail ? (
+                  <div className="flex justify-between items-center space-x-4">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="flex-1 justify-start h-10 px-2 text-primary hover:bg-primary/5 cursor-pointer"
+                      onClick={handleEditEmail}
+                    >
+                      <Edit2 className="h-4 w-4 mr-2" />
+                      Edit Email
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="flex-1 h-10 cursor-pointer"
+                      onClick={handleResendOtp}
+                      disabled={isResendDisabled}
+                    >
+                      {isLoading ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : isResendDisabled ? (
+                        `Resend in ${countdown}s`
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Resend OTP
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ) : null}
+
+                {/* Submit Button */}
                 <Button
                   type="submit"
                   className="w-full h-12 bg-primary-800 cursor-pointer text-white font-semibold"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                  {isLoading 
+                    ? (otpSent ? 'Verifying...' : 'Sending OTP...') 
+                    : (otpSent ? 'Verify & Create Account' : 'Continue')
+                  }
                 </Button>
               </form>
 
@@ -262,8 +450,8 @@ const SignUp = () => {
 
               {/* Social Sign Up */}
               <div className="grid grid-cols-1 gap-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="h-12"
                   onClick={() => window.location.href = `${import.meta.env.VITE_SERVER_URL}/v1/auth/google`}
                   type="button"

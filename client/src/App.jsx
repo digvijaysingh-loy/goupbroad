@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import Home from './Pages/LandingPage';
 import Dashboard from './Pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -53,7 +53,7 @@ import CollegeFinderStep4 from './Pages/Static/CollegeFinder/CollegeFinderStep4'
 import NewCollegeFinder from './Pages/CollegeFinder/NewCollegeFinder';
 import QuestionnaireForm from './Pages/CollegeFinder/QuestionnaireForm';
 import NewCollegeFinderResults from './Pages/CollegeFinder/CollegeFinderResults';
-import OrderConfirmation from './Pages/Static/OrderConfirmation';
+
 import Checkout from './Pages/Static/Checkout';
 import TestOrderConfirmation from './Pages/Static/components/TestOrderConfirmation';
 import SignIn from './Pages/Static/SignIn';
@@ -62,8 +62,14 @@ import PrivacyPolicy from './Pages/Static/PrivacyPolicy.';
 import Calculator from './Pages/Calculator/Calculator';
 import AuthCallback from './Pages/Auth/AuthCallback';
 import CGPAConverter from './Pages/Calculator/GPAConverter';
+import { useEffect } from 'react';
+import OrderConfirmation from './Pages/Static/OrderConfirmation';
 
 const App = () => {
+  const location = useLocation();
+    useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.pathname]);
   return (
     <Routes>
       <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
@@ -78,7 +84,7 @@ const App = () => {
       <Route path="/auth/payment-failed" element={<PaymentFailed />} />
 
       {/* Static Pages */}
-      <Route path="/community" element={<Community />} />
+      {/* <Route path="/community" element={<Community />} /> */}
       <Route path="/about" element={<About />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/premium" element={<PremiumAccess />} />
@@ -101,16 +107,16 @@ const App = () => {
       <Route path="/college-finder/results" element={<NewCollegeFinderResults />} />
 
       {/* College Finder Routes - Legacy */}
-      <Route path="/college-finder" element={<CollegeFinder />} />
+      {/* <Route path="/university-finder" element={<CollegeFinder />} />
       <Route path="/college-finder/step1" element={<CollegeFinderStep1 />} />
       <Route path="/college-finder/step2" element={<CollegeFinderStep2 />} />
       <Route path="/college-finder/step3" element={<CollegeFinderStep3 />} />
-      <Route path="/college-finder/step4" element={<CollegeFinderStep4 />} />
+      <Route path="/college-finder/step4" element={<CollegeFinderStep4 />} /> */}
 
       {/* Dashboard Routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/dashboard/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="/dashboard/timeline" element={<ProtectedRoute><StudentTasks /></ProtectedRoute>} />
+      {/* <Route path="/dashboard/timeline" element={<ProtectedRoute><StudentTasks /></ProtectedRoute>} /> */}
       <Route path="/dashboard/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
       <Route path="/dashboard/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
       <Route path="/dashboard/edu-loan" element={<ProtectedRoute><EduLoan /></ProtectedRoute>} />

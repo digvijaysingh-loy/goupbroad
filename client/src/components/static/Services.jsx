@@ -20,16 +20,16 @@ const Services = () => {
       badge: 'Popular',
       route:'/university-finder'
     },
-    {
-      icon: Users,
-      title: 'Community Forum & Discussion',
-      description: 'Connect with fellow students, share experiences, and get advice from those who\'ve been there.',
-      color: 'bg-green-50 text-green-600',
-      borderColor: 'border-green-200',
-      features: ['Student networking', 'Experience sharing', 'Peer support'],
-      badge: 'Active',
-      route:'/community'
-    },
+    // {
+    //   icon: Users,
+    //   title: 'Community Forum & Discussion',
+    //   description: 'Connect with fellow students, share experiences, and get advice from those who\'ve been there.',
+    //   color: 'bg-green-50 text-green-600',
+    //   borderColor: 'border-green-200',
+    //   features: ['Student networking', 'Experience sharing', 'Peer support'],
+    //   badge: 'Active',
+    //   route:'/community'
+    // },
     // {
     //   icon: BookOpen,
     //   title: 'Scholarship & Funding Finder',
@@ -92,7 +92,7 @@ const Services = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {services.map((service, index) => (
             <Card
               key={index}

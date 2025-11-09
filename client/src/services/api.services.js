@@ -5,17 +5,17 @@ export const apiService = {
     const response = await servicesAxiosInstance.get(endpoint);
     return response.data;
   },
-  
+
   post: async (endpoint, data) => {
     const response = await servicesAxiosInstance.post(endpoint, data);
     return response.data;
   },
-    
+
   put: async (endpoint, data) => {
     const response = await servicesAxiosInstance.put(endpoint, data);
     return response.data;
   },
-  
+
   delete: async (endpoint) => {
     const response = await servicesAxiosInstance.delete(endpoint);
     return response.data;
@@ -30,10 +30,76 @@ export const getServerHealth = async () => {
   return apiService.get('/health');
 };
 
-export const registerUser = async (userData) => {
-  return apiService.post('/auth/signup', userData);
+export const sendEmailOtp = async (email) => {
+  try {
+    const response = await apiService.post('/auth/send-email-otp', { email });
+    return {
+      success: true,
+      data: response
+    };
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || 'Failed to send OTP'
+    };
+  }
 };
-
+export const registerUser = async (userData) => {
+  try {
+    const response = await apiService.post('/auth/signup', userData);
+    return {
+      success: true,
+      data: response
+    };
+  } catch (error) {
+    console.error('Signup failed:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || 'Signup failed'
+    };
+  }
+};
+export const requestPasswordReset = async (email) => {
+  try {
+    const response = await apiService.post('/auth/forgot-password', { email });
+    return { success: true, data: response };
+  } catch (error) {
+    console.error('Error requesting password reset:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || 'Failed to request reset'
+    };
+  }
+};
+export const verifyOtp = async ({ email, otp }) => {
+  try {
+    const response = await apiService.post('/auth/verify-otp', { email, otp });
+    return { success: true, data: response };
+  } catch (error) {
+    console.error('OTP verification failed:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || 'Invalid or expired OTP'
+    };
+  }
+};
+export const setNewPassword = async ({ email, otp, password }) => {
+  try {
+    const response = await apiService.post('/auth/reset-password', {
+      email,
+      otp,
+      password
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Password reset failed:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || 'Failed to reset password'
+    };
+  }
+};
 export const loginUser = async (userData) => {
   return apiService.post('/auth/login', userData);
 };
@@ -41,7 +107,9 @@ export const loginUser = async (userData) => {
 export const getUserProfile = async () => {
   return apiService.get('/student/self');
 };
-
+export const getAssignedUniversities = async () => {
+  return apiService.get('/student/llm-assigned-university?preferredSpeed=FAST');
+};
 export const updateUserProfile = async (profileData) => {
   return apiService.put('/student/profile', profileData);
 };
@@ -189,7 +257,7 @@ export const deleteFaq = async (id) => {
   } catch (error) {
     console.error('Error deleting FAQ:', error);
     return {
-      success: false, 
+      success: false,
       error: error.response?.data?.message || 'Failed to delete FAQ'
     };
   }

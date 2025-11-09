@@ -22,12 +22,12 @@ const formatPhoneNumber = (number) => {
 
 
   const cleaned = number.replace(/[^\d+]/g, '');
-  
+
   // If it doesn't start with +, add +91
   if (!cleaned.startsWith('+')) {
     return '+91' + cleaned;
   }
-  
+
   // Keep the + and the numbers
   return cleaned;
 };
@@ -64,7 +64,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
       noOfBacklogs: userData?.collegeDetails?.noOfBacklogs || '',
       admissionTerm: userData?.collegeDetails?.admissionTerm || '',
       coursesApplying: userData?.collegeDetails?.coursesApplying?.join(', ') || ''
-    },    greDetails: {
+    }, greDetails: {
       grePlane: createSafeDate(userData?.greDetails?.grePlane),
       greDate: createSafeDate(userData?.greDetails?.greDate),
       greScore: {
@@ -84,7 +84,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
         listening: userData?.ieltsDetails?.ieltsScore?.listening || '',
       },
       retakingIELTS: userData?.ieltsDetails?.retakingIELTS || ''
-    },    toeflDetails: {
+    }, toeflDetails: {
       toeflPlan: createSafeDate(userData?.toeflDetails?.toeflPlan),
       toeflDate: createSafeDate(userData?.toeflDetails?.toeflDate),
       toeflScore: {
@@ -103,6 +103,16 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
 
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const fallbackValue = (value, fallback = 'N/A') => value || fallback;
+  const safeNumber = (value) => (isNaN(Number(value)) ? 0 : Number(value));
+  const stringToArray = (str) => (str && typeof str === 'string'
+    ? str.split(',').map(s => s.trim()).filter(Boolean)
+    : Array.isArray(str) ? str : []);
+  const dateToISOString = (dateStr) => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
 
   const handleInputChange = (section, field, value) => {
     if (section) {
@@ -158,8 +168,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
       setImageUploading(true);
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('category', 'profile');      
-      const response = await uploadFile(formData);        
+      formData.append('category', 'profile');
+      const response = await uploadFile(formData);
       if (response.success && response.data && response.data.url) {
         setFormData(prev => ({
           ...prev,
@@ -176,10 +186,10 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
   };
   const handlePhoneNumberChange = (e) => {
     const input = e.target.value;
-    
+
     // Format the phone number
     const formattedNumber = formatPhoneNumber(input);
-    
+
     // Only update if the number is valid or empty
     if (!formattedNumber || formattedNumber === '+' || validatePhoneNumber(formattedNumber) || formattedNumber.length <= 13) {
       handleInputChange(null, 'phoneNumber', formattedNumber);
@@ -188,27 +198,30 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate phone number before submission
     if (!validatePhoneNumber(formData.phoneNumber)) {
       toast.error('Phone number must start with country code (e.g., +918388656625)');
       return;
     }
-
+    if (!formData.personalDetails.gender) {
+      toast.error('Please select a gender');
+      return;
+    }
     try {
       setLoading(true);
-      
+
       const safeNumber = (value) => {
         const num = Number(value);
         return isNaN(num) ? 0 : num;
       };
-      
+
       const stringToArray = (str) => {
-        return str && typeof str === 'string' 
+        return str && typeof str === 'string'
           ? str.split(',').map(item => item.trim()).filter(Boolean)
           : Array.isArray(str) ? str : [];
       };
-      
+
       const fallbackValue = (value, fallback = 'N/A') => {
         return value || fallback;
       };
@@ -219,7 +232,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
         return !isNaN(date.getTime()) ? date.toISOString() : null;
       };
 
-      const processedFormData = {        name: fallbackValue(formData.name),
+      const processedFormData = {
+        name: fallbackValue(formData.name),
         email: userData?.email,
         phoneNumber: fallbackValue(formData.phoneNumber),
         profilePicture: formData.profilePicture,
@@ -243,7 +257,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
           noOfBacklogs: safeNumber(formData.collegeDetails.noOfBacklogs),
           admissionTerm: fallbackValue(formData.collegeDetails.admissionTerm),
           coursesApplying: stringToArray(formData.collegeDetails.coursesApplying)
-        },        greDetails: {
+        }, greDetails: {
           grePlane: dateToISOString(formData.greDetails.grePlane),
           greDate: dateToISOString(formData.greDetails.greDate),
           greScore: {
@@ -273,13 +287,13 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             speaking: safeNumber(formData.toeflDetails.toeflScore.speaking)
           },
           retakingTOEFL: fallbackValue(formData.toeflDetails.retakingTOEFL, 'No')
-        },        visa: {
+        }, visa: {
           countriesPlanningToApply: stringToArray(formData.visa.countriesPlanningToApply),
           visaInterviewDate: dateToISOString(formData.visa.visaInterviewDate),
           visaInterviewLocation: fallbackValue(formData.visa.visaInterviewLocation)
         }
-      };      
-      const response = await updateUserProfile(processedFormData);        
+      };
+      const response = await updateUserProfile(processedFormData);
       if (response.success) {
         toast.success('The operation has been successful');
 
@@ -310,13 +324,13 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center gap-4">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100">              
+            <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100">
               <img
                 src={formData.profilePicture || ''}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
-            </div>            
+            </div>
             <div>
               <Button
                 variant="outline"
@@ -358,7 +372,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input 
+              <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange(null, 'name', e.target.value)}
@@ -371,7 +385,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             <div className="space-y-2">
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <div className="space-y-1">
-                <Input 
+                <Input
                   id="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handlePhoneNumberChange}
@@ -379,7 +393,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
                 />
                 <p className="text-xs text-muted-foreground">Must include country code (e.g., +918388656625)</p>
               </div>
-            </div>            
+            </div>
             <div className="space-y-2">              <Label htmlFor="dob">Date of Birth</Label>
               <Input
                 type="date"
@@ -390,8 +404,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>
-              <Select 
-                value={formData.personalDetails.gender} 
+              <Select
+                value={formData.personalDetails.gender}
                 onValueChange={(value) => handleInputChange('personalDetails', 'gender', value)}
               >
                 <SelectTrigger>
@@ -406,7 +420,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="profession">Profession</Label>
-              <Input 
+              <Input
                 id="profession"
                 value={formData.personalDetails.profession}
                 onChange={(e) => handleInputChange('personalDetails', 'profession', e.target.value)}
@@ -414,7 +428,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="col-span-1 md:col-span-2 space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Textarea 
+              <Textarea
                 id="address"
                 value={formData.personalDetails.address}
                 onChange={(e) => handleInputChange('personalDetails', 'address', e.target.value)}
@@ -432,7 +446,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="program">Program</Label>
-              <Input 
+              <Input
                 id="program"
                 value={formData.programDetails.program}
                 onChange={(e) => handleInputChange('programDetails', 'program', e.target.value)}
@@ -445,8 +459,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
                 value={formData.programDetails.validity}
                 onChange={(e) => handleInputChange('programDetails', 'validity', e.target.value)}
               />
-            </div>      
             </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -458,7 +472,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="branch">Branch</Label>
-              <Input 
+              <Input
                 id="branch"
                 value={formData.collegeDetails.branch}
                 onChange={(e) => handleInputChange('collegeDetails', 'branch', e.target.value)}
@@ -466,7 +480,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="highestDegree">Highest Degree</Label>
-              <Input 
+              <Input
                 id="highestDegree"
                 value={formData.collegeDetails.highestDegree}
                 onChange={(e) => handleInputChange('collegeDetails', 'highestDegree', e.target.value)}
@@ -474,7 +488,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="university">University</Label>
-              <Input 
+              <Input
                 id="university"
                 value={formData.collegeDetails.university}
                 onChange={(e) => handleInputChange('collegeDetails', 'university', e.target.value)}
@@ -482,7 +496,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="college">College</Label>
-              <Input 
+              <Input
                 id="college"
                 value={formData.collegeDetails.college}
                 onChange={(e) => handleInputChange('collegeDetails', 'college', e.target.value)}
@@ -490,7 +504,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="gpa">GPA</Label>
-              <Input 
+              <Input
                 id="gpa"
                 type="number"
                 step="0.01"
@@ -499,7 +513,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
               />
             </div>            <div className="space-y-2">
               <Label htmlFor="toppersGPA">Topper&apos;s GPA</Label>
-              <Input 
+              <Input
                 id="toppersGPA"
                 type="number"
                 step="0.01"
@@ -509,7 +523,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="noOfBacklogs">Number of Backlogs</Label>
-              <Input 
+              <Input
                 id="noOfBacklogs"
                 type="number"
                 value={formData.collegeDetails.noOfBacklogs}
@@ -518,7 +532,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="admissionTerm">Admission Term</Label>
-              <Input 
+              <Input
                 id="admissionTerm"
                 value={formData.collegeDetails.admissionTerm}
                 onChange={(e) => handleInputChange('collegeDetails', 'admissionTerm', e.target.value)}
@@ -526,7 +540,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="col-span-1 md:col-span-2 space-y-2">
               <Label htmlFor="coursesApplying">Courses Applying (comma separated)</Label>
-              <Textarea 
+              <Textarea
                 id="coursesApplying"
                 value={formData.collegeDetails.coursesApplying}
                 onChange={(e) => handleInputChange('collegeDetails', 'coursesApplying', e.target.value)}
@@ -560,7 +574,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="verbal">Verbal Score</Label>
-              <Input 
+              <Input
                 id="verbal"
                 type="number"
                 value={formData.greDetails.greScore.verbal}
@@ -571,7 +585,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="quant">Quantitative Score</Label>
-              <Input 
+              <Input
                 id="quant"
                 type="number"
                 value={formData.greDetails.greScore.quant}
@@ -582,7 +596,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="awa">AWA Score</Label>
-              <Input 
+              <Input
                 id="awa"
                 type="number"
                 step="0.5"
@@ -594,8 +608,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="retakingGRE">Retaking GRE</Label>
-              <Select 
-                value={formData.greDetails.retakingGRE} 
+              <Select
+                value={formData.greDetails.retakingGRE}
                 onValueChange={(value) => handleInputChange('greDetails', 'retakingGRE', value)}
               >
                 <SelectTrigger>
@@ -606,8 +620,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
                   <SelectItem value="No">No</SelectItem>
                 </SelectContent>
               </Select>
-            </div>      
             </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -635,7 +649,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="ieltsReading">Reading Score</Label>
-              <Input 
+              <Input
                 id="ieltsReading"
                 type="number"
                 step="0.5"
@@ -647,7 +661,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="ieltsWriting">Writing Score</Label>
-              <Input 
+              <Input
                 id="ieltsWriting"
                 type="number"
                 step="0.5"
@@ -659,7 +673,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="ieltsSpeaking">Speaking Score</Label>
-              <Input 
+              <Input
                 id="ieltsSpeaking"
                 type="number"
                 step="0.5"
@@ -671,7 +685,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="ieltsListening">Listening Score</Label>
-              <Input 
+              <Input
                 id="ieltsListening"
                 type="number"
                 step="0.5"
@@ -683,8 +697,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="retakingIELTS">Retaking IELTS</Label>
-              <Select 
-                value={formData.ieltsDetails.retakingIELTS} 
+              <Select
+                value={formData.ieltsDetails.retakingIELTS}
                 onValueChange={(value) => handleInputChange('ieltsDetails', 'retakingIELTS', value)}
               >
                 <SelectTrigger>
@@ -723,7 +737,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="toeflReading">Reading Score</Label>
-              <Input 
+              <Input
                 id="toeflReading"
                 type="number"
                 value={formData.toeflDetails.toeflScore.reading}
@@ -732,7 +746,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="toeflWriting">Writing Score</Label>
-              <Input 
+              <Input
                 id="toeflWriting"
                 type="number"
                 value={formData.toeflDetails.toeflScore.writing}
@@ -741,7 +755,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="toeflSpeaking">Speaking Score</Label>
-              <Input 
+              <Input
                 id="toeflSpeaking"
                 type="number"
                 value={formData.toeflDetails.toeflScore.speaking}
@@ -750,8 +764,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="retakingTOEFL">Retaking TOEFL</Label>
-              <Select 
-                value={formData.toeflDetails.retakingTOEFL} 
+              <Select
+                value={formData.toeflDetails.retakingTOEFL}
                 onValueChange={(value) => handleInputChange('toeflDetails', 'retakingTOEFL', value)}
               >
                 <SelectTrigger>
@@ -774,7 +788,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="col-span-1 md:col-span-2 space-y-2">
               <Label htmlFor="countriesPlanningToApply">Countries Planning to Apply (comma separated)</Label>
-              <Textarea 
+              <Textarea
                 id="countriesPlanningToApply"
                 value={formData.visa.countriesPlanningToApply}
                 onChange={(e) => handleInputChange('visa', 'countriesPlanningToApply', e.target.value)}
@@ -791,7 +805,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="visaInterviewLocation">Visa Interview Location</Label>
-              <Input 
+              <Input
                 id="visaInterviewLocation"
                 value={formData.visa.visaInterviewLocation}
                 onChange={(e) => handleInputChange('visa', 'visaInterviewLocation', e.target.value)}

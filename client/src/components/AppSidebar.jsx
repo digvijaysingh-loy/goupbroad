@@ -39,7 +39,7 @@ const AppSidebar = ({ isSidebarOpen }) => {
   const menuItems = [
     { id: 2, name: 'Dashboard', icon: <Home className="h-5 w-5" />, link: '/dashboard' },
     { id: 1, name: 'Profile', icon: <User className="h-5 w-5" />, link: '/dashboard/profile' },
-    { id: 3, name: 'Timeline', icon: <ListChecks className="h-5 w-5" />, link: '/dashboard/timeline' },
+    // { id: 3, name: 'Timeline', icon: <ListChecks className="h-5 w-5" />, link: '/dashboard/timeline' },
     { id: 4, name: 'Checklist', icon: <CheckSquare className="h-5 w-5" />, link: '/dashboard/checklist' },
     { id: 5, name: 'Universities', icon: <School className="h-5 w-5" />, link: '/dashboard/universities' },
     { id: 6, name: 'Edu Loan', icon: <BriefcaseBusiness className="h-5 w-5" />, link: '/dashboard/edu-loan' },
@@ -59,12 +59,13 @@ const AppSidebar = ({ isSidebarOpen }) => {
           </div>
         )} */}
          
-        <div className="md:py-6 flex md:items-center md:space-x-3 px-1">
+        <Link to="/" className="md:py-6 flex md:items-center md:space-x-3 px-1 "
+        >
             <>
               <img src="/logo.svg" height={40} width={40} />
               <span className="text-2xl font-bold text-gray-900">GoupBroad</span>
             </>
-        </div>
+        </Link>
           {/* )} */}
       </SidebarHeader>
 

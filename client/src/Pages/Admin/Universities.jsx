@@ -32,12 +32,12 @@ const Universities = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [universities, setUniversities] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   const hasEditPermission = () => {
     const currentUser = getUser();
     return currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'EDITOR');
   };
-  
+
   const [isUploading, setIsUploading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -72,7 +72,7 @@ const Universities = () => {
 
   const [newProgram, setNewProgram] = useState('');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-
+  console.log(universities)
   const categoryOptions = [
     { label: 'Top Tier', value: 'top-tier' },
     { label: 'High Chance', value: 'high-chance' },
@@ -100,7 +100,7 @@ const Universities = () => {
 
       const params = {
         page: currentPage,
-        limit: 10
+        limit: 12
       };
 
 
@@ -132,6 +132,7 @@ const Universities = () => {
       }
 
       const response = await getUniversities(params);
+      console.log(response);
       setUniversities(response.data.universities || []);
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
@@ -152,7 +153,7 @@ const Universities = () => {
       toast.error('You don\'t have permission to add universities');
       return;
     }
-    
+
     if (currentStep === 1 && (!newUniversity.name || !newUniversity.location)) {
       toast.error('University name and location are required');
       return;
@@ -257,7 +258,7 @@ const Universities = () => {
       toast.error('You don\'t have permission to delete universities');
       return;
     }
-    
+
     try {
       setLoading(true);
       await deleteUniversity(selectedUniversity._id);
@@ -305,7 +306,7 @@ const Universities = () => {
       toast.error('You don\'t have permission to update universities');
       return;
     }
-    
+
     try {
       setLoading(true);
 
@@ -379,7 +380,7 @@ const Universities = () => {
       toast.error('You don\'t have permission to upload files');
       return;
     }
-    
+
     const file = event.target.files[0];
     if (!file) return;
 
@@ -427,7 +428,7 @@ const Universities = () => {
       toast.error('You don\'t have permission to upload files');
       return;
     }
-    
+
     const file = event.target.files[0];
     if (!file) return;
 
@@ -568,6 +569,7 @@ const Universities = () => {
                           <Button
                             variant="outline"
                             size="sm"
+                             style={{ cursor: 'pointer' }}
                             onClick={() => university.website_url ? window.open(university.website_url, '_blank') : null}
                             disabled={!university.website_url}
                           >
@@ -575,6 +577,7 @@ const Universities = () => {
                             Website
                           </Button>
                           <Button
+                            style={{ cursor: 'pointer' }}
                             size="sm"
                             onClick={() => {
                               setSelectedUniversity(university);
@@ -648,9 +651,9 @@ const Universities = () => {
             <div className="flex-1 overflow-y-auto pr-2">
               {selectedUniversity.banner && (
                 <div className="relative h-48 w-[calc(100%+2rem)] -ml-6 -mr-6 mb-4 -mt-4">
-                  <img 
-                    src={selectedUniversity.banner} 
-                    alt={`${selectedUniversity.name} banner`} 
+                  <img
+                    src={selectedUniversity.banner}
+                    alt={`${selectedUniversity.name} banner`}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
@@ -730,7 +733,7 @@ const Universities = () => {
                           : 'N/A'}
                       </p>
                     </div>
-                  
+
                     <div>
                       <h3 className="font-semibold">Program</h3>
                       <p className="text-sm mt-1">{selectedUniversity.program?.toLocaleString() || 'N/A'}</p>
@@ -1153,7 +1156,7 @@ const Universities = () => {
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     placeholder="City, State, Country"
                   />
-                </div>                
+                </div>
                 <div className="grid gap-1.5">
                   <Label htmlFor="address">Address</Label>
                   <Input
@@ -1270,7 +1273,7 @@ const Universities = () => {
                 <div className="flex gap-2">
                   <Input
                     value={newUniversity.programs}
-                    onChange={(e) => setNewUniversity({ ...newUniversity, programs: e.target.value})}
+                    onChange={(e) => setNewUniversity({ ...newUniversity, programs: e.target.value })}
                     placeholder="Enter program name"
                     className="flex-1"
                   />
