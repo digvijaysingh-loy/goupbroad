@@ -489,7 +489,7 @@ const Messages = () => {
                                                                     </span>
                                                                 </div>
                                                                 {message.type === 'file' && message.file ? (
-                                                                    <div className="p-2 my-1 rounded-md bg-black bg-opacity-10">
+                                                                    <div className="p-2 my-1 rounded-md bg-white ">
                                                                         {message.file.type.startsWith('image/') ? (
                                                                             <img
                                                                                 src={message.file.url}
@@ -497,7 +497,7 @@ const Messages = () => {
                                                                                 className="max-w-xs max-h-48 rounded-md my-1"
                                                                             />
                                                                         ) : (
-                                                                            <div className="flex items-center gap-2 p-2 rounded-md bg-black bg-opacity-20">
+                                                                            <div className="flex items-center gap-2 p-2 rounded-md bg-white text-black ">
                                                                                 <FileText className="h-6 w-6" />
                                                                                 <div className="flex-1">
                                                                                     <p className="text-sm font-medium truncate">

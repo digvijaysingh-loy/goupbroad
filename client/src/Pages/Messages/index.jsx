@@ -47,7 +47,7 @@ const Chat = () => {
         const fetchStudentChats = async () => {
             try {
                 setLoading(true)
-                const response = await getChatsStudents({page:currentChatPage})
+                const response = await getChatsStudents({ page: currentChatPage })
                 if (isMounted && response.data?.data?.chatRooms) {
                     setConversations(response.data.data.chatRooms)
                     setChatPagination(response.data.data.pagination)
@@ -247,10 +247,10 @@ const Chat = () => {
 
                                     <div className="divide-y divide-gray-100">
                                         {loading ? (
-                                        <div className="flex h-full items-center justify-center">
+                                            <div className="flex h-full items-center justify-center">
                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                                             </div>
-                                      ) :conversations.map((convo) => (
+                                        ) : conversations.map((convo) => (
                                             <div
                                                 key={convo.chatRoomId}
                                                 className={`flex gap-2 mx-2 rounded-lg items-center p-4 cursor-pointer hover:bg-gray-50 ${selectedRoom.adminId === convo.participants.member.id ? 'bg-gray-200' : ''}`}
@@ -262,46 +262,46 @@ const Chat = () => {
                                                         className="h-10 w-10 rounded-full bg-gray-200 "
                                                     />
                                                 </div>
-                                                 <div className="flex-1 overflow-hidden">
-                                                <h4 className="font-medium text-base truncate">
-                                                    {convo.participants.member.name === 'Unnamed Student'
-                                                        ? convo.participants.member.email
-                                                        : convo.participants.member.name}
-                                                </h4>
-                                               <p className="text-sm text-muted-foreground truncate flex items-center justify-between">
-                                                  <span className='truncate max-w-[150px]'>
-                                                    {convo.latestMessage?.type === 'file'
-                                                      ? `file : ${convo.latestMessage?.file?.name}`
-                                                      : convo.latestMessage?.content || 'No messages yet'}
-                                                  </span>
-                                                  {convo.latestMessage?.timestamp && (
-                                                    <span className="ml-2 text-xs text-gray-500 whitespace-nowrap">
-                                                      {new Date(convo.latestMessage.timestamp._seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </span>
-                                                  )}
-                                                </p>
-                                            </div>
+                                                <div className="flex-1 overflow-hidden">
+                                                    <h4 className="font-medium text-base truncate">
+                                                        {convo.participants.member.name === 'Unnamed Student'
+                                                            ? convo.participants.member.email
+                                                            : convo.participants.member.name}
+                                                    </h4>
+                                                    <p className="text-sm text-muted-foreground truncate flex items-center justify-between">
+                                                        <span className='truncate max-w-[150px]'>
+                                                            {convo.latestMessage?.type === 'file'
+                                                                ? `file : ${convo.latestMessage?.file?.name}`
+                                                                : convo.latestMessage?.content || 'No messages yet'}
+                                                        </span>
+                                                        {convo.latestMessage?.timestamp && (
+                                                            <span className="ml-2 text-xs text-gray-500 whitespace-nowrap">
+                                                                {new Date(convo.latestMessage.timestamp._seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                </div>
                                             </div>
                                         ))}
-                                        {chatPagination  && chatPagination.totalPages > 1 && (
-                                        <div className="flex justify-center mt-4 text-xs gap-2">
-                                            <Button
-                                                variant="outline"
-                                                disabled={chatPagination.currentPage === 1}
-                                                onClick={() => setCurrentChatpage((p) => p - 1)}>
-                                                Prev
-                                            </Button>
-                                            <span className="px-4 py-2">
-                                                Page {chatPagination.currentPage} of {chatPagination.totalPages}
-                                            </span>
-                                            <Button
-                                                variant="outline"
-                                                disabled={chatPagination.currentPage === chatPagination.totalPages}
-                                                onClick={() => setCurrentChatpage((p) => p + 1)}>
-                                                Next
-                                            </Button>
-                                        </div>
-                                    )}
+                                        {chatPagination && chatPagination.totalPages > 1 && (
+                                            <div className="flex justify-center mt-4 text-xs gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    disabled={chatPagination.currentPage === 1}
+                                                    onClick={() => setCurrentChatpage((p) => p - 1)}>
+                                                    Prev
+                                                </Button>
+                                                <span className="px-4 py-2">
+                                                    Page {chatPagination.currentPage} of {chatPagination.totalPages}
+                                                </span>
+                                                <Button
+                                                    variant="outline"
+                                                    disabled={chatPagination.currentPage === chatPagination.totalPages}
+                                                    onClick={() => setCurrentChatpage((p) => p + 1)}>
+                                                    Next
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -335,7 +335,7 @@ const Chat = () => {
                                                                 <div
                                                                     key={msg.id}
                                                                     className={`flex ${isOutgoing ? 'justify-end' : 'justify-start'}`}>
-                                                                      {!isOutgoing && (
+                                                                    {!isOutgoing && (
                                                                         <Avatar className="h-8 w-8 mr-2 mt-1 rounded-full overflow-hidden">
                                                                             <img
                                                                                 src={selectedRoom.adminInfo?.profilePicture || defaultUser}
@@ -344,11 +344,10 @@ const Chat = () => {
                                                                         </Avatar>
                                                                     )}
                                                                     <div
-                                                                        className={`rounded-lg p-3 max-w-xs md:max-w-md ${
-                                                                            isOutgoing ? 'bg-primary-1 text-white' : 'bg-gray-100 text-gray-800'
-                                                                        }`}>
+                                                                        className={`rounded-lg p-3 max-w-xs md:max-w-md ${isOutgoing ? 'bg-primary-1 text-white' : 'bg-gray-100 text-gray-800'
+                                                                            }`}>
                                                                         {msg.type === 'file' && msg.file ? (
-                                                                            <div className="p-2 my-1 rounded-md bg-black bg-opacity-10">
+                                                                            <div className="p-2 my-1 rounded-md  bg-opacity-10">
                                                                                 {msg.file.type.startsWith('image/') ? (
                                                                                     <img
                                                                                         src={msg.file.url}
@@ -356,22 +355,26 @@ const Chat = () => {
                                                                                         className="max-w-xs max-h-48 rounded-md my-1"
                                                                                     />
                                                                                 ) : (
-                                                                                    <div className="flex items-center gap-2 p-2 rounded-md text-white bg-black bg-opacity-20">
-                                                                                        <FileText className="h-6 w-6 text-white" />
-                                                                                        <div className="flex-1">
-                                                                                            <p className="text-sm font-medium text-white truncate">
+                                                                                    <div className="flex items-center gap-2 p-2 rounded-md bg-white text-black">
+                                                                                        <FileText className="h-6 w-6 text-gray-600 shrink-0" />
+
+                                                                                        <div className="flex-1 min-w-0"> {/* Key: min-w-0 allows truncation */}
+                                                                                            <p className="text-sm font-medium text-black truncate">
                                                                                                 {msg.file.name}
                                                                                             </p>
-                                                                                            <p className="text-xs opacity-80">
+                                                                                            <p className="text-xs text-gray-600 opacity-80">
                                                                                                 {formatFileSize(msg.file.size)}
                                                                                             </p>
                                                                                         </div>
+
                                                                                         <a
                                                                                             href={msg.file.url}
                                                                                             target="_blank"
                                                                                             rel="noopener noreferrer"
-                                                                                            download={msg.file.name}>
-                                                                                            <Download className="h-5 w-5 cursor-pointer" />
+                                                                                            download={msg.file.name}
+                                                                                            className="shrink-0"
+                                                                                        >
+                                                                                            <Download className="h-5 w-5 cursor-pointer text-gray-600 hover:text-gray-800" />
                                                                                         </a>
                                                                                     </div>
                                                                                 )}
