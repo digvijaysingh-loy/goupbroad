@@ -34,12 +34,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Loader2, X, Briefcase } from 'lucide-react';
+import TaskPopup from './TaskPopup';
 
 
 const Tasks = () => {
   const [mainTaskCategories, setMainTaskCategories] = useState([]);
   const [selectedMainTask, setSelectedMainTask] = useState('');
-
+const [viewTask, setViewTask] = useState(null);
   // Permission check functions
   const hasAdminPermission = () => {
     const currentUser = getUser();
@@ -797,13 +798,14 @@ const Tasks = () => {
         <table className="w-full ">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="px-4 py-3 text-left font-medium">Status</th>
+              {/* <th className="px-4 py-3 text-left font-medium">Status</th> */}
               <th className="px-4 py-3 text-left font-medium">Task</th>
               {/* <th className="px-4 py-3 text-left font-medium">Main Task</th>   */}
               <th className="px-4 py-3 text-left font-medium">Student</th>
               <th className="px-4 py-3 text-left font-medium">Assignee</th>
               <th className="px-4 py-3 text-left font-medium">Priority</th>
               <th className="px-4 py-3 text-center font-medium">Actions</th>
+
             </tr>
           </thead>
           <tbody>
@@ -822,7 +824,7 @@ const Tasks = () => {
             ) : (
               tasks.map(task => (
                 <tr key={task._id} className="border-b">
-                  <td className="px-4 py-3">
+                  {/* <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       {task.status === 'COMPLETED' ? (
                         <Badge variant="success">Completed</Badge>
@@ -832,7 +834,7 @@ const Tasks = () => {
                         <Badge variant="secondary">Pending</Badge>
                       )}
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-4 py-3">
                     <div>
                       <div className="font-medium truncate max-w-[100px]" title={task.title}>{task.title}</div>
@@ -899,12 +901,20 @@ const Tasks = () => {
                           <Button
                             variant="ghost"
                             size="sm"
+                         onClick={() => setViewTask(task)}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="text-destructive hover:text-destructive"
                             onClick={() => handleDeleteTask(task._id)}
                             disabled={loading.delete}
                           >
                             Delete
                           </Button>
+
                         </>
                       )}
                       {/* {!hasEditPermission() && (
@@ -1732,6 +1742,7 @@ const Tasks = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {viewTask && <TaskPopup task={viewTask} onClose={() => setViewTask(null)} />}
     </div>
   );
 };

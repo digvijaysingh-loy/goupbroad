@@ -1,3 +1,4 @@
+// src/components/ProfileEditForm.jsx
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from '@/components/ui/button';
@@ -6,411 +7,413 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
 import { updateUserProfile, uploadFile } from '@/services/api.services';
 import { toast } from 'sonner';
 import { Upload, Loader2 } from 'lucide-react';
 
-const validatePhoneNumber = (number) => {
-
-  const phoneRegex = /^\+\d{2,3}\d{10}$/;
-  return phoneRegex.test(number);
-};
+const validatePhoneNumber = (number) => /^\+\d{2,3}\d{10}$/.test(number);
 
 const formatPhoneNumber = (number) => {
   if (!number) return '';
-
-
   const cleaned = number.replace(/[^\d+]/g, '');
-
-  // If it doesn't start with +, add +91
-  if (!cleaned.startsWith('+')) {
-    return '+91' + cleaned;
-  }
-
-  // Keep the + and the numbers
-  return cleaned;
+  return cleaned.startsWith('+') ? cleaned : '+91' + cleaned;
 };
 
-const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
+const safeDate = (dateString) => {
+  if (!dateString) return '';
+  const d = new Date(dateString);
+  return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+};
 
-  const createSafeDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
-  };
+const dateToISOString = (dateStr) => (!dateStr ? null : new Date(dateStr).toISOString());
+
+const fallback = (v, fb = '') => v || fb;
+const toNum = (v) => (isNaN(Number(v)) ? 0 : Number(v));
+const strToArr = (s) => (s && typeof s === 'string' ? s.split(',').map((i) => i.trim()).filter(Boolean) : Array.isArray(s) ? s : []);
+
+const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
+  const isBachelor = userData?.degree === 'BACHELOR';
+  const isMaster = userData?.degree === 'MASTER';
 
   const [formData, setFormData] = useState({
     name: userData?.name || '',
     phoneNumber: userData?.phoneNumber || '',
     profilePicture: userData?.profilePicture || '',
     personalDetails: {
-      dob: createSafeDate(userData?.personalDetails?.dob),
+      dob: safeDate(userData?.personalDetails?.dob),
       gender: userData?.personalDetails?.gender || '',
       address: userData?.personalDetails?.address || '',
-      profession: userData?.personalDetails?.profession || ''
+      profession: userData?.personalDetails?.profession || '',
     },
     programDetails: {
       program: userData?.programDetails?.program || '',
-      validity: createSafeDate(userData?.programDetails?.validity),
+      validity: safeDate(userData?.programDetails?.validity),
     },
-    collegeDetails: {
-      branch: userData?.collegeDetails?.branch || '',
-      highestDegree: userData?.collegeDetails?.highestDegree || '',
-      university: userData?.collegeDetails?.university || '',
-      college: userData?.collegeDetails?.college || '',
-      gpa: userData?.collegeDetails?.gpa || '',
-      toppersGPA: userData?.collegeDetails?.toppersGPA || '',
-      noOfBacklogs: userData?.collegeDetails?.noOfBacklogs || '',
-      admissionTerm: userData?.collegeDetails?.admissionTerm || '',
-      coursesApplying: userData?.collegeDetails?.coursesApplying?.join(', ') || ''
-    }, greDetails: {
-      grePlane: createSafeDate(userData?.greDetails?.grePlane),
-      greDate: createSafeDate(userData?.greDetails?.greDate),
-      greScore: {
-        verbal: userData?.greDetails?.greScore?.verbal || '',
-        quant: userData?.greDetails?.greScore?.quant || '',
-        awa: userData?.greDetails?.greScore?.awa || '',
+
+    // ---------- BACHELOR ----------
+    schoolDetails: isBachelor
+      ? {
+          schoolName: userData?.schoolDetails?.schoolName || '',
+          board: userData?.schoolDetails?.board || '',
+          yearOfPassing: userData?.schoolDetails?.yearOfPassing || '',
+          percentage: userData?.schoolDetails?.percentage || '',
+        }
+      : {},
+    satDetails: isBachelor
+      ? {
+          readingWriting: userData?.satDetails?.satScore?.readingWriting ?? '',
+          math: userData?.satDetails?.satScore?.math ?? '',
+          total: userData?.satDetails?.satScore?.total ?? '',
+        }
+      : {},
+    actDetails: isBachelor
+      ? {
+          english: userData?.actDetails?.actScore?.english ?? '',
+          math: userData?.actDetails?.actScore?.math ?? '',
+          total: userData?.actDetails?.actScore?.total ?? '',
+        }
+      : {},
+
+    // ---------- MASTER ----------
+    collegeDetails: isMaster
+      ? {
+          branch: userData?.collegeDetails?.branch || '',
+          highestDegree: userData?.collegeDetails?.highestDegree || '',
+          university: userData?.collegeDetails?.university || '',
+          college: userData?.collegeDetails?.college || '',
+          gpa: userData?.collegeDetails?.gpa ?? '',
+          toppersGPA: userData?.collegeDetails?.toppersGPA ?? '',
+          noOfBacklogs: userData?.collegeDetails?.noOfBacklogs ?? '',
+          admissionTerm: userData?.collegeDetails?.admissionTerm || '',
+          coursesApplying: userData?.collegeDetails?.coursesApplying?.join(', ') || '',
+        }
+      : {},
+    gmatDetails: isMaster
+      ? {
+          total: userData?.gmatDetails?.gmatScore?.total ?? '',
+          quant: userData?.gmatDetails?.gmatScore?.quant ?? '',
+        }
+      : {},
+
+    // ---------- COMMON ----------
+    duolingoDetails: {
+      duolingoPlan: safeDate(userData?.duolingoDetails?.duolingoPlan),
+      duolingoDate: safeDate(userData?.duolingoDetails?.duolingoDate),
+      duolingoScore: {
+        reading: userData?.duolingoDetails?.duolingoScore?.reading ?? '',
+        writing: userData?.duolingoDetails?.duolingoScore?.writing ?? '',
+        listening: userData?.duolingoDetails?.duolingoScore?.listening ?? '',
+        speaking: userData?.duolingoDetails?.duolingoScore?.speaking ?? '',
       },
-      retakingGRE: userData?.greDetails?.retakingGRE || ''
+      retakingDuolingo: userData?.duolingoDetails?.retakingDuolingo || '',
+    },
+    greDetails: {
+      grePlan: safeDate(userData?.greDetails?.grePlan),
+      greDate: safeDate(userData?.greDetails?.greDate),
+      greScore: {
+        verbal: userData?.greDetails?.greScore?.verbal ?? '',
+        quant: userData?.greDetails?.greScore?.quant ?? '',
+        awa: userData?.greDetails?.greScore?.awa ?? '',
+      },
+      retakingGRE: userData?.greDetails?.retakingGRE || '',
     },
     ieltsDetails: {
-      ieltsPlan: createSafeDate(userData?.ieltsDetails?.ieltsPlan),
-      ieltsDate: createSafeDate(userData?.ieltsDetails?.ieltsDate),
+      ieltsPlan: safeDate(userData?.ieltsDetails?.ieltsPlan),
+      ieltsDate: safeDate(userData?.ieltsDetails?.ieltsDate),
       ieltsScore: {
-        reading: userData?.ieltsDetails?.ieltsScore?.reading || '',
-        writing: userData?.ieltsDetails?.ieltsScore?.writing || '',
-        speaking: userData?.ieltsDetails?.ieltsScore?.speaking || '',
-        listening: userData?.ieltsDetails?.ieltsScore?.listening || '',
+        reading: userData?.ieltsDetails?.ieltsScore?.reading ?? '',
+        writing: userData?.ieltsDetails?.ieltsScore?.writing ?? '',
+        speaking: userData?.ieltsDetails?.ieltsScore?.speaking ?? '',
+        listening: userData?.ieltsDetails?.ieltsScore?.listening ?? '',
       },
-      retakingIELTS: userData?.ieltsDetails?.retakingIELTS || ''
-    }, toeflDetails: {
-      toeflPlan: createSafeDate(userData?.toeflDetails?.toeflPlan),
-      toeflDate: createSafeDate(userData?.toeflDetails?.toeflDate),
+      retakingIELTS: userData?.ieltsDetails?.retakingIELTS || '',
+    },
+    toeflDetails: {
+      toeflPlan: safeDate(userData?.toeflDetails?.toeflPlan),
+      toeflDate: safeDate(userData?.toeflDetails?.toeflDate),
       toeflScore: {
-        reading: userData?.toeflDetails?.toeflScore?.reading || '',
-        writing: userData?.toeflDetails?.toeflScore?.writing || '',
-        speaking: userData?.toeflDetails?.toeflScore?.speaking || ''
+        reading: userData?.toeflDetails?.toeflScore?.reading ?? '',
+        writing: userData?.toeflDetails?.toeflScore?.writing ?? '',
+        speaking: userData?.toeflDetails?.toeflScore?.speaking ?? '',
+        listening: userData?.toeflDetails?.toeflScore?.listening ?? '',
       },
-      retakingTOEFL: userData?.toeflDetails?.retakingTOEFL || ''
+      retakingTOEFL: userData?.toeflDetails?.retakingTOEFL || '',
     },
     visa: {
       countriesPlanningToApply: userData?.visa?.countriesPlanningToApply?.join(', ') || '',
-      visaInterviewDate: createSafeDate(userData?.visa?.visaInterviewDate),
-      visaInterviewLocation: userData?.visa?.visaInterviewLocation || ''
-    }
+      visaInterviewDate: safeDate(userData?.visa?.visaInterviewDate),
+      visaInterviewLocation: userData?.visa?.visaInterviewLocation || '',
+    },
   });
 
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
-  const fallbackValue = (value, fallback = 'N/A') => value || fallback;
-  const safeNumber = (value) => (isNaN(Number(value)) ? 0 : Number(value));
-  const stringToArray = (str) => (str && typeof str === 'string'
-    ? str.split(',').map(s => s.trim()).filter(Boolean)
-    : Array.isArray(str) ? str : []);
-  const dateToISOString = (dateStr) => {
-    if (!dateStr) return null;
-    const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? null : d.toISOString();
-  };
 
-  const handleInputChange = (section, field, value) => {
-    if (section) {
-      if (field.includes('.')) {
-        // Handle nested score objects (e.g., greScore.verbal)
-        const [subSection, subField] = field.split('.');
-        setFormData(prev => ({
-          ...prev,
-          [section]: {
-            ...prev[section],
-            [subSection]: {
-              ...prev[section][subSection],
-              [subField]: value
-            }
-          }
-        }));
-      } else {
-        // Handle regular section fields
-        setFormData(prev => ({
-          ...prev,
-          [section]: {
-            ...prev[section],
-            [field]: value
-          }
-        }));
-      }
+  // -------------------------------------------------------------------------
+  // Generic change handler (supports nested paths like greScore.verbal)
+  // -------------------------------------------------------------------------
+  const handleChange = (section, field, value) => {
+    if (!section) {
+      setFormData((p) => ({ ...p, [field]: value }));
+      return;
+    }
+    if (field.includes('.')) {
+      const [sub, subField] = field.split('.');
+      setFormData((p) => ({
+        ...p,
+        [section]: {
+          ...p[section],
+          [sub]: { ...p[section][sub], [subField]: value },
+        },
+      }));
     } else {
-      // Handle top-level fields
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
+      setFormData((p) => ({
+        ...p,
+        [section]: { ...p[section], [field]: value },
       }));
     }
   };
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
+  // -------------------------------------------------------------------------
+  // Phone number formatting
+  // -------------------------------------------------------------------------
+  const handlePhoneChange = (e) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    if (!formatted || formatted === '+' || validatePhoneNumber(formatted) || formatted.length <= 13) {
+      handleChange(null, 'phoneNumber', formatted);
+    }
+  };
+
+  // -------------------------------------------------------------------------
+  // Image upload
+  // -------------------------------------------------------------------------
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
     if (!file) return;
 
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validImageTypes.includes(file.type)) {
-      toast.error('Please upload a valid image file (JPEG, PNG, GIF, or WebP)');
-      return;
-    }
-
-    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-    if (file.size > MAX_SIZE) {
-      toast.error('Image size should be less than 5MB');
-      return;
-    }
+    const valid = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!valid.includes(file.type)) return toast.error('Invalid image type');
+    if (file.size > 5 * 1024 * 1024) return toast.error('Image ≤ 5 MB');
 
     try {
       setImageUploading(true);
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('category', 'profile');
-      const response = await uploadFile(formData);
-      if (response.success && response.data && response.data.url) {
-        setFormData(prev => ({
-          ...prev,
-          profilePicture: response.data.url
-        }));
-        toast.success('Profile image uploaded successfully');
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('category', 'profile');
+      const { data } = await uploadFile(fd);
+      if (data?.url) {
+        setFormData((p) => ({ ...p, profilePicture: data.url }));
+        toast.success('Image uploaded');
       }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast.error(error.response?.data?.message || 'Failed to upload image');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Upload failed');
     } finally {
       setImageUploading(false);
     }
   };
-  const handlePhoneNumberChange = (e) => {
-    const input = e.target.value;
 
-    // Format the phone number
-    const formattedNumber = formatPhoneNumber(input);
-
-    // Only update if the number is valid or empty
-    if (!formattedNumber || formattedNumber === '+' || validatePhoneNumber(formattedNumber) || formattedNumber.length <= 13) {
-      handleInputChange(null, 'phoneNumber', formattedNumber);
-    }
-  };
-
+  // -------------------------------------------------------------------------
+  // Submit
+  // -------------------------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validatePhoneNumber(formData.phoneNumber))
+      return toast.error('Phone must be +CountryCode + 10 digits');
+    // if (!formData.personalDetails.gender) return toast.error('Select gender');
 
-    // Validate phone number before submission
-    if (!validatePhoneNumber(formData.phoneNumber)) {
-      toast.error('Phone number must start with country code (e.g., +918388656625)');
-      return;
-    }
-    if (!formData.personalDetails.gender) {
-      toast.error('Please select a gender');
-      return;
-    }
+    setLoading(true);
     try {
-      setLoading(true);
-
-      const safeNumber = (value) => {
-        const num = Number(value);
-        return isNaN(num) ? 0 : num;
-      };
-
-      const stringToArray = (str) => {
-        return str && typeof str === 'string'
-          ? str.split(',').map(item => item.trim()).filter(Boolean)
-          : Array.isArray(str) ? str : [];
-      };
-
-      const fallbackValue = (value, fallback = 'N/A') => {
-        return value || fallback;
-      };
-
-      const dateToISOString = (dateStr) => {
-        if (!dateStr) return null;
-        const date = new Date(dateStr);
-        return !isNaN(date.getTime()) ? date.toISOString() : null;
-      };
-
-      const processedFormData = {
-        name: fallbackValue(formData.name),
+      const payload = {
+        name: fallback(formData.name),
         email: userData?.email,
-        phoneNumber: fallbackValue(formData.phoneNumber),
+        phoneNumber: fallback(formData.phoneNumber),
         profilePicture: formData.profilePicture,
         personalDetails: {
           dob: dateToISOString(formData.personalDetails.dob),
-          gender: fallbackValue(formData.personalDetails.gender),
-          address: fallbackValue(formData.personalDetails.address),
-          profession: fallbackValue(formData.personalDetails.profession)
+          gender: fallback(formData.personalDetails.gender),
+          address: fallback(formData.personalDetails.address),
+          profession: fallback(formData.personalDetails.profession),
         },
         programDetails: {
-          program: fallbackValue(formData.programDetails.program),
-          validity: dateToISOString(formData.programDetails.validity)
+          program: fallback(formData.programDetails.program),
+          validity: dateToISOString(formData.programDetails.validity),
         },
-        collegeDetails: {
-          branch: fallbackValue(formData.collegeDetails.branch),
-          highestDegree: fallbackValue(formData.collegeDetails.highestDegree),
-          university: fallbackValue(formData.collegeDetails.university),
-          college: fallbackValue(formData.collegeDetails.college),
-          gpa: safeNumber(formData.collegeDetails.gpa),
-          toppersGPA: safeNumber(formData.collegeDetails.toppersGPA),
-          noOfBacklogs: safeNumber(formData.collegeDetails.noOfBacklogs),
-          admissionTerm: fallbackValue(formData.collegeDetails.admissionTerm),
-          coursesApplying: stringToArray(formData.collegeDetails.coursesApplying)
-        }, greDetails: {
-          grePlane: dateToISOString(formData.greDetails.grePlane),
+
+        // BACHELOR
+        ...(isBachelor && {
+          schoolDetails: {
+            schoolName: fallback(formData.schoolDetails.schoolName),
+            board: fallback(formData.schoolDetails.board),
+            yearOfPassing: fallback(formData.schoolDetails.yearOfPassing),
+            percentage: fallback(formData.schoolDetails.percentage),
+          },
+          satDetails: {
+            satScore: {
+              readingWriting: toNum(formData.satDetails.readingWriting),
+              math: toNum(formData.satDetails.math),
+              total: toNum(formData.satDetails.total),
+            },
+          },
+          actDetails: {
+            actScore: {
+              english: toNum(formData.actDetails.english),
+              math: toNum(formData.actDetails.math),
+              total: toNum(formData.actDetails.total),
+            },
+          },
+        }),
+
+        // MASTER
+        ...(isMaster && {
+          collegeDetails: {
+            branch: fallback(formData.collegeDetails.branch),
+            highestDegree: fallback(formData.collegeDetails.highestDegree),
+            university: fallback(formData.collegeDetails.university),
+            college: fallback(formData.collegeDetails.college),
+            gpa: toNum(formData.collegeDetails.gpa),
+            toppersGPA: toNum(formData.collegeDetails.toppersGPA),
+            noOfBacklogs: toNum(formData.collegeDetails.noOfBacklogs),
+            admissionTerm: fallback(formData.collegeDetails.admissionTerm),
+            coursesApplying: strToArr(formData.collegeDetails.coursesApplying),
+          },
+          gmatDetails: {
+            gmatScore: {
+              total: toNum(formData.gmatDetails.total),
+              quant: toNum(formData.gmatDetails.quant),
+            },
+          },
+        }),
+
+        // COMMON
+        duolingoDetails: {
+          duolingoPlan: dateToISOString(formData.duolingoDetails.duolingoPlan),
+          duolingoDate: dateToISOString(formData.duolingoDetails.duolingoDate),
+          duolingoScore: {
+            reading: toNum(formData.duolingoDetails.duolingoScore.reading),
+            writing: toNum(formData.duolingoDetails.duolingoScore.writing),
+            listening: toNum(formData.duolingoDetails.duolingoScore.listening),
+            speaking: toNum(formData.duolingoDetails.duolingoScore.speaking),
+          },
+          retakingDuolingo: fallback(formData.duolingoDetails.retakingDuolingo, 'No'),
+        },
+        greDetails: {
+          grePlan: dateToISOString(formData.greDetails.grePlan),
           greDate: dateToISOString(formData.greDetails.greDate),
           greScore: {
-            verbal: safeNumber(formData.greDetails.greScore.verbal),
-            quant: safeNumber(formData.greDetails.greScore.quant),
-            awa: safeNumber(formData.greDetails.greScore.awa)
+            verbal: toNum(formData.greDetails.greScore.verbal),
+            quant: toNum(formData.greDetails.greScore.quant),
+            awa: toNum(formData.greDetails.greScore.awa),
           },
-          retakingGRE: fallbackValue(formData.greDetails.retakingGRE, 'No')
+          retakingGRE: fallback(formData.greDetails.retakingGRE, 'No'),
         },
         ieltsDetails: {
           ieltsPlan: dateToISOString(formData.ieltsDetails.ieltsPlan),
           ieltsDate: dateToISOString(formData.ieltsDetails.ieltsDate),
           ieltsScore: {
-            reading: safeNumber(formData.ieltsDetails.ieltsScore.reading),
-            writing: safeNumber(formData.ieltsDetails.ieltsScore.writing),
-            speaking: safeNumber(formData.ieltsDetails.ieltsScore.speaking),
-            listening: safeNumber(formData.ieltsDetails.ieltsScore.listening)
+            reading: toNum(formData.ieltsDetails.ieltsScore.reading),
+            writing: toNum(formData.ieltsDetails.ieltsScore.writing),
+            speaking: toNum(formData.ieltsDetails.ieltsScore.speaking),
+            listening: toNum(formData.ieltsDetails.ieltsScore.listening),
           },
-          retakingIELTS: fallbackValue(formData.ieltsDetails.retakingIELTS, 'No')
+          retakingIELTS: fallback(formData.ieltsDetails.retakingIELTS, 'No'),
         },
         toeflDetails: {
           toeflPlan: dateToISOString(formData.toeflDetails.toeflPlan),
           toeflDate: dateToISOString(formData.toeflDetails.toeflDate),
           toeflScore: {
-            reading: safeNumber(formData.toeflDetails.toeflScore.reading),
-            writing: safeNumber(formData.toeflDetails.toeflScore.writing),
-            speaking: safeNumber(formData.toeflDetails.toeflScore.speaking)
+            reading: toNum(formData.toeflDetails.toeflScore.reading),
+            writing: toNum(formData.toeflDetails.toeflScore.writing),
+            speaking: toNum(formData.toeflDetails.toeflScore.speaking),
+            listening: toNum(formData.toeflDetails.toeflScore.listening),
           },
-          retakingTOEFL: fallbackValue(formData.toeflDetails.retakingTOEFL, 'No')
-        }, visa: {
-          countriesPlanningToApply: stringToArray(formData.visa.countriesPlanningToApply),
+          retakingTOEFL: fallback(formData.toeflDetails.retakingTOEFL, 'No'),
+        },
+        visa: {
+          countriesPlanningToApply: strToArr(formData.visa.countriesPlanningToApply),
           visaInterviewDate: dateToISOString(formData.visa.visaInterviewDate),
-          visaInterviewLocation: fallbackValue(formData.visa.visaInterviewLocation)
-        }
+          visaInterviewLocation: fallback(formData.visa.visaInterviewLocation),
+        },
       };
-      const response = await updateUserProfile(processedFormData);
-      if (response.success) {
-        toast.success('The operation has been successful');
 
-        if (onSuccess) {
-          await onSuccess();
-        }
-        if (onClose) {
-          onClose();
-        }
-
-        window.location.reload();
+      const { success } = await updateUserProfile(payload);
+      if (success) {
+        toast.success('Profile updated');
+        onSuccess?.();
+        onClose?.();
+        // window.location.reload();
       } else {
-
-        toast.error(response.message || 'Failed to update profile');
+        toast.error('Update failed');
       }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('An error occurred while updating your profile');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
   };
+
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
   return (
     <form onSubmit={handleSubmit} className="space-y-8 pr-2">
+      {/* ---------- Profile Image ---------- */}
       <Card>
-        <CardHeader>
-          <CardTitle>Profile Image</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Profile Image</CardTitle></CardHeader>
         <CardContent>
           <div className="flex flex-col items-center gap-4">
             <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100">
-              <img
-                src={formData.profilePicture || ''}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
+              <img src={formData.profilePicture || ''} alt="Profile" className="w-full h-full object-cover" />
             </div>
-            <div>
-              <Button
-                variant="outline"
-                type="button"
-                disabled={imageUploading}
-                className="gap-2 cursor-pointer"
-                onClick={() => document.getElementById('profileImageInput').click()}
-              >
-                {imageUploading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="h-4 w-4" />
-                    Change Photo
-                  </>
-                )}
-              </Button>
-              <input
-                id="profileImageInput"
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                onChange={handleImageUpload}
-                className="hidden"
-                disabled={imageUploading}
-              />
-            </div>
+            <Button
+              variant="outline"
+              type="button"
+              disabled={imageUploading}
+              onClick={() => document.getElementById('profileImg').click()}
+              className="gap-2"
+            >
+              {imageUploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4" />
+                  Change Photo
+                </>
+              )}
+            </Button>
+            <input id="profileImg" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
           </div>
         </CardContent>
       </Card>
 
+      {/* ---------- Personal Information ---------- */}
       <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Personal Information</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleInputChange(null, 'name', e.target.value)}
-              />
+              <Input id="name" value={formData.name} onChange={(e) => handleChange(null, 'name', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" value={userData?.email} disabled />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
-              <div className="space-y-1">
-                <Input
-                  id="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handlePhoneNumberChange}
-                  placeholder="+91XXXXXXXXXX"
-                />
-                <p className="text-xs text-muted-foreground">Must include country code (e.g., +918388656625)</p>
-              </div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input id="phone" value={formData.phoneNumber} onChange={handlePhoneChange} placeholder="+91XXXXXXXXXX" />
+              <p className="text-xs text-muted-foreground">e.g. +918388656625</p>
             </div>
-            <div className="space-y-2">              <Label htmlFor="dob">Date of Birth</Label>
-              <Input
-                type="date"
-                id="dob"
-                value={formData.personalDetails.dob}
-                onChange={(e) => handleInputChange('personalDetails', 'dob', e.target.value)}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="dob">Date of Birth</Label>
+              <Input type="date" id="dob" value={formData.personalDetails.dob} onChange={(e) => handleChange('personalDetails', 'dob', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>
-              <Select
-                value={formData.personalDetails.gender}
-                onValueChange={(value) => handleInputChange('personalDetails', 'gender', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
+              <Select value={formData.personalDetails.gender} onValueChange={(v) => handleChange('personalDetails', 'gender', v)}>
+                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="MALE">Male</SelectItem>
                   <SelectItem value="FEMALE">Female</SelectItem>
@@ -420,405 +423,309 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="profession">Profession</Label>
-              <Input
-                id="profession"
-                value={formData.personalDetails.profession}
-                onChange={(e) => handleInputChange('personalDetails', 'profession', e.target.value)}
-              />
+              <Input id="profession" value={formData.personalDetails.profession} onChange={(e) => handleChange('personalDetails', 'profession', e.target.value)} />
             </div>
             <div className="col-span-1 md:col-span-2 space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                value={formData.personalDetails.address}
-                onChange={(e) => handleInputChange('personalDetails', 'address', e.target.value)}
-                rows={3}
-              />
-            </div>      </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Program Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="program">Program</Label>
-              <Input
-                id="program"
-                value={formData.programDetails.program}
-                onChange={(e) => handleInputChange('programDetails', 'program', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">              <Label htmlFor="validity">Validity</Label>
-              <Input
-                type="date"
-                id="validity"
-                value={formData.programDetails.validity}
-                onChange={(e) => handleInputChange('programDetails', 'validity', e.target.value)}
-              />
+              <Textarea id="address" rows={3} value={formData.personalDetails.address} onChange={(e) => handleChange('personalDetails', 'address', e.target.value)} />
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* ---------- Program Details ---------- */}
       <Card>
-        <CardHeader>
-          <CardTitle>College Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="branch">Branch</Label>
-              <Input
-                id="branch"
-                value={formData.collegeDetails.branch}
-                onChange={(e) => handleInputChange('collegeDetails', 'branch', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="highestDegree">Highest Degree</Label>
-              <Input
-                id="highestDegree"
-                value={formData.collegeDetails.highestDegree}
-                onChange={(e) => handleInputChange('collegeDetails', 'highestDegree', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="university">University</Label>
-              <Input
-                id="university"
-                value={formData.collegeDetails.university}
-                onChange={(e) => handleInputChange('collegeDetails', 'university', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="college">College</Label>
-              <Input
-                id="college"
-                value={formData.collegeDetails.college}
-                onChange={(e) => handleInputChange('collegeDetails', 'college', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="gpa">GPA</Label>
-              <Input
-                id="gpa"
-                type="number"
-                step="0.01"
-                value={formData.collegeDetails.gpa}
-                onChange={(e) => handleInputChange('collegeDetails', 'gpa', e.target.value)}
-              />
-            </div>            <div className="space-y-2">
-              <Label htmlFor="toppersGPA">Topper&apos;s GPA</Label>
-              <Input
-                id="toppersGPA"
-                type="number"
-                step="0.01"
-                value={formData.collegeDetails.toppersGPA}
-                onChange={(e) => handleInputChange('collegeDetails', 'toppersGPA', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="noOfBacklogs">Number of Backlogs</Label>
-              <Input
-                id="noOfBacklogs"
-                type="number"
-                value={formData.collegeDetails.noOfBacklogs}
-                onChange={(e) => handleInputChange('collegeDetails', 'noOfBacklogs', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="admissionTerm">Admission Term</Label>
-              <Input
-                id="admissionTerm"
-                value={formData.collegeDetails.admissionTerm}
-                onChange={(e) => handleInputChange('collegeDetails', 'admissionTerm', e.target.value)}
-              />
-            </div>
-            <div className="col-span-1 md:col-span-2 space-y-2">
-              <Label htmlFor="coursesApplying">Courses Applying (comma separated)</Label>
-              <Textarea
-                id="coursesApplying"
-                value={formData.collegeDetails.coursesApplying}
-                onChange={(e) => handleInputChange('collegeDetails', 'coursesApplying', e.target.value)}
-                rows={2}
-              />
-            </div>      </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>GRE Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">              <Label htmlFor="grePlane">GRE Plan Date</Label>
-              <Input
-                type="date"
-                id="grePlane"
-                value={formData.greDetails.grePlane}
-                onChange={(e) => handleInputChange('greDetails', 'grePlane', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">              <Label htmlFor="greDate">GRE Exam Date</Label>
-              <Input
-                type="date"
-                id="greDate"
-                value={formData.greDetails.greDate}
-                onChange={(e) => handleInputChange('greDetails', 'greDate', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="verbal">Verbal Score</Label>
-              <Input
-                id="verbal"
-                type="number"
-                value={formData.greDetails.greScore.verbal}
-                onChange={(e) => handleInputChange('greDetails', 'greScore.verbal', e.target.value)}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="quant">Quantitative Score</Label>
-              <Input
-                id="quant"
-                type="number"
-                value={formData.greDetails.greScore.quant}
-                onChange={(e) => handleInputChange('greDetails', 'greScore.quant', e.target.value)}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="awa">AWA Score</Label>
-              <Input
-                id="awa"
-                type="number"
-                step="0.5"
-                value={formData.greDetails.greScore.awa}
-                onChange={(e) => handleInputChange('greDetails', 'greScore.awa', e.target.value)}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="retakingGRE">Retaking GRE</Label>
-              <Select
-                value={formData.greDetails.retakingGRE}
-                onValueChange={(value) => handleInputChange('greDetails', 'retakingGRE', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Yes">Yes</SelectItem>
-                  <SelectItem value="No">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <CardHeader><CardTitle>Program Details</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="program">Program</Label>
+            <Input id="program" value={formData.programDetails.program} onChange={(e) => handleChange('programDetails', 'program', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="validity">Validity</Label>
+            <Input type="date" id="validity" value={formData.programDetails.validity} onChange={(e) => handleChange('programDetails', 'validity', e.target.value)} />
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>IELTS Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">                <Label htmlFor="ieltsPlan">IELTS Plan Date</Label>
-              <Input
-                type="date"
-                id="ieltsPlan"
-                value={formData.ieltsDetails.ieltsPlan}
-                onChange={(e) => handleInputChange('ieltsDetails', 'ieltsPlan', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">                <Label htmlFor="ieltsDate">IELTS Exam Date</Label>
-              <Input
-                type="date"
-                id="ieltsDate"
-                value={formData.ieltsDetails.ieltsDate}
-                onChange={(e) => handleInputChange('ieltsDetails', 'ieltsDate', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ieltsReading">Reading Score</Label>
-              <Input
-                id="ieltsReading"
-                type="number"
-                step="0.5"
-                value={formData.ieltsDetails.ieltsScore.reading}
-                onChange={(e) => handleInputChange('ieltsDetails', 'ieltsScore.reading', e.target.value)}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ieltsWriting">Writing Score</Label>
-              <Input
-                id="ieltsWriting"
-                type="number"
-                step="0.5"
-                value={formData.ieltsDetails.ieltsScore.writing}
-                onChange={(e) => handleInputChange('ieltsDetails', 'ieltsScore.writing', e.target.value)}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ieltsSpeaking">Speaking Score</Label>
-              <Input
-                id="ieltsSpeaking"
-                type="number"
-                step="0.5"
-                value={formData.ieltsDetails.ieltsScore.speaking}
-                onChange={(e) => handleInputChange('ieltsDetails', 'ieltsScore.speaking', e.target.value)}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ieltsListening">Listening Score</Label>
-              <Input
-                id="ieltsListening"
-                type="number"
-                step="0.5"
-                value={formData.ieltsDetails.ieltsScore.listening}
-                onChange={(e) => handleInputChange('ieltsDetails', 'ieltsScore.listening', e.target.value)}
-                disabled
-                className="bg-gray-50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="retakingIELTS">Retaking IELTS</Label>
-              <Select
-                value={formData.ieltsDetails.retakingIELTS}
-                onValueChange={(value) => handleInputChange('ieltsDetails', 'retakingIELTS', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Yes">Yes</SelectItem>
-                  <SelectItem value="No">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>      </div>
-        </CardContent>
-      </Card>
+      {/* ---------- BACHELOR ONLY ---------- */}
+      {isBachelor && (
+        <>
+          {/* School */}
+          <Card>
+            <CardHeader><CardTitle>School Details</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="schoolName">School Name</Label>
+                <Input id="schoolName" value={formData.schoolDetails.schoolName} onChange={(e) => handleChange('schoolDetails', 'schoolName', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="board">Board</Label>
+                <Input id="board" value={formData.schoolDetails.board} onChange={(e) => handleChange('schoolDetails', 'board', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="yop">Year of Passing</Label>
+                <Input id="yop" value={formData.schoolDetails.yearOfPassing} onChange={(e) => handleChange('schoolDetails', 'yearOfPassing', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="percent">Percentage</Label>
+                <Input id="percent" value={formData.schoolDetails.percentage} onChange={(e) => handleChange('schoolDetails', 'percentage', e.target.value)} />
+              </div>
+            </CardContent>
+          </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>TOEFL Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">                <Label htmlFor="toeflPlan">TOEFL Plan Date</Label>
-              <Input
-                type="date"
-                id="toeflPlan"
-                value={formData.toeflDetails.toeflPlan}
-                onChange={(e) => handleInputChange('toeflDetails', 'toeflPlan', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">                <Label htmlFor="toeflDate">TOEFL Exam Date</Label>
-              <Input
-                type="date"
-                id="toeflDate"
-                value={formData.toeflDetails.toeflDate}
-                onChange={(e) => handleInputChange('toeflDetails', 'toeflDate', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="toeflReading">Reading Score</Label>
-              <Input
-                id="toeflReading"
-                type="number"
-                value={formData.toeflDetails.toeflScore.reading}
-                onChange={(e) => handleInputChange('toeflDetails', 'toeflScore.reading', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="toeflWriting">Writing Score</Label>
-              <Input
-                id="toeflWriting"
-                type="number"
-                value={formData.toeflDetails.toeflScore.writing}
-                onChange={(e) => handleInputChange('toeflDetails', 'toeflScore.writing', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="toeflSpeaking">Speaking Score</Label>
-              <Input
-                id="toeflSpeaking"
-                type="number"
-                value={formData.toeflDetails.toeflScore.speaking}
-                onChange={(e) => handleInputChange('toeflDetails', 'toeflScore.speaking', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="retakingTOEFL">Retaking TOEFL</Label>
-              <Select
-                value={formData.toeflDetails.retakingTOEFL}
-                onValueChange={(value) => handleInputChange('toeflDetails', 'retakingTOEFL', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Yes">Yes</SelectItem>
-                  <SelectItem value="No">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>      </div>
-        </CardContent>
-      </Card>
+          {/* SAT */}
+          <Card>
+            <CardHeader><CardTitle>SAT</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="satRW">Reading + Writing</Label>
+                <Input id="satRW" type="number" value={formData.satDetails.readingWriting} onChange={(e) => handleChange('satDetails', 'readingWriting', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="satMath">Math</Label>
+                <Input id="satMath" type="number" value={formData.satDetails.math} onChange={(e) => handleChange('satDetails', 'math', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="satTotal">Total</Label>
+                <Input id="satTotal" type="number" value={formData.satDetails.total} onChange={(e) => handleChange('satDetails', 'total', e.target.value)} />
+              </div>
+            </CardContent>
+          </Card>
 
+          {/* ACT */}
+          <Card>
+            <CardHeader><CardTitle>ACT</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="actEng">English</Label>
+                <Input id="actEng" type="number" value={formData.actDetails.english} onChange={(e) => handleChange('actDetails', 'english', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="actMath">Math</Label>
+                <Input id="actMath" type="number" value={formData.actDetails.math} onChange={(e) => handleChange('actDetails', 'math', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="actTotal">Total</Label>
+                <Input id="actTotal" type="number" value={formData.actDetails.total} onChange={(e) => handleChange('actDetails', 'total', e.target.value)} />
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {/* ---------- MASTER ONLY ---------- */}
+      {isMaster && (
+        <>
+          {/* College */}
+          <Card>
+            <CardHeader><CardTitle>College Details</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="branch">Branch</Label>
+                <Input id="branch" value={formData.collegeDetails.branch} onChange={(e) => handleChange('collegeDetails', 'branch', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="highestDegree">Highest Degree</Label>
+                <Input id="highestDegree" value={formData.collegeDetails.highestDegree} onChange={(e) => handleChange('collegeDetails', 'highestDegree', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="university">University</Label>
+                <Input id="university" value={formData.collegeDetails.university} onChange={(e) => handleChange('collegeDetails', 'university', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="college">College</Label>
+                <Input id="college" value={formData.collegeDetails.college} onChange={(e) => handleChange('collegeDetails', 'college', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gpa">GPA</Label>
+                <Input id="gpa" type="number" step="0.01" value={formData.collegeDetails.gpa} onChange={(e) => handleChange('collegeDetails', 'gpa', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="toppersGPA">Topper&apos;s GPA</Label>
+                <Input id="toppersGPA" type="number" step="0.01" value={formData.collegeDetails.toppersGPA} onChange={(e) => handleChange('collegeDetails', 'toppersGPA', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="backlogs">Backlogs</Label>
+                <Input id="backlogs" type="number" value={formData.collegeDetails.noOfBacklogs} onChange={(e) => handleChange('collegeDetails', 'noOfBacklogs', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admissionTerm">Admission Term</Label>
+                <Input id="admissionTerm" value={formData.collegeDetails.admissionTerm} onChange={(e) => handleChange('collegeDetails', 'admissionTerm', e.target.value)} />
+              </div>
+              <div className="col-span-1 md:col-span-2 space-y-2">
+                <Label htmlFor="coursesApplying">Courses Applying (comma separated)</Label>
+                <Textarea id="coursesApplying" rows={2} value={formData.collegeDetails.coursesApplying} onChange={(e) => handleChange('collegeDetails', 'coursesApplying', e.target.value)} />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* GMAT */}
+          <Card>
+            <CardHeader><CardTitle>GMAT</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="gmatTotal">Total</Label>
+                <Input id="gmatTotal" type="number" value={formData.gmatDetails.total} onChange={(e) => handleChange('gmatDetails', 'total', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gmatQuant">Quantitative</Label>
+                <Input id="gmatQuant" type="number" value={formData.gmatDetails.quant} onChange={(e) => handleChange('gmatDetails', 'quant', e.target.value)} />
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {/* ---------- COMMON SECTIONS (Duolingo, GRE, IELTS, TOEFL, Visa) ---------- */}
+      {/* Duolingo */}
       <Card>
-        <CardHeader>
-          <CardTitle>Visa Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="col-span-1 md:col-span-2 space-y-2">
-              <Label htmlFor="countriesPlanningToApply">Countries Planning to Apply (comma separated)</Label>
-              <Textarea
-                id="countriesPlanningToApply"
-                value={formData.visa.countriesPlanningToApply}
-                onChange={(e) => handleInputChange('visa', 'countriesPlanningToApply', e.target.value)}
-                rows={2}
-              />
+        <CardHeader><CardTitle>Duolingo</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="duoPlan">Plan Date</Label>
+            <Input type="date" id="duoPlan" value={formData.duolingoDetails.duolingoPlan} onChange={(e) => handleChange('duolingoDetails', 'duolingoPlan', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="duoDate">Exam Date</Label>
+            <Input type="date" id="duoDate" value={formData.duolingoDetails.duolingoDate} onChange={(e) => handleChange('duolingoDetails', 'duolingoDate', e.target.value)} />
+          </div>
+          {['reading', 'writing', 'listening', 'speaking'].map((band) => (
+            <div key={band} className="space-y-2">
+              <Label htmlFor={`duo${band}`}>{band.charAt(0).toUpperCase() + band.slice(1)}</Label>
+              <Input id={`duo${band}`} type="number" step="0.5" value={formData.duolingoDetails.duolingoScore[band]} onChange={(e) => handleChange('duolingoDetails', `duolingoScore.${band}`, e.target.value)} />
             </div>
-            <div className="space-y-2">              <Label htmlFor="visaInterviewDate">Visa Interview Date</Label>
-              <Input
-                type="date"
-                id="visaInterviewDate"
-                value={formData.visa.visaInterviewDate}
-                onChange={(e) => handleInputChange('visa', 'visaInterviewDate', e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="visaInterviewLocation">Visa Interview Location</Label>
-              <Input
-                id="visaInterviewLocation"
-                value={formData.visa.visaInterviewLocation}
-                onChange={(e) => handleInputChange('visa', 'visaInterviewLocation', e.target.value)}
-              />
-            </div>
+          ))}
+          <div className="space-y-2">
+            <Label htmlFor="retakeDuo">Retaking</Label>
+            <Select value={formData.duolingoDetails.retakingDuolingo} onValueChange={(v) => handleChange('duolingoDetails', 'retakingDuolingo', v)}>
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
 
+      {/* GRE */}
+      <Card>
+        <CardHeader><CardTitle>GRE</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="grePlan">Plan Date</Label>
+            <Input type="date" id="grePlan" value={formData.greDetails.grePlan} onChange={(e) => handleChange('greDetails', 'grePlan', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="greDate">Exam Date</Label>
+            <Input type="date" id="greDate" value={formData.greDetails.greDate} onChange={(e) => handleChange('greDetails', 'greDate', e.target.value)} />
+          </div>
+          {['verbal', 'quant', 'awa'].map((s) => (
+            <div key={s} className="space-y-2">
+              <Label htmlFor={`gre${s}`}>{s.toUpperCase()}</Label>
+              <Input id={`gre${s}`} type="number" step={s === 'awa' ? '0.5' : '1'} value={formData.greDetails.greScore[s]} onChange={(e) => handleChange('greDetails', `greScore.${s}`, e.target.value)} />
+            </div>
+          ))}
+          <div className="space-y-2">
+            <Label htmlFor="retakeGRE">Retaking</Label>
+            <Select value={formData.greDetails.retakingGRE} onValueChange={(v) => handleChange('greDetails', 'retakingGRE', v)}>
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* IELTS */}
+      <Card>
+        <CardHeader><CardTitle>IELTS</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="ieltsPlan">Plan Date</Label>
+            <Input type="date" id="ieltsPlan" value={formData.ieltsDetails.ieltsPlan} onChange={(e) => handleChange('ieltsDetails', 'ieltsPlan', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ieltsDate">Exam Date</Label>
+            <Input type="date" id="ieltsDate" value={formData.ieltsDetails.ieltsDate} onChange={(e) => handleChange('ieltsDetails', 'ieltsDate', e.target.value)} />
+          </div>
+          {['reading', 'writing', 'speaking', 'listening'].map((band) => (
+            <div key={band} className="space-y-2">
+              <Label htmlFor={`ielts${band}`}>{band.charAt(0).toUpperCase() + band.slice(1)}</Label>
+              <Input id={`ielts${band}`} type="number" step="0.5" value={formData.ieltsDetails.ieltsScore[band]} onChange={(e) => handleChange('ieltsDetails', `ieltsScore.${band}`, e.target.value)} />
+            </div>
+          ))}
+          <div className="space-y-2">
+            <Label htmlFor="retakeIELTS">Retaking</Label>
+            <Select value={formData.ieltsDetails.retakingIELTS} onValueChange={(v) => handleChange('ieltsDetails', 'retakingIELTS', v)}>
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* TOEFL */}
+      <Card>
+        <CardHeader><CardTitle>TOEFL</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="toeflPlan">Plan Date</Label>
+            <Input type="date" id="toeflPlan" value={formData.toeflDetails.toeflPlan} onChange={(e) => handleChange('toeflDetails', 'toeflPlan', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="toeflDate">Exam Date</Label>
+            <Input type="date" id="toeflDate" value={formData.toeflDetails.toeflDate} onChange={(e) => handleChange('toeflDetails', 'toeflDate', e.target.value)} />
+          </div>
+          {['reading', 'writing', 'speaking', 'listening'].map((band) => (
+            <div key={band} className="space-y-2">
+              <Label htmlFor={`toefl${band}`}>{band.charAt(0).toUpperCase() + band.slice(1)}</Label>
+              <Input id={`toefl${band}`} type="number" value={formData.toeflDetails.toeflScore[band]} onChange={(e) => handleChange('toeflDetails', `toeflScore.${band}`, e.target.value)} />
+            </div>
+          ))}
+          <div className="space-y-2">
+            <Label htmlFor="retakeTOEFL">Retaking</Label>
+            <Select value={formData.toeflDetails.retakingTOEFL} onValueChange={(v) => handleChange('toeflDetails', 'retakingTOEFL', v)}>
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Yes">Yes</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Visa */}
+      <Card>
+        <CardHeader><CardTitle>Visa Details</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="col-span-1 md:col-span-2 space-y-2">
+            <Label htmlFor="countries">Countries (comma separated)</Label>
+            <Textarea id="countries" rows={2} value={formData.visa.countriesPlanningToApply} onChange={(e) => handleChange('visa', 'countriesPlanningToApply', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="visaInterview">Interview Date</Label>
+            <Input type="date" id="visaInterview" value={formData.visa.visaInterviewDate} onChange={(e) => handleChange('visa', 'visaInterviewDate', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="visaLocation">Location</Label>
+            <Input id="visaLocation" value={formData.visa.visaInterviewLocation} onChange={(e) => handleChange('visa', 'visaInterviewLocation', e.target.value)} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ---------- Buttons ---------- */}
       <div className="flex justify-end space-x-4">
         <Button variant="outline" type="button" onClick={onClose}>Cancel</Button>
-        <Button type="submit" disabled={loading} className="bg-primary-1 cursor-pointer">
-          {loading && <span className="mr-2 h-4 w-4 animate-spin">⏳</span>}
+        <Button type="submit" disabled={loading} className="bg-primary-1">
+          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Changes
         </Button>
       </div>
@@ -829,7 +736,7 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
 ProfileEditForm.propTypes = {
   userData: PropTypes.object,
   onClose: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired
+  onSuccess: PropTypes.func.isRequired,
 };
 
 export default ProfileEditForm;

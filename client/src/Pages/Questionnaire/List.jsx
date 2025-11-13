@@ -23,7 +23,7 @@ const QuestionnaireList = () => {
     setIsLoading(true);
     try {
       const response = await getSubtaskQuestionnaires(taskId, subtaskId);
-      
+      console.log(response)
       if (response.success && response.data?.questionnaires) {
         setQuestionnaires(response.data.questionnaires);
         
@@ -131,17 +131,17 @@ const QuestionnaireList = () => {
                     {questionnaires.map((questionnaire, index) => (
                       <div 
                         key={questionnaire.questionnaireId} 
-                        className={`bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer ${
+                        className={`bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow  ${
                           index % 2 === 0 ? 'border-l-4 border-primary-1' : 'border-l-4 border-orange-500'
                         }`}
-                        onClick={() => handleQuestionnaireSelect(questionnaire.questionnaireId)}
+                        // onClick={() => handleQuestionnaireSelect(questionnaire.questionnaireId)}
                       >
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-medium text-gray-800">
                             {questionnaire.title || 'Untitled Questionnaire'}
                           </h3>
-                          
-                          <button 
+                          {questionnaire.taskStatus !== 'COMPLETED' && (
+                                <button 
                             className="bg-primary-1 cursor-pointer hover:bg-teal-800 text-white text-xs font-medium py-2 px-5 rounded"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -150,6 +150,16 @@ const QuestionnaireList = () => {
                           >
                             Start Questionnaire
                           </button>
+                          )}
+                          {questionnaire.taskStatus === 'COMPLETED' && (
+                                <button 
+                            className="bg-primary-1  hover:bg-teal-800 text-white text-xs font-medium py-2 px-5 rounded"
+                           
+                          >
+                            Submitted
+                          </button>
+                          )}
+                      
                         </div>
                         
                         {questionnaire.description && (

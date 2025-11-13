@@ -335,7 +335,7 @@ const OrderConfirmation = () => {
               <Download className="w-5 h-5 mr-2" />
               Download Receipt
             </Button>
-            <Button
+            {/* <Button
               size="lg"
               variant="outline"
               className="border-[#145044] text-[#145044] hover:bg-[#145044]/10"
@@ -343,7 +343,16 @@ const OrderConfirmation = () => {
             >
               <Home className="w-5 h-5 mr-2" />
               Sign In
-            </Button>
+            </Button> */}
+             <Button
+              size="lg"
+              variant="outline"
+              className="border-[#145044] text-[#145044] hover:bg-[#145044]/10"
+              onClick={() => navigate('/dashboard')}
+            >
+              <Home className="w-5 h-5 mr-2" />
+             Go To Dashboard
+            </Button> 
           </div>
 
           {/* Support Information */}

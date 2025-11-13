@@ -35,7 +35,7 @@ const ProfileDetailsCard = ({ title, children, className, onEdit, canEdit = fals
   };
   
   return (
-    <div className={cn('bg-white rounded-lg p-4 sm:p-5 shadow-sm relative', className)}>
+    <div className={cn('bg-white rounded-lg p-2 sm:p-2 shadow-sm relative', className)}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">{title}</h2>
         {canEdit && (

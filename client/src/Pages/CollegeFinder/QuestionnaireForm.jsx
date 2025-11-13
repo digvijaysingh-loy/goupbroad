@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
 import { isAuthenticated, setAuth } from '@/lib/auth';
-import { updateUserProfile } from '@/services/api.services';
+import { updateUserProfile, getUserProfile } from '@/services/api.services';
 import { toast } from 'sonner';
 
 const QuestionnaireForm = () => {
@@ -31,6 +31,7 @@ const QuestionnaireForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authTab, setAuthTab] = useState('signin');
+  const [userProfile, setUserProfile] = useState(null);
 
   const [formData, setFormData] = useState({
     degreeLevel: '',
@@ -282,9 +283,40 @@ const QuestionnaireForm = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const response = await getUserProfile();
+      if (response.success) {
+        setUserProfile(response.data);
+        return response.data;
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      toast.error('Failed to fetch user profile.');
+    }
+    return null;
+  }, []);
+
+  const checkAndHandleLimit = useCallback(async (profile) => {
+    const limit = profile?.universityFinderLlmResponseLimit || 0;
+    if (limit <= 0) {
+      toast.error('Your free limit is exceeded. Please upgrade to continue getting AI-powered recommendations.');
+      return false;
+    }
+    return true;
+  }, []);
+
   const handleAuthSuccess = async (token, user) => {
     setAuth({ accessToken: token, user });
     setShowAuthModal(false);
+
+    // Fetch user profile after auth
+    const profile = await fetchUserProfile();
+    if (profile && !(await checkAndHandleLimit(profile))) {
+      return; // Don't proceed if limit exceeded
+    }
+
+    // Proceed to get universities if limit is okay
     await handleGetUniversities(true);
   };
 
@@ -292,6 +324,15 @@ const QuestionnaireForm = () => {
     if (!skipAuthCheck && !isAuthenticated()) {
       setShowAuthModal(true);
       return;
+    }
+
+    // Fetch user profile if not already fetched
+    let profile = userProfile;
+    if (!profile) {
+      profile = await fetchUserProfile();
+    }
+    if (!profile || !(await checkAndHandleLimit(profile))) {
+      return; // Don't proceed if limit exceeded
     }
 
     setIsSubmitting(true);

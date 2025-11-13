@@ -107,13 +107,20 @@ export const loginUser = async (userData) => {
 export const getUserProfile = async () => {
   return apiService.get('/student/self');
 };
+
 export const getAssignedUniversities = async () => {
   return apiService.get('/student/llm-assigned-university?preferredSpeed=FAST');
 };
+
 export const updateUserProfile = async (profileData) => {
   return apiService.put('/student/profile', profileData);
 };
 
+export const getStudentQuestionnaireResponses = async (taskId, page = 1, limit = 10) => {
+  return servicesAxiosInstance.get(`/admin/tasks/${taskId}/responses`, {
+    params: { page, limit }
+  });
+};
 export const uploadFile = async (formData) => {
   return apiService.post('/upload-file', formData);
 };
