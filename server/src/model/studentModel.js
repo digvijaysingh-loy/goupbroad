@@ -22,8 +22,21 @@ const studentSchema = new mongoose.Schema({
         enum: ['BACHELOR', 'MASTER', 'MBA', 'PHD', 'OTHER'],
         default: null
     },
+    degreeLength: {
+        type: String,
+        enum: ['2 YEARS', '3 YEARS', '4 YEARS', '5 YEARS', 'OTHER'],
+        default: null
+    },
     programDetails: {
         program: {
+            type: String,
+            default: null
+        },
+        intake: {
+            type: String,
+            default: null
+        },
+        duration: {
             type: String,
             default: null
         },
@@ -31,6 +44,21 @@ const studentSchema = new mongoose.Schema({
             type: Date,
             default: null
         }
+    },
+    intakeMode: {
+        type: String,
+        enum: ['BASIC', 'ADVANCED'],
+        default: null
+    },
+    stemRequired: {
+        type: String,
+        enum: ['YES', 'NO'],
+        default: null
+    },
+    f1Required: {
+        type: String,
+        enum: ['YES', 'NO'],
+        default: null
     },
     phoneNumber: {
         type: String,
@@ -43,7 +71,7 @@ const studentSchema = new mongoose.Schema({
         },
         gender: {
             type: String,
-            enum: ['MALE', 'FEMALE', 'OTHER'],
+            enum: ['MALE', 'FEMALE', 'OTHER', ""],
             default: null
         },
         address: {
@@ -148,7 +176,16 @@ const studentSchema = new mongoose.Schema({
             type: String,
             default: null
         },
+        tier: {
+            type: String,
+            enum: ['IIT', 'NIT', 'TIER 1', 'TIER 2', 'TIER 3', 'OTHER'],
+            default: null
+        },
         gpa: {
+            type: Number,
+            default: null
+        },
+        gpaScale: {
             type: Number,
             default: null
         },
@@ -201,6 +238,38 @@ const studentSchema = new mongoose.Schema({
             default: null
         }
     },
+    gmatDetails: {
+        gmatPlan: {
+            type: Date,
+            default: null
+        },
+        gmatDate: {
+            type: Date,
+            default: null
+        },
+        gmatScoreCard: {
+            type: String,
+            default: null
+        },
+        gmatScore: {
+            verbal: {
+                type: Number,
+                default: null
+            },
+            quant: {
+                type: Number,
+                default: null
+            },
+            total: {
+                type: Number,
+                default: null
+            }
+        },
+        retakingGMAT: {
+            type: String,
+            default: null
+        }
+    },
     ieltsDetails: {
         ieltsPlan: {
             type: Date,
@@ -233,6 +302,38 @@ const studentSchema = new mongoose.Schema({
             default: null
         }
     },
+    duolingoDetails: {
+        duolingoPlan: {
+            type: Date,
+            default: null
+        },
+        duolingoDate: {
+            type: Date,
+            default: null
+        },
+        duolingoScore: {
+           reading: {
+                type: Number,
+                default: null
+            },
+            writing: {
+                type: Number,
+                default: null
+            },
+            speaking: {
+                type: Number,
+                default: null
+            },
+            listening: {
+                type: Number,
+                default: null
+            }
+        },
+        retakingDuolingo: {
+            type: String,
+            default: null
+        }
+    },
     toeflDetails: {
         toeflPlan: {
             type: Date,
@@ -254,12 +355,38 @@ const studentSchema = new mongoose.Schema({
             speaking: {
                 type: Number,
                 default: null
+            },
+            listening: {
+                type: Number,
+                default: null
             }
         },
         retakingTOEFL: {
             type: String,
             default: null
         }
+    },
+    experienceDetails: {
+        totalExperience: {
+            type: Number,
+            default: null
+        },
+        experienceIndustry: {
+            type: String,
+            default: null
+        }
+    },
+    leadershipActivities: {
+        type: String,
+        default: null
+    },
+    researchPublications: {
+        type: String,
+        default: null
+    },
+    certifications: {
+        type: String,
+        default: null
     },
     visa: {
         countriesPlanningToApply: {
@@ -283,6 +410,10 @@ const studentSchema = new mongoose.Schema({
     isFeePaid: {
         type: Boolean,
         default: false
+    },
+    universityFinderLlmResponseLimit:{
+        type: Number,
+        default: 5
     },
     planDetails: {
         course: {

@@ -6,6 +6,7 @@ export const EApplicationEnvironment = Object.freeze({
 // activityConstants.js
 export const ACTIVITY_TYPES = Object.freeze({
     LOGIN: 'LOGIN',
+    SIGNUP: 'SIGNUP',
     LOAN_APPLICATION: 'LOAN_APPLICATION',
     PAYMENT_INITIATED: 'PAYMENT_INITIATED',
     PAYMENT_COMPLETED: 'PAYMENT_COMPLETED',

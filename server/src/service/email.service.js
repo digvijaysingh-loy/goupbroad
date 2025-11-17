@@ -9,10 +9,13 @@ const transporter = nodemailer.createTransport({
     user: config.email.user,
     pass: config.email.password,
   },
+  tls: {
+    rejectUnauthorized: false, // <— accept self-signed certs
+  },
 });
 
 const mailer = {
-  sendEmail: async (to, subject, text, html) => {
+  sendEmail: async (to, {subject, text, html}) => {
     console.log(`Sending Email to ${to}`);
     try {
       await transporter.sendMail({
@@ -24,6 +27,7 @@ const mailer = {
       });
       console.log(`✅ Email successfully sent to ${to}`);
     } catch (err) {
+      console.log(err)
       console.error(`❌ Failed to send email: ${err.message}`);
     }
   },

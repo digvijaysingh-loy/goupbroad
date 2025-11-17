@@ -7,12 +7,18 @@ import StudentUniversityAssignment from '../../model/studentUniversityAssignment
 import mongoose from 'mongoose';
 import TaskSubtaskAssignment from '../../model/taskSubtaskAssignmentModel.js';
 import SubtaskQuestionnaireAssignment from '../../model/subtaskQuestionnaireAssignmentModel.js';
+import Task from '../../model/taskModel.js';
+import Subtask from '../../model/subtaskModel.js';
+import mailer from '../../service/email.service.js';
+import config from '../../config/config.js';
+import { AdminQuestionnaireSubmissionTemplate, QuestionnaireSubmissionTemplate } from '../../service/emailTemplates.js';
 import Questionnaire from '../../model/questionnaireModel.js';
 import Response from '../../model/responseModel.js';
 import StudentActivity from '../../model/studentActivitySchema.js';
 import { ACTIVITY_STATUSES, ACTIVITY_TYPES } from '../../constant/application.js';
 import StudentTaskAssignment from '../../model/studentTaskAssignmentModel.js';
 import { getUniversitiesAccurate, getUniversitiesFast, } from '../../util/universityFinder.js';
+import { assign } from 'nodemailer/lib/shared/index.js';
 
 export default {
     getSelfData: async (req, res, next) => {
@@ -34,10 +40,10 @@ export default {
             const updateData = req.body;
 
             // Validate update data
-            const validationResult = validateJoiSchema(ValidateProfileUpdate, updateData);
-            if (validationResult.error) {
-                return httpError(next, validationResult.error, req, 422);
-            }
+            // const validationResult = validateJoiSchema(ValidateProfileUpdate, updateData);
+            // if (validationResult.error) {
+            //     return httpError(next, validationResult.error, req, 422);
+            // }
 
             // Prevent changes to isFeePaid, isVerified, and role
             const restrictedFields = ['isFeePaid', 'isVerified', 'role', "password"];
@@ -110,7 +116,10 @@ export default {
     },
 
     getLlmAssignedUniversity: async (req, res, next) => {
+        const start = Date.now();
         try {
+            
+            console.log("Starting LLM University Finder", start);
             const studentId = req.authenticatedStudent._id;
             const { preferredSpeed } = req.query;
             if (!preferredSpeed || !['FAST', 'ACCURATE'].includes(preferredSpeed)) {
@@ -120,16 +129,30 @@ export default {
             if (!student) {
                 return httpError(next, new Error(responseMessage.NOT_FOUND('Student')), req, 404);
             }
+           // console.log("Student Data:", student);
+            if (student.universityFinderLlmResponseLimit <= 0) {
+                return httpError(next, new Error(responseMessage.CUSTOM_MESSAGE("You have reached your University Finder request limit. Please contact support to increase your limit.")), req, 403);
+            }
             let universityResults;
             if (preferredSpeed === 'FAST') {
+                console.log("Student degree:", student.degree);
                 universityResults = await getUniversitiesFast(student, student.degree);
             } else {
                 universityResults = await getUniversitiesAccurate(student, student.degree);
             }
+            student.universityFinderLlmResponseLimit -= 1;
+            // save student limit update
+            await Student.findByIdAndUpdate(studentId, { universityFinderLlmResponseLimit: student.universityFinderLlmResponseLimit });
+            const end = Date.now();
+            console.log("Completed LLM University Finder", end);
+            console.log(`LLM University Finder (${preferredSpeed}) took ${(end - start) / 1000} s`);
             httpResponse(req, res, 200, responseMessage.SUCCESS, {
                 universityResults
             });
         } catch (err) {
+            console.log("Error occurred in LLM University Finder:", err);
+            const end = Date.now();
+            console.log(`LLM University Finder (${preferredSpeed}) took ${(end - start) / 1000} s`);
             httpError(next, err, req, 500);
         }
     },
@@ -190,373 +213,478 @@ export default {
 
     // Task Controller 
 
-    getStudentTasks: async (req, res, next) => {
-        try {
-            const { value, error } = validateJoiSchema(ValidateGetStudentTasks, { ...req.query });
-            if (error) return httpError(next, error, req, 422);
+   getStudentTasks: async (req, res, next) => {
+    try {
+        const { value, error } = validateJoiSchema(ValidateGetStudentTasks, { ...req.query });
+        if (error) return httpError(next, error, req, 422);
 
-            const { page, limit, sortOrder } = value;
-            const skip = (page - 1) * limit;
+        const { page, limit, sortOrder } = value;
+        const skip = (page - 1) * limit;
 
-            const tasks = await TaskSubtaskAssignment.aggregate([
-                {
-                    $match: {
-                        studentId: req.authenticatedStudent._id,
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'tasks',
-                        localField: 'taskId',
-                        foreignField: '_id',
-                        as: 'taskDetails'
-                    }
-                },
-                {
-                    $unwind: '$taskDetails'
-                },
-                {
-                    $lookup: {
-                        from: 'subtasks',
-                        localField: 'subtaskId',
-                        foreignField: '_id',
-                        as: 'subtaskDetails'
-                    }
-                },
-                {
-                    $unwind: '$subtaskDetails'
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        taskId: '$taskDetails._id',
-                        taskTitle: '$taskDetails.title',
-                        taskDescription: '$taskDetails.description',
-                        taskPriority: '$taskDetails.priority',
-                        taskAssignedAt: '$taskDetails.createdDate',
-                        subtaskId: '$subtaskDetails._id',
-                        subtaskTitle: '$subtaskDetails.title',
-                        subtaskDescription: '$subtaskDetails.description',
-                        subtaskPriority: '$subtaskDetails.priority',
-                        subtaskLogo: '$subtaskDetails.logo',
-                        assignedAt: 1,
-                        status: 1,
-                        isLocked: 1,
-                        dueDate: 1
-                    }
-                },
-                {
-                    $sort: { assignedAt: sortOrder === 'asc' ? 1 : -1 }
-                },
-                {
-                    $skip: skip
-                },
-                {
-                    $limit: limit
+        // -----------------------------------------------------------------
+        // 1. Aggregate from the *new* StudentTaskAssignment collection
+        // -----------------------------------------------------------------
+        const raw = await StudentTaskAssignment.aggregate([
+            // ---- filter by the logged-in student --------------------------------
+            { $match: { studentId: req.authenticatedStudent._id } },
+
+            // ---- bring in Task data --------------------------------------------
+            {
+                $lookup: {
+                    from: 'tasks',
+                    localField: 'taskId',
+                    foreignField: '_id',
+                    as: 'taskDetails'
                 }
-            ]);
+            },
+            { $unwind: '$taskDetails' },
 
-            const totalTasks = await TaskSubtaskAssignment.countDocuments({
-                studentId: req.authenticatedStudent._id,
-            });
+            // ---- bring in Subtask data -----------------------------------------
+            {
+                $lookup: {
+                    from: 'subtasks',
+                    localField: 'subtaskId',
+                    foreignField: '_id',
+                    as: 'subtaskDetails'
+                }
+            },
+            { $unwind: '$subtaskDetails' },
 
-            const pagination = {
-                total: totalTasks,
-                page,
-                limit,
-                totalPages: Math.ceil(totalTasks / limit),
-                hasNextPage: page < Math.ceil(totalTasks / limit),
-                hasPrevPage: page > 1
-            };
+            // ---- (optional) bring in Questionnaire data ------------------------
+            {
+                $lookup: {
+                    from: 'questionnaires',
+                    localField: 'questionnaireId',
+                    foreignField: '_id',
+                    as: 'questionnaireDetails'
+                }
+            },
+            // keep a single object even if questionnaireId is null
+            {
+                $addFields: {
+                    questionnaireDetails: {
+                        $cond: [
+                            { $gt: [{ $size: '$questionnaireDetails' }, 0] },
+                            { $arrayElemAt: ['$questionnaireDetails', 0] },
+                            null
+                        ]
+                    }
+                }
+            },
 
+            // ---- sort by assignment date ---------------------------------------
+            { $sort: { assignedAt: sortOrder === 'asc' ? 1 : -1 } },
 
-            const structuredTasks = tasks.reduce((acc, item) => {
-                const taskId = item.taskId.toString();
-                if (!acc[taskId]) {
-                    acc[taskId] = {
-                        _id: item.taskId,
-                        title: item.taskTitle,
-                        description: item.taskDescription,
-                        priority: item.taskPriority,
-                        assignedAt: item.taskAssignedAt,
-                        subtasks: []
+            // ---- pagination ----------------------------------------------------
+            { $skip: skip },
+            { $limit: limit },
+
+            // ---- final projection (keeps the same fields you used before) -----
+            {
+                $project: {
+                    _id: 0,
+                    taskId: '$taskDetails._id',
+                    taskTitle: '$taskDetails.title',
+                    taskDescription: '$taskDetails.description',
+                    taskPriority: '$taskDetails.priority',
+                    taskAssignedAt: '$taskDetails.createdDate',
+
+                    subtaskId: '$subtaskDetails._id',
+                    subtaskTitle: '$subtaskDetails.title',
+                    subtaskDescription: '$subtaskDetails.description',
+                    subtaskPriority: '$subtaskDetails.priority',
+                    subtaskLogo: '$subtaskDetails.logo',
+
+                    questionnaireId: '$questionnaireDetails._id',
+                    questionnaireTitle: '$questionnaireDetails.title',
+
+                    assignedAt: 1,
+                    status: 1,
+                    isLocked: 1,
+                    dueDate: 1
+                }
+            }
+        ]);
+
+        // -----------------------------------------------------------------
+        // 2. Total count for pagination (still on the new collection)
+        // -----------------------------------------------------------------
+        const totalAssignments = await StudentTaskAssignment.countDocuments({
+            studentId: req.authenticatedStudent._id
+        });
+
+        const pagination = {
+            total: totalAssignments,
+            page,
+            limit,
+            totalPages: Math.ceil(totalAssignments / limit),
+            hasNextPage: page < Math.ceil(totalAssignments / limit),
+            hasPrevPage: page > 1
+        };
+
+        // -----------------------------------------------------------------
+        // 3. Restructure into the exact response format you already send
+        // -----------------------------------------------------------------
+        const structuredTasks = raw.reduce((acc, cur) => {
+            const taskKey = cur.taskId.toString();
+
+            // ---- task entry -------------------------------------------------
+            if (!acc[taskKey]) {
+                acc[taskKey] = {
+                    _id: cur.taskId,
+                    title: cur.taskTitle,
+                    description: cur.taskDescription,
+                    priority: cur.taskPriority,
+                    assignedAt: cur.taskAssignedAt,
+                    subtasks: []
+                };
+            }
+
+            // ---- find (or create) subtask entry inside the task -------------
+            const subKey = cur.subtaskId.toString();
+            let subEntry = acc[taskKey].subtasks.find(s => s._id.toString() === subKey);
+            if (!subEntry) {
+                subEntry = {
+                    _id: cur.subtaskId,
+                    title: cur.subtaskTitle,
+                    description: cur.subtaskDescription,
+                    priority: cur.subtaskPriority,
+                    logo: cur.subtaskLogo,
+                    assignedAt: cur.assignedAt,
+                    status: cur.status,
+                    isLocked: cur.isLocked,
+                    dueDate: cur.dueDate,
+                    questionnaires: []               // <-- new array for questionnaire rows
+                };
+                acc[taskKey].subtasks.push(subEntry);
+            }
+
+            // ---- questionnaire row (only when a questionnaire exists) -------
+            if (cur.questionnaireId) {
+                subEntry.questionnaires.push({
+                    _id: cur.questionnaireId,
+                    title: cur.questionnaireTitle,
+                    status: cur.status,
+                    isLocked: cur.isLocked,
+                    dueDate: cur.dueDate
+                });
+            } else {
+                // keep the original sub-task level fields when there is no questionnaire
+                // (they are already set above)
+            }
+
+            return acc;
+        }, {});
+
+        // Convert map → array
+        const tasks = Object.values(structuredTasks).map(t => {
+            // If a subtask has no questionnaires, keep the sub-task level status fields
+            t.subtasks = t.subtasks.map(s => {
+                if (s.questionnaires.length === 0) {
+                    // expose the sub-task level fields directly (same as before DB change)
+                    return {
+                        _id: s._id,
+                        title: s.title,
+                        description: s.description,
+                        priority: s.priority,
+                        logo: s.logo,
+                        assignedAt: s.assignedAt,
+                        status: s.status,
+                        isLocked: s.isLocked,
+                        dueDate: s.dueDate
                     };
                 }
-                acc[taskId].subtasks.push({
-                    _id: item.subtaskId,
-                    title: item.subtaskTitle,
-                    description: item.subtaskDescription,
-                    priority: item.subtaskPriority,
-                    logo: item.subtaskLogo,
-                    assignedAt: item.assignedAt,
-                    status: item.status,
-                    isLocked: item.isLocked,
-                    dueDate: item.dueDate
-                });
-                return acc;
-            }, {});
-
-            httpResponse(req, res, 200, responseMessage.SUCCESS, {
-                tasks: Object.values(structuredTasks),
-                pagination
-            });
-        } catch (err) {
-            httpError(next, err, req, 500);
-        }
-    },
-
-    // Get questionnaires for a specific task and subtask
-    getSubtaskQuestionnaires: async (req, res, next) => {
-        try {
-            const { value, error } = validateJoiSchema(ValidateGetSubtaskQuestionnaires, { ...req.params });
-            if (error) return httpError(next, error, req, 422);
-
-            const { taskId, subtaskId } = value;
-
-
-            const assignment = await TaskSubtaskAssignment.findOne({
-                studentId: req.authenticatedStudent._id,
-                taskId,
-                subtaskId,
-
-            }).lean();
-
-            if (!assignment) {
-                return httpError(next, new Error('Task or subtask not assigned to the student or not accessible'), req, 404);
-            }
-
-            const questionnaires = await SubtaskQuestionnaireAssignment.aggregate([
-                {
-                    $match: { subtaskId: assignment.subtaskId }
-                },
-                {
-                    $lookup: {
-                        from: 'questionnaires',
-                        localField: 'questionnaireId',
-                        foreignField: '_id',
-                        as: 'questionnaireDetails'
-                    }
-                },
-                {
-                    $unwind: '$questionnaireDetails'
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        questionnaireId: '$questionnaireDetails._id',
-                        title: '$questionnaireDetails.title',
-                        description: '$questionnaireDetails.description',
-                        status: '$questionnaireDetails.status',
-                        // questions: '$questionnaireDetails.questions',
-                        assignedAt: 1
-                    }
-                }
-            ]);
-
-            httpResponse(req, res, 200, responseMessage.SUCCESS, {
-                questionnaires
-            });
-        } catch (err) {
-            console.log(err);
-
-            httpError(next, err, req, 500);
-        }
-    },
-
-
-    // Get questions of a questionnaire with existing responses
-    getQuestionnaireQuestionsWithResponses: async (req, res, next) => {
-        try {
-            const { value, error } = validateJoiSchema(ValidateGetQuestionnaireQuestions, { ...req.params });
-            if (error) return httpError(next, error, req, 422);
-
-            const { taskId, subtaskId, questionnaireId } = value;
-
-            // Verify assignment
-            const assignment = await TaskSubtaskAssignment.findOne({
-                studentId: req.authenticatedStudent._id,
-                taskId,
-                subtaskId,
-                // status: { $in: ['PENDING', 'IN_PROGRESS', 'COMPLETED'] }
-            }).lean();
-
-            if (!assignment) {
-                return httpError(next, new Error('Task or subtask not assigned to the student or not accessible'), req, 404);
-            }
-
-
-
-            // Verify questionnaire assignment
-            const questionnaireAssignment = await SubtaskQuestionnaireAssignment.findOne({
-                subtaskId: assignment.subtaskId,
-                questionnaireId
-            }).lean();
-
-            if (!questionnaireAssignment) {
-                return httpError(next, new Error('Questionnaire not assigned to the subtask'), req, 404);
-            }
-
-            // Fetch questionnaire with questions
-            const questionnaire = await Questionnaire.findById(questionnaireId).lean();
-            if (!questionnaire) {
-                return httpError(next, new Error('Questionnaire not found'), req, 404);
-            }
-
-            // Fetch existing responses
-            const responses = await Response.find({
-                studentId: req.authenticatedStudent._id,
-                taskId,
-                subtaskId,
-                questionnaireId
-            }).lean();
-
-            // Merge questions with responses
-            const questionsWithResponses = questionnaire.questions.map(question => {
-                const response = responses.find(r => r.questionId.toString() === question._id.toString());
+                // otherwise return the subtask with its questionnaire array
                 return {
-                    _id: question._id,
-                    question: question.question,
-                    ansType: question.ansType,
-                    options: question.options || [],
-                    answer: response ? response.answer : null,
-                    status: response ? response.status : 'PENDING',
-                    feedback: response ? response.feedback : null
+                    _id: s._id,
+                    title: s.title,
+                    description: s.description,
+                    priority: s.priority,
+                    logo: s.logo,
+                    assignedAt: s.assignedAt,
+                    status: s.status,
+                    isLocked: s.isLocked,
+                    dueDate: s.dueDate,
+                    questionnaires: s.questionnaires
                 };
             });
+            return t;
+        });
 
-            httpResponse(req, res, 200, responseMessage.SUCCESS, {
-                questionnaire: {
-                    _id: questionnaire._id,
-                    title: questionnaire.title,
-                    description: questionnaire.description,
-                    status: questionnaire.status,
-                    questions: questionsWithResponses
-                }
-            });
-        } catch (err) {
-            httpError(next, err, req, 500);
+        // -----------------------------------------------------------------
+        // 4. Send response – **identical shape** to the original controller
+        // -----------------------------------------------------------------
+        httpResponse(req, res, 200, responseMessage.SUCCESS, {
+            tasks,
+            pagination
+        });
+    } catch (err) {
+        httpError(next, err, req, 500);
+    }
+},
+
+    // Get questionnaires for a specific task and subtask
+getSubtaskQuestionnaires: async (req, res, next) => {
+    try {
+        const { value, error } = validateJoiSchema(ValidateGetSubtaskQuestionnaires, { ...req.params });
+        if (error) return httpError(next, error, req, 422);
+
+        const { taskId, subtaskId } = value;
+
+        // 1. Find all StudentTaskAssignment entries for this student + task + subtask
+        const assignments = await StudentTaskAssignment.find({
+            studentId: req.authenticatedStudent._id,
+            taskId,
+            subtaskId
+        })
+        .populate({
+            path: 'questionnaireId',
+            match: { status: 'ACTIVE' }, // Only ACTIVE questionnaires
+            select: 'title description status'
+        })
+        .lean();
+
+        if (!assignments || assignments.length === 0) {
+            return httpError(next, new Error('Task or subtask not assigned to the student or not accessible'), req, 404);
         }
-    },
 
-    // Submit or update responses for a questionnaire
-    submitQuestionnaireResponses: async (req, res, next) => {
-        try {
-            const { value, error } = validateJoiSchema(ValidateSubmitQuestionnaireResponse, { ...req.params, ...req.body });
-            if (error) return httpError(next, error, req, 422);
+        // 2. Build response: only include assignments that have an ACTIVE questionnaire
+        const questionnaires = assignments
+            .filter(a => a.questionnaireId) // Only those with ACTIVE questionnaire
+            .map(a => ({
+                _id: a._id,
+                questionnaireId: a.questionnaireId._id,
+                title: a.questionnaireId.title,
+                description: a.questionnaireId.description,
+                status: a.questionnaireId.status,
+                taskStatus: a.status, // Student's progress on this questionnaire
+                assignedAt: a.assignedAt
+            }));
 
-            const { taskId, subtaskId, questionnaireId, responses } = value;
+        // 3. If no active questionnaires found
+        if (questionnaires.length === 0) {
+            return httpResponse(req, res, 200, responseMessage.SUCCESS, { questionnaires: [] });
+        }
 
-            const assignment = await TaskSubtaskAssignment.findOne({
+        httpResponse(req, res, 200, responseMessage.SUCCESS, { questionnaires });
+    } catch (err) {
+        console.log(err);
+        httpError(next, err, req, 500);
+    }
+},
+
+
+
+   getQuestionnaireQuestionsWithResponses: async (req, res, next) => {
+    try {
+        const { value, error } = validateJoiSchema(ValidateGetQuestionnaireQuestions, { ...req.params });
+        if (error) return httpError(next, error, req, 422);
+
+        const { taskId, subtaskId, questionnaireId } = value;
+
+        // 1. Verify student has access via StudentTaskAssignment
+        const assignment = await StudentTaskAssignment.findOne({
+            studentId: req.authenticatedStudent._id,
+            taskId,
+            subtaskId,
+            questionnaireId
+        }).lean();
+
+        if (!assignment) {
+            return httpError(next, new Error('Task, subtask, or questionnaire not assigned to the student or not accessible'), req, 404);
+        }
+
+        // 2. Fetch the questionnaire (with questions)
+        const questionnaire = await Questionnaire.findById(questionnaireId)
+            .select('title description status questions')
+            .lean();
+
+        if (!questionnaire) {
+            return httpError(next, new Error('Questionnaire not found'), req, 404);
+        }
+
+        // 3. Fetch existing responses for this student + task + subtask + questionnaire
+        const responses = await Response.find({
+            studentId: req.authenticatedStudent._id,
+            taskId,
+            subtaskId,
+            questionnaireId
+        }).lean();
+
+        // 4. Map questions with responses
+        const questionsWithResponses = questionnaire.questions.map(question => {
+            const response = responses.find(r => 
+                r.questionId.toString() === question._id.toString()
+            );
+
+            return {
+                _id: question._id,
+                question: question.question,
+                ansType: question.ansType,
+                options: question.options || [],
+                answer: response ? response.answer : null,
+                status: response ? response.status : 'PENDING',
+                feedback: response ? response.feedback : null
+            };
+        });
+
+        // 5. Return in exact same format
+        httpResponse(req, res, 200, responseMessage.SUCCESS, {
+            questionnaire: {
+                _id: questionnaire._id,
+                title: questionnaire.title,
+                description: questionnaire.description,
+                status: questionnaire.status,
+                questions: questionsWithResponses
+            }
+        });
+    } catch (err) {
+        httpError(next, err, req, 500);
+    }
+},
+
+   submitQuestionnaireResponses: async (req, res, next) => {
+    try {
+        const { value, error } = validateJoiSchema(ValidateSubmitQuestionnaireResponse, { ...req.params, ...req.body });
+        if (error) return httpError(next, error, req, 422);
+
+        const { taskId, subtaskId, questionnaireId, responses } = value;
+
+        // 1. Find the specific StudentTaskAssignment (includes questionnaireId)
+        const assignment = await StudentTaskAssignment.findOne({
+            studentId: req.authenticatedStudent._id,
+            taskId,
+            subtaskId,
+            questionnaireId
+        }).lean();
+
+        if (!assignment) {
+            return httpError(next, new Error('Task, subtask, or questionnaire not assigned to the student or not accessible'), req, 404);
+        }
+
+        // 2. Fetch the questionnaire to validate questions
+        const questionnaire = await Questionnaire.findById(questionnaireId).lean();
+        if (!questionnaire) {
+            return httpError(next, new Error('Questionnaire not found'), req, 404);
+        }
+
+        const questionIds = questionnaire.questions.map(q => q._id.toString());
+        const responseMap = new Map(responses.map(r => [r.questionId, r.answer]));
+
+        const task = await Task.findById(taskId).lean();
+        const subtask = await Subtask.findById(subtaskId).lean();
+
+        const taskTitle = task ? task.title : 'Unknown Task';
+        const subtaskTitle = subtask ? subtask.title : 'Unknown Subtask';
+
+        // 3. Validate each response
+        const operations = responses.map(async response => {
+            if (!questionIds.includes(response.questionId)) {
+                throw new Error(`Invalid question ID: ${response.questionId}`);
+            }
+
+            const question = questionnaire.questions.find(q => q._id.toString() === response.questionId);
+            const ansType = question.ansType;
+
+            let validatedAnswer = response.answer;
+
+            // Type validation per ansType
+            switch (ansType) {
+                case 'TEXT':
+                case 'PARAGRAPH':
+                    if (typeof validatedAnswer !== 'string') {
+                        throw new Error(`Answer for "${question.question}" must be a string`);
+                    }
+                    break;
+
+                case 'MULTIPLE_CHOICE':
+                case 'CHECKBOX':
+                    if (!Array.isArray(validatedAnswer) || !validatedAnswer.every(a => typeof a === 'string')) {
+                        throw new Error(`Answer for "${question.question}" must be an array of strings`);
+                    }
+                    if (ansType === 'MULTIPLE_CHOICE' && validatedAnswer.length > 1) {
+                        throw new Error(`Only one option allowed for "${question.question}"`);
+                    }
+                    break;
+
+                case 'FILE':
+                    if (typeof validatedAnswer !== 'string' || !validatedAnswer.match(/^https?:\/\//)) {
+                        throw new Error(`Answer for "${question.question}" must be a valid URL`);
+                    }
+                    break;
+
+                case 'DATE':
+                    // Allow string (ISO) or Date object; validate format if needed
+                    if (typeof validatedAnswer === 'string' && !isNaN(Date.parse(validatedAnswer))) {
+                        validatedAnswer = new Date(validatedAnswer);
+                    } else if (!(validatedAnswer instanceof Date) || isNaN(validatedAnswer)) {
+                        throw new Error(`Answer for "${question.question}" must be a valid date`);
+                    }
+                    break;
+
+                default:
+                    throw new Error(`Unsupported answer type: ${ansType}`);
+            }
+
+            // 4. Upsert response
+            const filter = {
                 studentId: req.authenticatedStudent._id,
                 taskId,
                 subtaskId,
-                status: { $in: ['PENDING', 'IN_PROGRESS', 'COMPLETED'] }
-            }).lean();
+                questionnaireId,
+                questionId: response.questionId
+            };
 
-            if (!assignment) {
-                return httpError(next, new Error('Task or subtask not assigned to the student or not accessible'), req, 404);
-            }
+            const update = {
+                $set: {
+                    answer: validatedAnswer,
+                    status: 'SUBMITTED',
+                    submittedAt: new Date()
+                },
+                $inc: { version: 1 }
+            };
 
-            const questionnaireAssignment = await SubtaskQuestionnaireAssignment.findOne({
-                subtaskId: assignment.subtaskId,
-                questionnaireId
-            }).lean();
-
-            if (!questionnaireAssignment) {
-                return httpError(next, new Error('Questionnaire not assigned to the subtask'), req, 404);
-            }
-
-            const questionnaire = await Questionnaire.findById(questionnaireId).lean();
-            if (!questionnaire) {
-                return httpError(next, new Error('Questionnaire not found'), req, 404);
-            }
-
-            const questionIds = questionnaire.questions.map(q => q._id.toString());
-            const responseMap = new Map(responses.map(r => [r.questionId, r.answer]));
-
-            const operations = responses.map(async response => {
-                if (!questionIds.includes(response.questionId)) {
-                    throw new Error(`Invalid question ID: ${response.questionId}`);
-                }
-
-                const question = questionnaire.questions.find(q => q._id.toString() === response.questionId);
-                const ansType = question.ansType;
-
-                let validatedAnswer = response.answer;
-                switch (ansType) {
-                    case 'TEXT':
-                    case 'PARAGRAPH':
-                        if (typeof validatedAnswer !== 'string') throw new Error(`Answer for ${question.question} must be a string`);
-                        break;
-                    case 'MULTIPLE_CHOICE':
-                    case 'CHECKBOX':
-                        if (!Array.isArray(validatedAnswer) || !validatedAnswer.every(a => typeof a === 'string')) {
-                            throw new Error(`Answer for ${question.question} must be an array of strings`);
-                        }
-                        if (ansType === 'MULTIPLE_CHOICE' && validatedAnswer.length > 1) {
-                            throw new Error(`Only one option allowed for ${question.question}`);
-                        }
-                        break;
-                    case 'FILE':
-                        if (typeof validatedAnswer !== 'string' || !validatedAnswer.match(/^https?:\/\//)) {
-                            throw new Error(`Answer for ${question.question} must be a valid URL`);
-                        }
-                        break;
-                    case 'DATE':
-                        // if (!(validatedAnswer instanceof Date) || isNaN(validatedAnswer)) {
-                        //     throw new Error(`Answer for ${question.question} must be a valid date`);
-                        // }
-                        break;
-                }
-
-                const existingResponse = await Response.findOne({
-                    studentId: req.authenticatedStudent._id,
-                    taskId,
-                    subtaskId,
-                    questionnaireId,
-                    questionId: response.questionId
-                });
-
-                if (existingResponse) {
-                    existingResponse.answer = validatedAnswer;
-                    existingResponse.status = 'SUBMITTED';
-                    existingResponse.submittedAt = new Date();
-                    existingResponse.version += 1;
-                    return existingResponse.save();
-                } else {
-                    return new Response({
-                        studentId: req.authenticatedStudent._id,
-                        taskId,
-                        subtaskId,
-                        questionnaireId,
-                        questionId: response.questionId,
-                        answer: validatedAnswer,
-                        status: 'SUBMITTED',
-                        submittedAt: new Date()
-                    }).save();
-                }
-
+            return Response.findOneAndUpdate(filter, update, {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
             });
+        });
 
-            await Promise.all(operations);
-
-            const activity = new StudentActivity({
+        // 5. Mark the questionnaire assignment as COMPLETED
+        await StudentTaskAssignment.findOneAndUpdate(
+            {
                 studentId: req.authenticatedStudent._id,
-                activityType: ACTIVITY_TYPES.QUESTIONNAIRE_SUBMITTED,
-                message: `Student submitted responses for questionnaire ${questionnaire?.title}`,
-                status: ACTIVITY_STATUSES.SUBMITTED,
-                details: { taskId, subtaskId, questionnaireId }
-            });
-            await activity.save();
+                taskId,
+                subtaskId,
+                questionnaireId
+            },
+            { status: 'COMPLETED' }
+        );
 
-            httpResponse(req, res, 201, responseMessage.SUCCESS, {
-                message: 'Responses submitted successfully'
-            });
-        } catch (err) {
-            httpError(next, err, req, 400);
-        }
-    },
+        // 6. Execute all response saves
+        await Promise.all(operations);
 
+        // 7. Log student activity
+        const activity = new StudentActivity({
+            studentId: req.authenticatedStudent._id,
+            activityType: ACTIVITY_TYPES.QUESTIONNAIRE_SUBMITTED,
+            message: `Student submitted responses for questionnaire "${questionnaire.title}"`,
+            status: ACTIVITY_STATUSES.SUBMITTED,
+            details: { taskId, subtaskId, questionnaireId }
+        });
+        await activity.save();
+
+        // 8. Success response (unchanged format)
+        httpResponse(req, res, 201, responseMessage.SUCCESS, {
+            message: 'Responses submitted successfully'
+        });
+        await mailer.sendEmail(req.authenticatedStudent.email, QuestionnaireSubmissionTemplate(taskTitle, subtaskTitle, questionnaire.title));
+        await mailer.sendEmail(config.SUPPORT_EMAIL, AdminQuestionnaireSubmissionTemplate(req.authenticatedStudent.email, req.authenticatedStudent.name ,taskTitle, subtaskTitle, questionnaire.title));
+    } catch (err) {
+        httpError(next, err, req, 400);
+    }
+},
 
     getStudentTimeline: async (req, res, next) => {
         try {

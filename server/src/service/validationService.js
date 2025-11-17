@@ -126,10 +126,12 @@ export const ValidateResetPassword = Joi.object({
 
 // validation/student.update.validation.js
 
+
+
 import { EAuthProvider } from '../constant/application.js';
 
-// Reusable atoms
-const urlString = Joi.string().uri().messages({ 'string.uri': 'Must be a valid URL' });
+// ---------- Reusable atoms ----------
+const urlString = Joi.string().allow(null, ''); // string or empty string or null
 
 const phoneWithCountry = Joi.string()
   .pattern(/^\+([1-9]{1}[0-9]{1,2})\d{10}$/)
@@ -138,161 +140,217 @@ const phoneWithCountry = Joi.string()
     'string.pattern.base': 'Phone number must start with a country code (e.g., +918388656625)',
   });
 
-const degreeEnum = Joi.string().valid('BACHELOR', 'MASTER', 'MBA', 'PHD', 'OTHER').allow(null);
-const genderEnum = Joi.string().valid('MALE', 'FEMALE', 'OTHER').allow(null);
+const degreeEnum = Joi.string().valid('BACHELOR', 'MASTER', 'MBA', 'PHD', 'OTHER').allow(null, '');
+const degreeLengthEnum = Joi.string().valid('2 YEARS', '3 YEARS', '4 YEARS', '5 YEARS', 'OTHER').allow(null, '');
+const intakeModeEnum = Joi.string().valid('BASIC', 'ADVANCED').allow(null, '');
+const yesNoEnum = Joi.string().valid('YES', 'NO').allow(null, '');
+const genderEnum = Joi.string().valid('MALE', 'FEMALE', 'OTHER', "").allow(null, "");
 const statusEnum = Joi.string().valid('PENDING', 'ACTIVE', 'COMPLETE', 'REJECTED');
 const providerEnum = Joi.string().valid(...Object.values(EAuthProvider));
+const tierEnum = Joi.string().valid('IIT', 'NIT', 'TIER 1', 'TIER 2', 'TIER 3', 'OTHER').allow(null, '');
 
-// Reusable nested blocks (all optional & null-friendly to allow clearing fields)
+// ---------- Reusable nested blocks (all optional & null/empty-string friendly) ----------
 const programDetails = Joi.object({
-  program: Joi.string().allow(null),
-  validity: Joi.date().allow(null),
-}).allow(null);
+  program: Joi.string().allow(null, ''),
+  intake: Joi.string().allow(null, ''),
+  duration: Joi.string().allow(null, ''),
+  validity: Joi.date().allow(null, ''),
+}).allow(null, '');
 
 const personalDetails = Joi.object({
-  dob: Joi.date().allow(null),
+  dob: Joi.date().allow(null, ''),
   gender: genderEnum,
-  address: Joi.string().allow(null),
-  profession: Joi.string().allow(null),
-}).allow(null);
+  address: Joi.string().allow(null, ''),
+  profession: Joi.string().allow(null, ''),
+}).allow(null, '');
 
 const schoolDetails = Joi.object({
-  schoolName: Joi.string().allow(null),
-  board: Joi.string().allow(null),
-  yearOfPassing: Joi.number().integer().allow(null),
-  percentage: Joi.number().allow(null),
-}).allow(null);
+  schoolName: Joi.string().allow(null, ''),
+  board: Joi.string().allow(null, ''),
+  yearOfPassing: Joi.number().integer().allow(null, ''),
+  percentage: Joi.number().allow(null, ''),
+}).allow(null, '');
 
 const satDetails = Joi.object({
-  satPlan: Joi.date().allow(null),
-  satDate: Joi.date().allow(null),
-  satScoreCard: Joi.string().allow(null),
+  satPlan: Joi.date().allow(null, ''),
+  satDate: Joi.date().allow(null, ''),
+  satScoreCard: Joi.string().allow(null, ''),
   satScore: Joi.object({
-    readingWriting: Joi.number().allow(null),
-    math: Joi.number().allow(null),
-    total: Joi.number().allow(null),
-  }).allow(null),
-}).allow(null);
+    readingWriting: Joi.number().allow(null, ''),
+    math: Joi.number().allow(null, ''),
+    total: Joi.number().allow(null, ''),
+  }).allow(null, ''),
+}).allow(null, '');
 
 const actDetails = Joi.object({
-  actPlan: Joi.date().allow(null),
-  actDate: Joi.date().allow(null),
-  actScoreCard: Joi.string().allow(null),
+  actPlan: Joi.date().allow(null, ''),
+  actDate: Joi.date().allow(null, ''),
+  actScoreCard: Joi.string().allow(null, ''),
   actScore: Joi.object({
-    english: Joi.number().allow(null),
-    math: Joi.number().allow(null),
-    total: Joi.number().allow(null),
-  }).allow(null),
-}).allow(null);
+    english: Joi.number().allow(null, ''),
+    math: Joi.number().allow(null, ''),
+    total: Joi.number().allow(null, ''),
+  }).allow(null, ''),
+}).allow(null, '');
 
 const collegeDetails = Joi.object({
-  branch: Joi.string().allow(null),
-  highestDegree: Joi.string().allow(null),
-  university: Joi.string().allow(null),
-  college: Joi.string().allow(null),
-  gpa: Joi.number().allow(null),
-  toppersGPA: Joi.number().allow(null),
-  noOfBacklogs: Joi.number().allow(null),
-  admissionTerm: Joi.string().allow(null),
-  coursesApplying: Joi.array().items(Joi.string()).allow(null),
-}).allow(null);
+  branch: Joi.string().allow(null, ''),
+  highestDegree: Joi.string().allow(null, ''),
+  university: Joi.string().allow(null, ''),
+  college: Joi.string().allow(null, ''),
+  tier: tierEnum,
+  gpa: Joi.number().allow(null, ''),
+  gpaScale: Joi.number().allow(null, ''),
+  toppersGPA: Joi.number().allow(null, ''),
+  noOfBacklogs: Joi.number().allow(null, ''),
+  admissionTerm: Joi.string().allow(null, ''),
+  coursesApplying: Joi.array().items(Joi.string()).allow(null, ''),
+}).allow(null, '');
 
 const greDetails = Joi.object({
-  grePlan: Joi.date().allow(null),    // ✅ matches model
-  greDate: Joi.date().allow(null),
-  greScoreCard: Joi.string().allow(null),
+  grePlan: Joi.date().allow(null, ''),
+  greDate: Joi.date().allow(null, ''),
+  greScoreCard: Joi.string().allow(null, ''),
   greScore: Joi.object({
-    verbal: Joi.number().allow(null),
-    quant: Joi.number().allow(null),
-    awa: Joi.number().allow(null),
-  }).allow(null),
-  retakingGRE: Joi.string().allow(null),
-}).allow(null);
+    verbal: Joi.number().allow(null, ''),
+    quant: Joi.number().allow(null, ''),
+    awa: Joi.number().allow(null, ''),
+  }).allow(null, ''),
+  retakingGRE: Joi.string().allow(null, ''),
+}).allow(null, '');
+
+const gmatDetails = Joi.object({
+  gmatPlan: Joi.date().allow(null, ''),
+  gmatDate: Joi.date().allow(null, ''),
+  gmatScoreCard: Joi.string().allow(null, ''),
+  gmatScore: Joi.object({
+    verbal: Joi.number().allow(null, ''),
+    quant: Joi.number().allow(null, ''),
+    total: Joi.number().allow(null, ''),
+  }).allow(null, ''),
+  retakingGMAT: Joi.string().allow(null, ''),
+}).allow(null, '');
 
 const ieltsDetails = Joi.object({
-  ieltsPlan: Joi.date().allow(null),
-  ieltsDate: Joi.date().allow(null),
+  ieltsPlan: Joi.date().allow(null, ''),
+  ieltsDate: Joi.date().allow(null, ''),
   ieltsScore: Joi.object({
-    reading: Joi.number().allow(null),
-    writing: Joi.number().allow(null),
-    speaking: Joi.number().allow(null),
-    listening: Joi.number().allow(null),
-  }).allow(null),
-  retakingIELTS: Joi.string().allow(null),
-}).allow(null);
+    reading: Joi.number().allow(null, ''),
+    writing: Joi.number().allow(null, ''),
+    speaking: Joi.number().allow(null, ''),
+    listening: Joi.number().allow(null, ''),
+  }).allow(null, ''),
+  retakingIELTS: Joi.string().allow(null, ''),
+}).allow(null, '');
 
 const toeflDetails = Joi.object({
-  toeflPlan: Joi.date().allow(null),
-  toeflDate: Joi.date().allow(null),
+  toeflPlan: Joi.date().allow(null, ''),
+  toeflDate: Joi.date().allow(null, ''),
   toeflScore: Joi.object({
-    reading: Joi.number().allow(null),
-    writing: Joi.number().allow(null),
-    speaking: Joi.number().allow(null),
-  }).allow(null),                      // ✅ no listening in model
-  retakingTOEFL: Joi.string().allow(null),
-}).allow(null);
+    reading: Joi.number().allow(null, ''),
+    writing: Joi.number().allow(null, ''),
+    speaking: Joi.number().allow(null, ''),
+    listening: Joi.number().allow(null, ''),
+  }).allow(null, ''),
+  retakingTOEFL: Joi.string().allow(null, ''),
+}).allow(null, '');
+
+const duolingoDetails = Joi.object({
+  duolingoPlan: Joi.date().allow(null, ''),
+  duolingoDate: Joi.date().allow(null, ''),
+  duolingoScore: Joi.object({
+    reading: Joi.number().allow(null, ''),
+    writing: Joi.number().allow(null, ''),
+    speaking: Joi.number().allow(null, ''),
+    listening: Joi.number().allow(null, ''),
+  }).allow(null, ''),
+  retakingDuolingo: Joi.string().allow(null, ''),
+}).allow(null, '');
+
+const experienceDetails = Joi.object({
+  totalExperience: Joi.number().allow(null, ''),
+  experienceIndustry: Joi.string().allow(null, ''),
+}).allow(null, '');
 
 const visa = Joi.object({
-  countriesPlanningToApply: Joi.array().items(Joi.string()).allow(null),
-  visaInterviewDate: Joi.date().allow(null),
-  visaInterviewLocation: Joi.string().allow(null),
-}).allow(null);
+  countriesPlanningToApply: Joi.array().items(Joi.string()).allow(null, ''),
+  visaInterviewDate: Joi.date().allow(null, ''),
+  visaInterviewLocation: Joi.string().allow(null, ''),
+}).allow(null, '');
 
 const planDetails = Joi.object({
-  course: Joi.string().allow(null),
-  planId: Joi.string().allow(null),
-  planName: Joi.string().allow(null),
-  planPrice: Joi.number().allow(null),
-  planBuyDate: Joi.date().allow(null),
-  receiptLink: urlString.allow(null),
-}).allow(null);
+  course: Joi.string().allow(null, ''),
+  planId: Joi.string().allow(null, ''),
+  planName: Joi.string().allow(null, ''),
+  planPrice: Joi.number().allow(null, ''),
+  planBuyDate: Joi.date().allow(null, ''),
+  receiptLink: Joi.string().allow(null, ''), // keep non-URL paths allowed
+}).allow(null, '');
 
 // ---------- UPDATE VALIDATOR (PATCH) ----------
 export const ValidateProfileUpdate = Joi.object({
-  // Core identity (optional on update)
+  // Core identity (all optional on update)
   email: Joi.string().email().messages({
     'string.email': 'Please provide a valid email address',
   }),
   password: Joi.string().min(6).messages({
     'string.min': 'Password must be at least 6 characters long',
   }),
-  name: Joi.string().min(1).max(100).messages({
-    'string.min': 'Name must be at least 1 character long',
+  name: Joi.string().min(0).max(100).messages({
+    'string.min': 'Name must be at least 0 character long',
     'string.max': 'Name must be at most 100 characters long',
   }),
-  profilePicture: urlString.messages({
-    'string.uri': 'Profile picture must be a valid URL',
-  }),
+  profilePicture: urlString, // string | '' | null
 
-  // Model-aligned optionals
+  // Flat fields mapped to enums/strings
   degree: degreeEnum,
+  degreeLength: degreeLengthEnum,
+  intakeMode: intakeModeEnum,
+  stemRequired: yesNoEnum,
+  f1Required: yesNoEnum,
+  phoneNumber: phoneWithCountry,
+
+  // Nested structures
   programDetails,
-  phoneNumber: phoneWithCountry,     // not required on update
   personalDetails,
   schoolDetails,
   satDetails,
   actDetails,
   collegeDetails,
   greDetails,
+  gmatDetails,
   ieltsDetails,
   toeflDetails,
-  visa,
+  duolingoDetails,
+  experienceDetails,
 
+  // Simple text areas
+  leadershipActivities: Joi.string().allow(null, ''),
+  researchPublications: Joi.string().allow(null, ''),
+  certifications: Joi.string().allow(null, ''),
+
+  // Visa & plan
+  visa,
   status: statusEnum,
   isFeePaid: Joi.boolean(),
   planDetails,
 
+  // Auth/identity meta
   isVerified: Joi.boolean(),
-  googleId: Joi.string().allow(null),
-  facebookId: Joi.string().allow(null),
+  googleId: Joi.string().allow(null, ''),
+  facebookId: Joi.string().allow(null, ''),
   provider: providerEnum,
   role: Joi.string().valid('STUDENT'),
-  lastLogin: Joi.date().allow(null),
-})
-  .unknown(false)                     // block fields not in the model
-  .min(1)                             // require at least one field to update
-  .prefs({ abortEarly: false });      // collect all errors in one go
+  lastLogin: Joi.date().allow(null, ''),
 
+  // Explicitly disallow server-managed fields if they sneak in
+  createdAt: Joi.forbidden(),
+  updatedAt: Joi.forbidden(),
+  _id: Joi.forbidden(),
+})
+  .unknown(false)  // block fields not in the model
+  .min(1)          // require at least one field to update
+  .prefs({ abortEarly: false }); // collect all errors in one go
 
 // ############ PROFILE Validation END ################
 
@@ -632,7 +690,7 @@ export const ValidateUpdateTaskCategory = Joi.object({
 });
 
 export const ValidateAddSubtasksToTask = Joi.object({
-    subtaskIds: Joi.array().items(Joi.string()).min(1).required()
+    subtaskIds: Joi.array().items(Joi.string()).min(0).required()
 });
 
 export const ValidateRemoveSubtasksFromTask = Joi.object({

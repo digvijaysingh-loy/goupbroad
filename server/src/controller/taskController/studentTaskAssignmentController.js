@@ -3,187 +3,240 @@ import responseMessage from '../../constant/responseMessage.js';
 import httpError from '../../util/httpError.js';
 import { ValidateAddStudentsToTask, ValidateUpdateStudentTaskAssignment, ValidateRemoveStudentFromTask, validateJoiSchema } from '../../service/validationService.js';
 import StudentTaskAssignment from '../../model/studentTaskAssignmentModel.js';
+import SubtaskQuestionnaireAssignment from '../../model/subtaskQuestionnaireAssignmentModel.js';
 import Task from '../../model/taskModel.js';
 import Student from '../../model/studentModel.js';
 import TaskSubtaskAssignment from '../../model/taskSubtaskAssignmentModel.js';
 
 export default {
-    // Add students to a task (ADMIN only)
     addStudentsToTask: async (req, res, next) => {
-        try {
-            const { taskId } = req.params;
-            const { value, error } = validateJoiSchema(ValidateAddStudentsToTask, req.body);
-            if (error) return httpError(next, error, req, 422);
+    try {
+        const { taskId } = req.params;
+        const { value, error } = validateJoiSchema(ValidateAddStudentsToTask, req.body);
+        if (error) return httpError(next, error, req, 422);
 
-            // Check role
-            if (req.authenticatedMember.role !== 'ADMIN') {
-                return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
-            }
+        if (req.authenticatedMember.role !== 'ADMIN') {
+            return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
+        }
 
-            const { studentIds } = value;
+        const { studentIds } = value;
 
-            // Find task
-            const task = await Task.findById(taskId);
-            if (!task) {
-                return httpError(next, new Error(responseMessage.NOT_FOUND('Task')), req, 404);
-            }
+        // 1. Validate task exists
+        const task = await Task.findById(taskId).lean();
+        if (!task) {
+            return httpError(next, new Error(responseMessage.NOT_FOUND('Task')), req, 404);
+        }
 
-            // Validate studentIds exist
-            const students = await Student.find({ _id: { $in: studentIds } }).lean();
-            if (students.length !== studentIds.length) {
-                return httpError(next, new Error('One or more studentIds are invalid'), req, 400);
-            }
+        // 2. Validate all studentIds exist
+        const students = await Student.find({ _id: { $in: studentIds } }).lean();
+        if (students.length !== studentIds.length) {
+            return httpError(next, new Error('One or more studentIds are invalid'), req, 400);
+        }
 
-            // Check for existing assignments to avoid duplicates
-            const existingAssignments = await StudentTaskAssignment.find({
-                taskId,
-                studentId: { $in: studentIds }
-            }).lean();
+        // 3. Get existing subtasks for this task
+        const existingSubtaskAssignments = await StudentTaskAssignment.find({ taskId })
+            .distinct('subtaskId')
+            .lean();
 
-            const existingStudentIds = new Set(existingAssignments.map(assignment => assignment.studentId.toString()));
-            const newStudentIds = studentIds.filter(studentId => !existingStudentIds.has(studentId));
+        const subtaskIds = [...new Set(existingSubtaskAssignments.map(id => id.toString()))];
 
-            if (newStudentIds.length === 0) {
-                return httpError(next, new Error('One Or More students are already assigned to this task'), req, 400);
-            }
+        // 4. Get questionnaire assignments per subtask
+        const subtaskQuestionnaires = await SubtaskQuestionnaireAssignment.find({
+            subtaskId: { $in: subtaskIds }
+        }).lean();
 
-            // Create new StudentTaskAssignment records
-            const studentAssignmentPromises = newStudentIds.map(async (studentId) => {
-                const assignment = new StudentTaskAssignment({
-                    studentId,
-                    taskId,
-                    assignedAt: new Date(),
-                    status: "PENDING",
-                    isLocked: false,
-                    dueDate: null
-                });
-                return assignment.save();
-            });
+        const questionnaireMap = new Map();
+        subtaskQuestionnaires.forEach(sq => {
+            const key = sq.subtaskId.toString();
+            if (!questionnaireMap.has(key)) questionnaireMap.set(key, []);
+            questionnaireMap.get(key).push(sq.questionnaireId);
+        });
 
-            await Promise.all(studentAssignmentPromises);
+        // 5. Check for existing student assignments (per subtask + questionnaire)
+        const existingAssignments = await StudentTaskAssignment.find({
+            taskId,
+            studentId: { $in: studentIds }
+        }).lean();
 
-            // Fetch existing subtasks for this task
-            const taskSubtaskAssignments = await TaskSubtaskAssignment.find({ taskId }).lean();
-            const existingSubtaskIds = [...new Set(taskSubtaskAssignments.map(assignment => assignment.subtaskId.toString()))];
+        const existingKeys = new Set(
+            existingAssignments.map(a =>
+                `${a.studentId.toString()}_${a.subtaskId?.toString()}_${a.questionnaireId?.toString()}`
+            )
+        );
 
-            // Create TaskSubtaskAssignment records for new students and existing subtasks
-            if (existingSubtaskIds.length > 0) {
-                const taskSubtaskAssignmentPromises = [];
-                newStudentIds.forEach(studentId => {
-                    existingSubtaskIds.forEach(subtaskId => {
-                        const assignment = new TaskSubtaskAssignment({
+        // 6. Build new assignment records
+        const newAssignments = [];
+
+        for (const studentId of studentIds) {
+            for (const subtaskId of subtaskIds) {
+                const questionnaires = questionnaireMap.get(subtaskId) || [];
+
+                if (questionnaires.length === 0) {
+                    // No questionnaire → one assignment
+                    const key = `${studentId}_${subtaskId}_null`;
+                    if (!existingKeys.has(key)) {
+                        newAssignments.push({
                             studentId,
                             taskId,
                             subtaskId,
+                            questionnaireId: null,
                             assignedAt: new Date(),
                             status: "PENDING",
                             isLocked: false,
                             dueDate: null
                         });
-                        taskSubtaskAssignmentPromises.push(assignment.save());
-                    });
-                });
-                await Promise.all(taskSubtaskAssignmentPromises);
+                    }
+                } else {
+                    // One per questionnaire
+                    for (const questionnaireId of questionnaires) {
+                        const key = `${studentId}_${subtaskId}_${questionnaireId.toString()}`;
+                        if (!existingKeys.has(key)) {
+                            newAssignments.push({
+                                studentId,
+                                taskId,
+                                subtaskId,
+                                questionnaireId,
+                                assignedAt: new Date(),
+                                status: "PENDING",
+                                isLocked: false,
+                                dueDate: null
+                            });
+                        }
+                    }
+                }
             }
-
-            // Fetch updated task with associations
-            const populatedTask = await Task.findById(task._id).lean();
-            const updatedStudentAssignments = await StudentTaskAssignment.find({ taskId: task._id })
-                .populate('studentId')
-                .lean();
-            const updatedTaskSubtaskAssignments = await TaskSubtaskAssignment.find({ taskId: task._id })
-                .populate('studentId')
-                .populate('subtaskId')
-                .lean();
-
-            populatedTask.students = updatedStudentAssignments.map(assignment => assignment.studentId);
-            populatedTask.subtasks = updatedTaskSubtaskAssignments.map(assignment => ({
-                subtask: assignment.subtaskId,
-                student: assignment.studentId,
-                status: assignment.status,
-                isLocked: assignment.isLocked,
-                dueDate: assignment.dueDate
-            }));
-
-            httpResponse(req, res, 200, responseMessage.SUCCESS, {
-                message: 'Students added to task successfully',
-                task: populatedTask
-            });
-        } catch (err) {
-            httpError(next, err, req, 500);
         }
-    },
+
+        if (newAssignments.length === 0) {
+            return httpError(next, new Error('All students are already assigned to all subtasks/questionnaires'), req, 400);
+        }
+
+        // 7. Save new assignments
+        await StudentTaskAssignment.insertMany(newAssignments);
+
+        // 8. Return updated task
+        const populatedTask = await Task.findById(taskId).lean();
+
+        const updatedAssignments = await StudentTaskAssignment.find({ taskId })
+            .populate('studentId', '-password')
+            .populate('subtaskId')
+            .populate('questionnaireId', 'title')
+            .lean();
+
+        const studentSet = new Set();
+        const subtaskMap = new Map();
+
+        updatedAssignments.forEach(a => {
+            studentSet.add(a.studentId._id.toString());
+
+            const subKey = a.subtaskId._id.toString();
+            if (!subtaskMap.has(subKey)) {
+                subtaskMap.set(subKey, {
+                    subtask: a.subtaskId,
+                    status: a.status,
+                    isLocked: a.isLocked,
+                    dueDate: a.dueDate
+                });
+            }
+        });
+
+        populatedTask.students = Array.from(studentSet).map(id => 
+            updatedAssignments.find(a => a.studentId._id.toString() === id).studentId
+        );
+        populatedTask.subtasks = Array.from(subtaskMap.values());
+        populatedTask.totalStudent = populatedTask.students.length;
+        populatedTask.totalSubtask = populatedTask.subtasks.length;
+
+        httpResponse(req, res, 200, responseMessage.SUCCESS, {
+            message: 'Students added to task successfully',
+            task: populatedTask
+        });
+    } catch (err) {
+        httpError(next, err, req, 500);
+    }
+},
 
     // Remove a student from a task (ADMIN only)
     removeStudentFromTask: async (req, res, next) => {
-        try {
-            const { taskId } = req.params;
-            const { value, error } = validateJoiSchema(ValidateRemoveStudentFromTask, req.body);
-            if (error) return httpError(next, error, req, 422);
+    try {
+        const { taskId } = req.params;
+        const { value, error } = validateJoiSchema(ValidateRemoveStudentFromTask, req.body);
+        if (error) return httpError(next, error, req, 422);
 
-            // Check role
-            if (req.authenticatedMember.role !== 'ADMIN') {
-                return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
-            }
-
-            const { studentId } = value;
-
-            // Find task
-            const task = await Task.findById(taskId);
-            if (!task) {
-                return httpError(next, new Error(responseMessage.NOT_FOUND('Task')), req, 404);
-            }
-
-            // Validate studentId exists
-            const student = await Student.findById(studentId).lean();
-            if (!student) {
-                return httpError(next, new Error('Student not found'), req, 404);
-            }
-
-            // Find the StudentTaskAssignment
-            const assignment = await StudentTaskAssignment.findOne({ taskId, studentId });
-            if (!assignment) {
-                return httpError(next, new Error('Student is not assigned to this task'), req, 400);
-            }
-
-            // Check if the assignment is locked
-            if (assignment.isLocked) {
-                return httpError(next, new Error('Cannot remove student: assignment is locked'), req, 403);
-            }
-
-            // Delete the StudentTaskAssignment
-            await StudentTaskAssignment.deleteOne({ taskId, studentId });
-
-            // Delete associated TaskSubtaskAssignment records
-            await TaskSubtaskAssignment.deleteMany({ taskId, studentId });
-
-            // Fetch updated task with associations
-            const populatedTask = await Task.findById(task._id).lean();
-            const updatedStudentAssignments = await StudentTaskAssignment.find({ taskId: task._id })
-                .populate('studentId')
-                .lean();
-            const updatedTaskSubtaskAssignments = await TaskSubtaskAssignment.find({ taskId: task._id })
-                .populate('studentId')
-                .populate('subtaskId')
-                .lean();
-
-            populatedTask.students = updatedStudentAssignments.map(assignment => assignment.studentId);
-            populatedTask.subtasks = updatedTaskSubtaskAssignments.map(assignment => ({
-                subtask: assignment.subtaskId,
-                student: assignment.studentId,
-                status: assignment.status,
-                isLocked: assignment.isLocked,
-                dueDate: assignment.dueDate
-            }));
-
-            httpResponse(req, res, 200, responseMessage.SUCCESS, {
-                message: 'Student removed from task successfully',
-                task: populatedTask
-            });
-        } catch (err) {
-            httpError(next, err, req, 500);
+        if (req.authenticatedMember.role !== 'ADMIN') {
+            return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
         }
-    },
+
+        const { studentId } = value;
+
+        // 1. Validate task
+        const task = await Task.findById(taskId).lean();
+        if (!task) {
+            return httpError(next, new Error(responseMessage.NOT_FOUND('Task')), req, 404);
+        }
+
+        // 2. Validate student
+        const student = await Student.findById(studentId).lean();
+        if (!student) {
+            return httpError(next, new Error('Student not found'), req, 404);
+        }
+
+        // 3. Find all StudentTaskAssignment for this student + task
+        const assignments = await StudentTaskAssignment.find({ taskId, studentId }).lean();
+        if (assignments.length === 0) {
+            return httpError(next, new Error('Student is not assigned to this task'), req, 400);
+        }
+
+        // 4. Check if any assignment is locked
+        const locked = assignments.some(a => a.isLocked);
+        if (locked) {
+            return httpError(next, new Error('Cannot remove student: one or more assignments are locked'), req, 403);
+        }
+
+        // 5. Delete all related StudentTaskAssignment entries
+        await StudentTaskAssignment.deleteMany({ taskId, studentId });
+
+        // 6. Return updated task
+        const populatedTask = await Task.findById(taskId).lean();
+
+        const updatedAssignments = await StudentTaskAssignment.find({ taskId })
+            .populate('studentId', '-password')
+            .populate('subtaskId')
+            .populate('questionnaireId', 'title')
+            .lean();
+
+        const studentSet = new Set();
+        const subtaskMap = new Map();
+
+        updatedAssignments.forEach(a => {
+            studentSet.add(a.studentId._id.toString());
+
+            const subKey = a.subtaskId._id.toString();
+            if (!subtaskMap.has(subKey)) {
+                subtaskMap.set(subKey, {
+                    subtask: a.subtaskId,
+                    status: a.status,
+                    isLocked: a.isLocked,
+                    dueDate: a.dueDate
+                });
+            }
+        });
+
+        populatedTask.students = Array.from(studentSet).map(id => 
+            updatedAssignments.find(a => a.studentId._id.toString() === id)?.studentId || null
+        ).filter(Boolean);
+        populatedTask.subtasks = Array.from(subtaskMap.values());
+        populatedTask.totalStudent = populatedTask.students.length;
+        populatedTask.totalSubtask = populatedTask.subtasks.length;
+
+        httpResponse(req, res, 200, responseMessage.SUCCESS, {
+            message: 'Student removed from task successfully',
+            task: populatedTask
+        });
+    } catch (err) {
+        httpError(next, err, req, 500);
+    }
+},
 
     // Update StudentTaskAssignment details (ADMIN only)
     updateStudentTaskAssignment: async (req, res, next) => {
@@ -222,29 +275,54 @@ export default {
         }
     },
 
-    getTaskByStudentId: async (req, res, next) => {
-        try {
-            const { studentId } = req.params
+getTaskByStudentId: async (req, res, next) => {
+    try {
+        const { studentId } = req.params;
 
-            const isStudentExist = await Student.findById(studentId)
-            if (!isStudentExist) {
-                return httpError(next, new Error(responseMessage.CUSTOM_MESSAGE("Student Not Found")), req, 400)
-            }
-
-            const task = await StudentTaskAssignment.find({
-                studentId
-            }).populate("taskId").sort({ createdAt: -1 })
-
-
-            httpResponse(req, res, 200, responseMessage.CUSTOM_MESSAGE("Student Assigned Task"), {
-                task
-            })
-
-
-        } catch (error) {
-            httpError(next, err, req, 500);
+        const isStudentExist = await Student.findById(studentId);
+        if (!isStudentExist) {
+            return httpError(
+                next,
+                new Error(responseMessage.CUSTOM_MESSAGE("Student Not Found")),
+                req,
+                400
+            );
         }
-    },
+
+        // 1. Pull every assignment for the student
+        const assignments = await StudentTaskAssignment.find({ studentId })
+            .populate("taskId")
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // 2. Keep only the **first** occurrence of each taskId (preserves order)
+        const seen = new Set();
+        const uniqueAssignments = [];
+
+        for (const ass of assignments) {
+            const taskIdStr = ass.taskId?._id?.toString();
+            if (taskIdStr && !seen.has(taskIdStr)) {
+                seen.add(taskIdStr);
+                uniqueAssignments.push(ass);           // keep the whole assignment object
+            }
+        }
+
+        // 3. Build the `task` array exactly like before – just the populated task objects
+        const task = uniqueAssignments
+        // 4. **Exact same response format**
+        httpResponse(
+            req,
+            res,
+            200,
+            responseMessage.CUSTOM_MESSAGE("Student Assigned Task"),
+            { task }
+        );
+
+    } catch (error) {
+        console.error("getTaskByStudentId error:", error);
+        httpError(next, error, req, 500);
+    }
+},
 
     getStudentUpcomingTasks: async (req, res, next) => {
         try {

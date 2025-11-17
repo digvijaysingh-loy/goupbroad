@@ -211,6 +211,9 @@ router.route('/admin/tasks/:taskId')
     .put(adminOnly, taskController.updateTaskDetails)
     .delete(adminOnly, taskController.deleteTask);
 
+router.route('/admin/tasks/:taskId/responses')
+    .get(memberAccess, taskController.getStudentQuestionnaireResponses);
+
 // Routes for managing subtasks (ADMIN only)
 router.route('/admin/tasks/:taskId/subtasks/add')
     .post(adminOnly, taskSubtaskAssignmentController.addSubtasksToTask);
@@ -277,7 +280,7 @@ router.route('/admin/student-activities').get(memberAccess, adminController.getS
 router.route('/student/assigned-universities')
     .get(authentication, studentController.getAssignedUniversities);
 
-router.route('/student/llm-assigned-university/')
+router.route('/student/llm-assigned-university')
     .get(authentication, studentController.getLlmAssignedUniversity);
 
 router.route('/student/assigned-universities/:assignmentId')
