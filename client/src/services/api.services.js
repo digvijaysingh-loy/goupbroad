@@ -273,3 +273,18 @@ export const deleteFaq = async (id) => {
 export const getStudentById = async (studentId) => {
   return apiService.get(`/admin/students/${studentId}`);
 };
+
+
+export const uploadDocumentUrl = async (taskId, questionnaireId, documentURL,studentId) => {
+  try {
+    const response = await apiService.put(`/admin/tasks/${taskId}/upload-documents`, {
+      questionnaireId,
+      documentURL,
+      documentStatus: "UPLOADED",
+      studentId
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

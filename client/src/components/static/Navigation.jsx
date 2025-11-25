@@ -24,9 +24,9 @@ const Navigation = () => {
     { name: 'University Finder', href: '/university-finder' },
     // { name: 'Scholarships', href: '#scholarships' },
     // { name: 'Communit'y', href: '/community' },
-    {name:'CGPA To GPA', href:'/cgp-to-gpa-converter'},
+    { name: 'CGPA To GPA', href: '/cgp-to-gpa-converter' },
     { name: 'About', href: '/about' },
-    {name: 'Pricing Plan' , href: '/pricing'}
+    { name: 'Plans & Pricing', href: '/pricing' }
   ];
 
   const buttonText = isLoggedIn ? 'Dashboard' : 'Get Started';
@@ -43,8 +43,8 @@ const Navigation = () => {
           }}>
             <div className='flex items-center justify-center gap-2'>
 
-            <img src={logo} alt="GoupBroad logo" className='w-[50px] h-[50px]' />
-            <h1 className="text-3xl font-bold text-[#145044] ">GoupBroad</h1>
+              <img src={logo} alt="Goupbroad logo" className='w-[50px] h-[50px]' />
+              <h1 className="text-3xl font-bold text-[#145044] ">Goupbroad</h1>
             </div>
           </div>
 

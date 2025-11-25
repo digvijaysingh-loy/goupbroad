@@ -10,25 +10,25 @@ function ServerStatusIndicator({ status }) {
     <div className="flex items-center gap-2 justify-center">
       {status ? <TooltipProvider>
         <Tooltip>
-        <TooltipTrigger asChild>
-        <MonitorCheck color="#145044" /> 
+          <TooltipTrigger asChild>
+            <MonitorCheck color="#145044" />
           </TooltipTrigger>
           <TooltipContent>
-          <p>Server Online</p>
-        </TooltipContent>
+            <p>Server Online</p>
+          </TooltipContent>
         </Tooltip>
-      </TooltipProvider> 
-      : 
-      <TooltipProvider>
-        <Tooltip>
-        <TooltipTrigger asChild>
-        <MonitorX color="red" /> 
-          </TooltipTrigger>
-          <TooltipContent>
-          <p>Server Offline</p>
-        </TooltipContent>
-        </Tooltip>
-      </TooltipProvider> 
+      </TooltipProvider>
+        :
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <MonitorX color="red" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Server Offline</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       }
     </div>
   );
@@ -56,12 +56,12 @@ export const Navbar = ({ status }) => {
   useEffect(() => {
 
     setIsLoggedIn(isAuthenticated());
-    
+
 
     const unsubscribe = subscribeToAuth((authenticated) => {
       setIsLoggedIn(authenticated);
     });
-    
+
     return () => unsubscribe();
   }, []);
 
@@ -70,23 +70,22 @@ export const Navbar = ({ status }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${isScrolled
           ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt="Logo" className="h-10 w-10" />
-            <span className="text-2xl font-bold">GoupBroad</span>
+              <img src="/logo.svg" alt="Logo" className="h-10 w-10" />
+              <span className="text-2xl font-bold">Goupbroad</span>
             </Link>
           </div>
 
           <nav className="hidden md:flex items-center space-x-8">
-          <a
+            <a
               href="/about-us"
               className="text-sm font-medium text-gray-700 hover:text-primary-1 dark:text-gray-300 transition-colors"
             >
@@ -172,5 +171,5 @@ ServerStatusIndicator.propTypes = {
 };
 
 Navbar.propTypes = {
-  status: PropTypes.bool.isRequired, 
+  status: PropTypes.bool.isRequired,
 };

@@ -34,7 +34,7 @@ const CollegeFinderStep4 = () => {
   const handleSubmit = () => {
     console.log('Final form data:', formData);
     // Navigate to results page instead of showing alert
-    navigate('/college-finder/results');
+    navigate('/university-finder/results');
   };
 
   return (

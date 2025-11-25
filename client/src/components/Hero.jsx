@@ -11,12 +11,12 @@ export const Hero = () => {
     useEffect(() => {
 
         setIsLoggedIn(isAuthenticated());
-        
+
 
         const unsubscribe = subscribeToAuth((authenticated) => {
             setIsLoggedIn(authenticated);
         });
-        
+
         return () => unsubscribe();
     }, []);
 
@@ -54,7 +54,7 @@ export const Hero = () => {
                         className="inline-flex items-center px-3 py-1 rounded-full bg-primary-1/10 dark:bg-primary-1/20 border border-primary-1/20 mb-6"
                     >
                         <span className="text-xs font-semibold text-primary-1">
-                            Introducing GoupBroad  -  Your Journey to Study Abroad Starts Here
+                            Introducing Goupbroad  -  Your Journey to Study Abroad Starts Here
                         </span>
                     </motion.div>
 
@@ -67,7 +67,7 @@ export const Hero = () => {
                         <span className="block">Study Abroad. Simplified.</span>
                         <span className="inline-block">
                             <TypewriterEffect
-                            className="mt-2"
+                                className="mt-2"
                                 words={[
                                     'College Shortlisting',
                                     'SOP & LOR Writing',

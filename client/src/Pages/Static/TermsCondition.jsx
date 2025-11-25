@@ -21,7 +21,7 @@ const TermsCondition = () => {
                     <div>
                         <h2 className="text-3xl font-bold mb-4 text-gray-900">1. Acceptance of Terms</h2>
                         <p>
-                            Welcome to GoupBroad! These Terms & Conditions ("Terms") govern your use of the GoupBroad website and services
+                            Welcome to Goupbroad! These Terms & Conditions ("Terms") govern your use of the Goupbroad website and services
                             (collectively, the "Service"). By accessing or using our Service, you agree to be bound by these Terms and our Privacy
                             Policy. If you do not agree to all the terms and conditions, you may not use our Service.
                         </p>
@@ -31,7 +31,7 @@ const TermsCondition = () => {
                     <div>
                         <h2 className="text-3xl font-bold mb-4 text-gray-900">2. Description of Service</h2>
                         <p>
-                            GoupBroad provides a platform to assist individuals in their journey to study abroad. Our services may include, but are
+                            Goupbroad provides a platform to assist individuals in their journey to study abroad. Our services may include, but are
                             not limited to, connecting you with educational institutions, providing information on visa processes, scholarship
                             resources, and general guidance on studying in a foreign country. We act as a facilitator and do not guarantee admission,
                             visa approval, or financial aid. The final decisions rest with the respective institutions and government bodies.
@@ -53,7 +53,7 @@ const TermsCondition = () => {
                     <div>
                         <h2 className="text-3xl font-bold mb-4 text-gray-900">4. Limitation of Liability</h2>
                         <p>
-                            To the maximum extent permitted by law, GoupBroad and its affiliates, officers, employees, and agents will not be liable
+                            To the maximum extent permitted by law, Goupbroad and its affiliates, officers, employees, and agents will not be liable
                             for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether
                             incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses, resulting from (a) your
                             use or inability to use the Service; (b) any unauthorized access to or use of our servers and/or any personal information

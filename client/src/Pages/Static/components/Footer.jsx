@@ -55,15 +55,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <h3 className="text-2xl font-bold text-white mb-4">GoupBroad</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">Goupbroad</h3>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Empowering students worldwide to achieve their international education dreams 
+              Empowering students worldwide to achieve their international education dreams
               through personalized guidance, comprehensive resources, and a supportive community.
             </p>
             <div className="flex space-x-4">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
               >
                 Get Started
@@ -78,8 +78,8 @@ const Footer = () => {
               <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <a 
-                      href="#" 
+                    <a
+                      href="#"
                       className="text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       {link}
@@ -101,8 +101,8 @@ const Footer = () => {
               Get weekly updates on new scholarships, university admissions, and study abroad opportunities.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="Enter your email"
                 className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
               />
@@ -117,7 +117,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © {currentYear} GoupBroad. All rights reserved.
+              © {currentYear} Goupbroad. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm text-gray-400">
               <a href="#" className="hover:text-white transition-colors duration-200">Privacy Policy</a>

@@ -23,9 +23,9 @@ const Navigation = () => {
 
   const navItems = [
     { name: 'University Finder', href: '/university-finder' },
-     { name: 'CGPA To GPA ', href: '/cgp-to-gpa-converter' },
+    { name: 'CGPA To GPA ', href: '/cgp-to-gpa-converter' },
     { name: 'About', href: '/about' },
-    { name: 'Pricing Plan', href: '/pricing' },
+    { name: 'Plans & Pricing', href: '/pricing' },
   ];
 
   const isPricingPage = location.pathname === '/pricing';
@@ -40,10 +40,10 @@ const Navigation = () => {
   if (isPricingPage) {
     if (isLoggedIn) {
       buttonText = 'Logout';
-      buttonPath = '#';               
+      buttonPath = '#';
       buttonOnClick = () => {
-        logout();                     
-        navigator('/');              
+        logout();
+        navigator('/');
       };
     } else {
       buttonText = 'Get Started';
@@ -60,8 +60,8 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex-shrink-0 cursor-pointer" onClick={() => navigator('/')}>
             <div className="flex items-center justify-center gap-2">
-              <img src={logo} alt="GoupBroad logo" className="w-[50px] h-[50px]" />
-              <h1 className="text-3xl font-bold text-[#145044]">GoupBroad</h1>
+              <img src={logo} alt="Goupbroad logo" className="w-[50px] h-[50px]" />
+              <h1 className="text-3xl font-bold text-[#145044]">Goupbroad</h1>
             </div>
           </div>
 

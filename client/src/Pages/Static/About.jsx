@@ -90,7 +90,7 @@ const About = () => {
             <div className="space-y-8">
               <div className="space-y-6">
                 <Badge variant="outline" className="border-primary-700 text-primary-700 rounded-full px-3 py-1">
-                  About GoupBroad
+                  About Goupbroad
                 </Badge>
 
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
@@ -100,7 +100,7 @@ const About = () => {
                 </h1>
 
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  GoupBroad is an all-in-one platform for aspirants to connect and collaborate
+                  Goupbroad is an all-in-one platform for aspirants to connect and collaborate
                   with fellow students and counselling experts creating a community that strives
                   to make every study abroad aspiration a dream come true.
                 </p>
@@ -198,7 +198,7 @@ const About = () => {
                 </h2>
                 <div className="space-y-4">
                   <p className="text-gray-700 leading-relaxed">
-                    GoupBroad was founded with a vision to democratize access to world-class education for Indian students.
+                    Goupbroad was founded with a vision to democratize access to world-class education for Indian students.
                     What started as a mission to help a few students has grown into India&apos;s most trusted study abroad consultancy.
                   </p>
                   <p className="text-gray-700 leading-relaxed">
@@ -226,7 +226,7 @@ const About = () => {
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4 border-primary-700 text-primary-700 rounded-full">Leadership</Badge>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Founders</h2>
-            <p className="text-lg text-gray-600">Meet the visionaries behind GoupBroad</p>
+            <p className="text-lg text-gray-600">Meet the visionaries behind Goupbroad</p>
           </div>
 
           <Tabs defaultValue="anushk" className="max-w-4xl mx-auto">
@@ -374,8 +374,8 @@ const About = () => {
           </div>
         </div>
       </section> */}
-      <CTA/>
-      <Footer/>
+      <CTA />
+      <Footer />
 
     </div>
   );

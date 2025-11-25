@@ -23,12 +23,13 @@ const PremiumCTA = () => {
             🎓 Premium Application Service
           </Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
-            Apply to Your Dream Universities
+            Apply to Your Dream Universities, With Expert Guidance You Can Trust
             <br className="hidden sm:block" />
             <span className="text-primary-700">With Expert Guidance</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-2">
-            Don't navigate the complex application process alone. Our expert counselors will guide you through every step with a personalized dashboard to track your progress.
+            Do not face the U.S. admissions maze alone. Our expert counselors and real-time
+            dashboard guide you step-by-step from shortlist to admit.
           </p>
         </div>
 
@@ -41,8 +42,10 @@ const PremiumCTA = () => {
                   <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
                 <div className="text-center sm:text-left">
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">Dedicated Expert Counselor</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Get assigned a personal counselor with 10+ years of experience in university admissions.</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">Dedicated Mentor Guidance</h3>
+                  <p className="text-sm sm:text-base text-gray-600">Learn directly from mentors who have secured
+                    admits to top global universities.
+                  </p>
                 </div>
               </div>
 
@@ -52,7 +55,9 @@ const PremiumCTA = () => {
                 </div>
                 <div className="text-center sm:text-left">
                   <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">Personalized Dashboard</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Track application deadlines, document submissions, and interview schedules in real-time.</p>
+                  <p className="text-sm sm:text-base text-gray-600"> Track every deadline, document, and interview in one
+                    organized space.
+                  </p>
                 </div>
               </div>
 
@@ -61,8 +66,9 @@ const PremiumCTA = () => {
                   <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
                 <div className="text-center sm:text-left">
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">Essay & SOP Review</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Professional editing and feedback on your personal statements and essays.</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">SOP and Essay Review</h3>
+                  <p className="text-sm sm:text-base text-gray-600"> Craft a story that stands out with structured feedback from
+                    experienced editors and mentors.</p>
                 </div>
               </div>
 
@@ -71,11 +77,27 @@ const PremiumCTA = () => {
                   <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
                 </div>
                 <div className="text-center sm:text-left">
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">Interview Preparation</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Mock interviews and personalized feedback to ace your university interviews.</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">Mock Interviews</h3>
+                  <p className="text-sm sm:text-base text-gray-600">Prepare with real interview scenarios led by alumni mentors and
+                    counselors.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto sm:mx-0">
+                  <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">24×7 Support</h3>
+                  <p className="text-sm sm:text-base text-gray-600">Get help whenever you need it. Our team and mentors are always by
+                    your side.
+
+                  </p>
                 </div>
               </div>
             </div>
+
 
             {/* Quick Benefits */}
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border">
@@ -95,7 +117,7 @@ const PremiumCTA = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-xs sm:text-sm text-gray-700">24/7 Support</span>
+                  <span className="text-xs sm:text-sm text-gray-700">Expert Mentorship</span>
                 </div>
               </div>
             </div>
@@ -152,7 +174,7 @@ const PremiumCTA = () => {
                     Start Your Premium Journey
                     <ArrowRight className="ml-1 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
-                  <p className="text-gray-500 text-xs sm:text-sm mt-2 sm:mt-3">Join 2,000+ students who got accepted</p>
+                  {/* <p className="text-gray-500 text-xs sm:text-sm mt-2 sm:mt-3">Join 2,000+ students who got accepted</p> */}
                 </div>
               </div>
             </div>
@@ -165,9 +187,9 @@ const PremiumCTA = () => {
               </div>
             </div>
 
-            <div className="absolute -bottom-3 sm:-bottom-4 -left-2 sm:-left-4 bg-white rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-4 border">
+            <div className="absolute -bottom-3 sm:-bottom-16 -left-2 sm:-left-8 bg-white rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-4 border">
               <div className="text-center">
-                <div className="text-lg sm:text-2xl font-bold text-primary-700">$2M+</div>
+                <div className="text-lg sm:text-2xl font-bold text-primary-700">200 Crore+</div>
                 <div className="text-[10px] sm:text-xs text-gray-600">Scholarships Won</div>
               </div>
             </div>
@@ -178,26 +200,26 @@ const PremiumCTA = () => {
         <div className="text-center mt-8 sm:mt-12 md:mt-16">
           <div className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border max-w-4xl mx-auto">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">
-              Ready to Transform Your University Applications?
+              Transform Your Applications Today
             </h3>
-            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-2">
+            {/* <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-2">
               Don't leave your future to chance. Get expert guidance and a personalized dashboard to track every step of your journey.
-            </p>
+            </p> */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Button
                 size="default"
                 className="bg-primary-800   text-white px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-base w-full sm:w-auto"
                 onClick={() => navigate('/pricing')}
               >
-                Pricing Plans
+                View Plans
               </Button>
-              <Button 
-                size="default" 
-                variant="outline" 
-                className="border-primary text-primary hover:bg-primary/10 px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-base w-full sm:w-auto" 
+              <Button
+                size="default"
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary/10 px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-base w-full sm:w-auto"
                 onClick={() => navigate('/signin')}
               >
-                Schedule Free Consultation
+                Book Free Consultation
               </Button>
             </div>
           </div>

@@ -103,8 +103,8 @@ const App = () => {
 
       {/* College Finder Routes - Final Version */}
       <Route path="/university-finder" element={<NewCollegeFinder />} />
-      <Route path="/college-finder/questionnaire" element={<QuestionnaireForm />} />
-      <Route path="/college-finder/results" element={<NewCollegeFinderResults />} />
+      <Route path="/university-finder/questionnaire" element={<QuestionnaireForm />} />
+      <Route path="/university-finder/results" element={<NewCollegeFinderResults />} />
 
       {/* College Finder Routes - Legacy */}
       {/* <Route path="/university-finder" element={<CollegeFinder />} />
@@ -135,7 +135,7 @@ const App = () => {
         <Route path="tasks" element={<Tasks />} />
         <Route path="tasks/student/:studentId" element={<Tasks />} />
         <Route path="subtasks" element={<Subtasks />} />
-        <Route path="applications" element={<Applications />} />
+        {/* <Route path="applications" element={<Applications />} /> */}
         <Route path="universities" element={<Universities />} />
         <Route path="messages" element={<Messages />} />
         <Route path="forms" element={<Forms />} />

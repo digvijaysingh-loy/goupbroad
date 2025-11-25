@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSubtaskQuestionnaires } from '@/services/questionnaireService';
@@ -5,7 +6,7 @@ import { toast } from 'sonner';
 import { SidebarProvider, SidebarInset } from '../../components/ui/sidebar';
 import AppSidebar from '../../components/AppSidebar';
 import SidebarHeader from '../../components/SidebarHeader';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FileText, ExternalLink } from 'lucide-react';
 
 const QuestionnaireList = () => {
   const { taskId, subtaskId } = useParams();
@@ -23,11 +24,10 @@ const QuestionnaireList = () => {
     setIsLoading(true);
     try {
       const response = await getSubtaskQuestionnaires(taskId, subtaskId);
-      console.log(response)
+      console.log(response);
       if (response.success && response.data?.questionnaires) {
         setQuestionnaires(response.data.questionnaires);
         
-        // Get task and subtask info if available
         if (response.data.task) {
           setTaskInfo({
             taskTitle: response.data.task.title || '',
@@ -52,6 +52,12 @@ const QuestionnaireList = () => {
 
   const handleQuestionnaireSelect = (questionnaireId) => {
     navigate(`/questionnaire/${taskId}/${subtaskId}/${questionnaireId}`);
+  };
+
+  const handleOpenDocument = (url) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const handleGoBack = () => { 
@@ -134,32 +140,31 @@ const QuestionnaireList = () => {
                         className={`bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow  ${
                           index % 2 === 0 ? 'border-l-4 border-primary-1' : 'border-l-4 border-orange-500'
                         }`}
-                        // onClick={() => handleQuestionnaireSelect(questionnaire.questionnaireId)}
                       >
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-medium text-gray-800">
                             {questionnaire.title || 'Untitled Questionnaire'}
                           </h3>
+
+                          {/* Top-right buttons: Start or Submitted */}
                           {questionnaire.taskStatus !== 'COMPLETED' && (
-                                <button 
-                            className="bg-primary-1 cursor-pointer hover:bg-teal-800 text-white text-xs font-medium py-2 px-5 rounded"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleQuestionnaireSelect(questionnaire.questionnaireId);
-                            }}
-                          >
-                            Start Questionnaire
-                          </button>
+                            <button 
+                              className="bg-primary-1 hover:bg-teal-800 text-white text-xs font-medium py-2 px-5 rounded"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuestionnaireSelect(questionnaire.questionnaireId);
+                              }}
+                            >
+                              Start Questionnaire
+                            </button>
                           )}
                           {questionnaire.taskStatus === 'COMPLETED' && (
-                                <button 
-                            className="bg-primary-1  hover:bg-teal-800 text-white text-xs font-medium py-2 px-5 rounded"
-                           
-                          >
-                            Submitted
-                          </button>
+                            <button 
+                              className="bg-primary-1 hover:bg-teal-800 text-white text-xs font-medium py-2 px-5 rounded"
+                            >
+                              Submitted
+                            </button>
                           )}
-                      
                         </div>
                         
                         {questionnaire.description && (
@@ -168,34 +173,57 @@ const QuestionnaireList = () => {
                           </p>
                         )}
                         
-                        <div className="flex justify-between items-center mt-4 text-sm">
-                          <div>
-                            {/* <span className="text-gray-600">Questions: </span>
-                            <span className="font-medium bg-gray-50 px-2 py-0.5 rounded-xs">
-                              {questionnaire.totalQuestions || 0}
-                            </span>   */}
-                            
-                            {questionnaire.estimatedTime && (
-                              <>
-                                <span className="text-gray-400 mx-2">|</span>
-                                <span className="text-gray-600">Estimated time: </span>
-                                <span className="font-medium bg-gray-50 px-2 py-0.5 rounded-xs">
-                                  {questionnaire.estimatedTime}
+                        {/* New: Document Action Row - Below description */}
+                        {questionnaire.taskStatus === 'COMPLETED' && (
+                          <div className="mt-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              {questionnaire.documentURL ? (
+                                <button
+                                  onClick={() => handleOpenDocument(questionnaire.documentURL)}
+                                  className="text-green-700 cursor-pointer hover:text-green-800 font-medium text-sm flex items-center gap-1.5 underline decoration-green-700/50"
+                                >
+                                  <FileText className="h-4 w-4" />
+                                  View Uploaded Document
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                </button>
+                              ) : (
+                                <span className="text-gray-500 text-sm flex items-center gap-1.5">
+                                  <FileText className="h-4 w-4 text-gray-400" />
+                                  Document not uploaded
                                 </span>
-                              </>
-                            )}
-                          </div>
-                          
-                          <span className={`text-xs px-3 py-1 rounded-full ${
-                            questionnaire.status === 'COMPLETED' 
-                              ? 'bg-green-100 text-green-800' 
-                              : questionnaire.status === 'IN_PROGRESS'
-                                ? 'bg-blue-100 text-blue-800'
+                              )}
+                            </div>
+
+                            {/* Status badge - stays on the right */}
+                            <span className={`text-xs px-3 py-1 rounded-full ${
+                              questionnaire.taskStatus === 'COMPLETED' 
+                                ? 'bg-green-100 text-green-800' 
                                 : 'bg-primary-1/10 text-primary-1'
-                          }`}>
-                            {questionnaire.status || 'Ready to start'}
-                          </span>
-                        </div>
+                            }`}>
+                              {questionnaire.taskStatus === 'COMPLETED' ? 'Completed' : questionnaire.status || 'Ready'}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* For non-completed: show estimated time + status */}
+                        {questionnaire.taskStatus !== 'COMPLETED' && (
+                          <div className="flex justify-between items-center mt-4 text-sm">
+                            <div>
+                              {questionnaire.estimatedTime && (
+                                <>
+                                  <span className="text-gray-600">Estimated time: </span>
+                                  <span className="font-medium bg-gray-50 px-2 py-0.5 rounded-xs">
+                                    {questionnaire.estimatedTime}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                            
+                            <span className={`text-xs px-3 py-1 rounded-full bg-primary-1/10 text-primary-1`}>
+                              {questionnaire.status || 'Ready to start'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

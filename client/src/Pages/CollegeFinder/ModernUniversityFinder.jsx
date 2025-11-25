@@ -306,7 +306,7 @@ Please analyze this profile and provide insights on university recommendations.
       });
 
       // Navigate to results
-      navigate('/college-finder/results', {
+      navigate('/university-finder/results', {
         state: {
           recommendations,
           responses: formData,

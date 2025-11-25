@@ -13,12 +13,12 @@ const Services = () => {
     {
       icon: Search,
       title: 'Personalized University & Course Search',
-      description: 'Find your perfect match with our AI-powered search that considers your strengths, weaknesses, and preferences.',
+      description: 'Discover universities tailored to your strengths, budget, and goals using our AIpowered matching engine.',
       color: 'bg-blue-50 text-blue-600',
       borderColor: 'border-blue-200',
-      features: ['AI-powered matching', 'Detailed course insights', 'Admission requirements'],
+      features: [' Verified programs', 'Real data', 'No commission bias'],
       badge: 'Popular',
-      route:'/university-finder'
+      route: '/university-finder'
     },
     // {
     //   icon: Users,
@@ -51,12 +51,12 @@ const Services = () => {
     {
       icon: Calculator,
       title: 'CGPA TO GPA Converter',
-      description: 'Use our CGPA to GPA calculator to convert your 10-point CGPA to a 4-point GPA accurately',
+      description: 'Instantly convert your grades to a U.S.-equivalent GPA with accuracy.',
       color: 'bg-red-50 text-red-600',
       borderColor: 'border-red-200',
-      features: ['Score calculation', 'Eligibility check', 'Test preparation'],
+      features: ['Understand your eligibility', 'Plan smarter'],
       badge: 'Smart',
-      route:'/cgp-to-gpa-converter'
+      route: '/cgp-to-gpa-converter'
     },
     // {
     //   icon: TrendingUp,
@@ -84,70 +84,71 @@ const Services = () => {
             Comprehensive Platform
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Everything You Need for Study Abroad Success
+            All the Tools You Need to Study Abroad, in One Place.
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Our comprehensive platform provides all the tools and resources you need to make informed decisions
-            about your international education journey.
+            From finding your ideal university to calculating your GPA and connecting with peers
+            abroad, Upbroad gives you everything to plan your U.S. journey confidently.
+
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-          {services.map((service, index) => (
-            <Card
-              key={index}
-              className={`group hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 shadow-md bg-white/80 backdrop-blur-sm hover:bg-white ${service.borderColor} border-l-4 relative overflow-hidden`}
-            >
-              {/* Background gradient overlay */}
-              <div className={`absolute inset-0 ${service.color.split(' ')[0]}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+  {services.map((service, index) => (
+    <Card
+      key={index}
+      className={`group hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 shadow-md bg-white/80 backdrop-blur-sm hover:bg-white ${service.borderColor} border-l-4 relative overflow-hidden 
+        h-full flex flex-col`} // ← Important: flex + h-full
+    >
+      {/* Background gradient overlay */}
+      <div className={`absolute inset-0 ${service.color.split(' ')[0]}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
 
-              <CardHeader className="relative z-10">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl ${service.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                    <service.icon size={24} />
-                  </div>
-                  {/* <Badge variant="secondary" className="text-xs px-2 py-1">
-                    {service.badge}
-                  </Badge> */}
-                </div>
-                <CardTitle className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-gray-800 transition-colors">
-                  {service.title}
-                </CardTitle>
-                <CardDescription className="text-gray-600 leading-relaxed">
-                  {service.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="relative z-10">
-                <ul className="space-y-3 mb-6">
-                  {service.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-primary rounded-full mr-3 flex-shrink-0"></div>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full group-hover:bg-primary group-hover:text-white transition-all duration-300"
-                >
-                 <Link to={service.route} > Learn More </Link>
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+      <CardHeader className="relative z-10 flex-grow"> {/* ← flex-grow to push content up */}
+        <div className="flex items-start justify-between mb-4">
+          <div className={`w-12 h-12 rounded-xl ${service.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+            <service.icon size={24} />
+          </div>
         </div>
+        <CardTitle className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-gray-800 transition-colors">
+          {service.title}
+        </CardTitle>
+        <CardDescription className="text-gray-600 leading-relaxed">
+          {service.description}
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="relative z-10 mt-auto"> {/* ← mt-auto pushes button to bottom */}
+        <ul className="space-y-3 mb-6 min-h-32"> {/* ← Optional: min-h to ensure consistent spacing */}
+          {service.features.map((feature, idx) => (
+            <li key={idx} className="flex items-center text-sm text-gray-600">
+              <div className="w-2 h-2 bg-primary rounded-full mr-3 flex-shrink-0"></div>
+              {feature}
+            </li>
+          ))}
+        </ul>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full group-hover:bg-primary group-hover:text-white transition-all duration-300"
+        >
+          <Link to={service.route}>Start Exploring for Free</Link>
+          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </Button>
+      </CardContent>
+    </Card>
+  ))}
+</div>
 
         {/* CTA Section */}
         <div className="text-center mt-16">
           <Card className="max-w-2xl mx-auto bg-gradient-to-r from-primary to-primary-600 border-0 shadow-xl">
             <CardContent className="p-8 text-center">
               <h3 className="text-2xl font-bold text-white mb-4">
-                Ready to Start Your Journey?
+               Ready to Begin Your U.S. Study Journey?
               </h3>
               <p className="text-primary-100 mb-6">
-                Get access to all these features and more with our comprehensive platform.
+               Upbroad makes studying abroad simpler, transparent, and truly guided.
+
               </p>
               <Button
                 size="lg"

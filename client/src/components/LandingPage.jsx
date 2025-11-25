@@ -19,7 +19,7 @@ import Hero from '@/components/Hero';
 import { Spotlight } from '@/components/ui/spotlight';
 import Loader from '@/components/ui/loader';
 
-export default function GoupBroadLandingPage() {
+export default function GoupbroadLandingPage() {
   const [serverStatus, setServerStatus] = useState({
     application: {
       environment: 'development',

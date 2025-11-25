@@ -31,7 +31,7 @@ const PaymentFailed = () => {
             </Link>
             <Button
               variant="outline"
-              onClick={() => window.location.href = 'mailto:support@goupbroad.com'}
+              onClick={() => window.location.href = 'mailto:support@Goupbroad.com'}
               className="w-full"
             >
               Contact Support

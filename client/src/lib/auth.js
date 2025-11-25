@@ -78,9 +78,20 @@ export function updateUserData(userData) {
 export function isAuthenticated() {
   return !!getToken();
 }
-
+export function clearCollegeFinderCache() {
+  const prefix = 'college_finder_cache_';
+  // console.log(prefix)
+  // Remove ALL keys that start with the prefix (covers guest + any logged-in user)
+  Object.keys(localStorage)
+    .filter(key => key.startsWith(prefix))
+    .forEach(key => {
+      console.log('Clearing college finder cache:', key);
+      localStorage.removeItem(key);
+    });
+}
 export function logout() {
   clearAuth();
+  clearCollegeFinderCache();
 }
 
 export function getUserInitials() {

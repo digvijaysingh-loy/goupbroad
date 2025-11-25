@@ -19,9 +19,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SignInModal from './SignInModal';
 import SignUpModal from './SignUpModal';
-import { isAuthenticated, setAuth } from '@/lib/auth';
+import { isAuthenticated, setAuth, getUser } from '@/lib/auth';
 import { updateUserProfile, getUserProfile } from '@/services/api.services';
 import { toast } from 'sonner';
+import LLMCreditUpgradeModal from './LLMCreditUpgradeModal';
+
+
+// MUST MATCH THE KEY USED IN CollegeFinderResults.jsx
+const CACHE_KEY_PREFIX = 'college_finder_cache_';
 
 const QuestionnaireForm = () => {
   const navigate = useNavigate();
@@ -32,7 +37,7 @@ const QuestionnaireForm = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authTab, setAuthTab] = useState('signin');
   const [userProfile, setUserProfile] = useState(null);
-
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [formData, setFormData] = useState({
     degreeLevel: '',
     program: '',
@@ -53,14 +58,12 @@ const QuestionnaireForm = () => {
     greAWA: '',
     gmatTotal: '',
     gmatQuant: '',
-    // English Test
     englishTest: '',
     toefl: { reading: '', writing: '', speaking: '', listening: '' },
     ielts: { reading: '', writing: '', speaking: '', listening: '' },
     duolingo: { reading: '', writing: '', speaking: '', listening: '', total: '' },
     intake: '',
     duration: '',
-    // Bachelor
     schoolBoard: '',
     averageMarks: '',
     satScore: '',
@@ -68,7 +71,6 @@ const QuestionnaireForm = () => {
     extracurriculars: '',
     intakeTarget: '',
     testTaken: '',
-    // Advanced
     experienceYears: '',
     experienceIndustry: '',
     leadership: { has: '', details: '' },
@@ -78,7 +80,6 @@ const QuestionnaireForm = () => {
     classesMarks: '',
     satBreakdown: { ebrw: '', math: '', total: '' },
     actBreakdown: { english: '', math: '', reading: '', science: '', composite: '' },
-    // testOptional: '',
     awards: '',
     specialCircumstances: '',
   });
@@ -87,6 +88,33 @@ const QuestionnaireForm = () => {
 
   const isAdvanced = formData.intakeMode?.includes('Advanced');
   const TOTAL_STEPS = useMemo(() => (isAdvanced ? 8 : 7), [isAdvanced]);
+  const user = getUser();
+  const getUserId = user?._id;                    // safe, returns undefined if no user
+  const currentUserId = isAuthenticated() ? getUserId : 'guest';
+
+  // console.log("user", currentUserId)
+  // Check if user already has cached results
+  const checkExistingCache = useCallback(() => {
+    try {
+      const cachedRaw = localStorage.getItem(`${CACHE_KEY_PREFIX}${currentUserId}`);
+      if (!cachedRaw) return null;
+
+      const cached = JSON.parse(cachedRaw);
+
+      // Expire cache after 24 hours
+      if (Date.now() - cached.timestamp > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(`${CACHE_KEY_PREFIX}${currentUserId}`);
+        return null;
+      }
+
+      if (cached.userId !== currentUserId) return null;
+
+      return cached; // contains recommendations + aiInsights
+    } catch (e) {
+      console.warn('Failed to read cache:', e);
+      return null;
+    }
+  }, [currentUserId]);
 
   useEffect(() => {
     try {
@@ -100,6 +128,7 @@ const QuestionnaireForm = () => {
     }
   }, []);
 
+  // Clear irrelevant fields when degree changes
   useEffect(() => {
     if (formData.degreeLevel === 'Master') {
       setFormData(prev => ({
@@ -113,7 +142,6 @@ const QuestionnaireForm = () => {
         classesMarks: '',
         satBreakdown: { ebrw: '', math: '', total: '' },
         actBreakdown: { english: '', math: '', reading: '', science: '', composite: '' },
-        // testOptional: '',
         awards: '',
         specialCircumstances: '',
       }));
@@ -161,7 +189,6 @@ const QuestionnaireForm = () => {
 
   const handleInputChange = useCallback((field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-
     setErrors(prev => {
       const newErrors = { ...prev };
       delete newErrors[field];
@@ -181,8 +208,6 @@ const QuestionnaireForm = () => {
         if (!formData.degreeLevel) {
           newErrors.degreeLevel = 'Please select Bachelor or Master';
           isValid = false;
-        } else {
-          delete newErrors.degreeLevel;
         }
         break;
       case 2:
@@ -229,24 +254,9 @@ const QuestionnaireForm = () => {
           newErrors.englishTest = 'Please select an option';
           isValid = false;
         } else if (formData.englishTest === 'Yes') {
-          const hasTOEFL = 
-            formData.toefl.reading && 
-            formData.toefl.writing && 
-            formData.toefl.speaking && 
-            formData.toefl.listening;
-
-          const hasIELTS = 
-            formData.ielts.reading && 
-            formData.ielts.writing && 
-            formData.ielts.speaking && 
-            formData.ielts.listening;
-
-          const hasDuolingo = 
-            formData.duolingo.reading && 
-            formData.duolingo.writing && 
-            formData.duolingo.speaking && 
-            formData.duolingo.listening && 
-            formData.duolingo.total;
+          const hasTOEFL = formData.toefl.reading && formData.toefl.writing && formData.toefl.speaking && formData.toefl.listening;
+          const hasIELTS = formData.ielts.reading && formData.ielts.writing && formData.ielts.speaking && formData.ielts.listening;
+          const hasDuolingo = formData.duolingo.reading && formData.duolingo.writing && formData.duolingo.speaking && formData.duolingo.listening && formData.duolingo.total;
 
           if (!hasTOEFL && !hasIELTS && !hasDuolingo) {
             newErrors.englishTest = 'Please fill at least one test completely';
@@ -286,6 +296,7 @@ const QuestionnaireForm = () => {
   const fetchUserProfile = useCallback(async () => {
     try {
       const response = await getUserProfile();
+      console.log(response)
       if (response.success) {
         setUserProfile(response.data);
         return response.data;
@@ -298,9 +309,9 @@ const QuestionnaireForm = () => {
   }, []);
 
   const checkAndHandleLimit = useCallback(async (profile) => {
-    const limit = profile?.universityFinderLlmResponseLimit || 0;
+    const limit = profile?.universityFinderLlmResponseLimit ?? 0;
     if (limit <= 0) {
-      toast.error('Your free limit is exceeded. Please upgrade to continue getting AI-powered recommendations.');
+      setShowUpgradeModal(true);
       return false;
     }
     return true;
@@ -309,30 +320,49 @@ const QuestionnaireForm = () => {
   const handleAuthSuccess = async (token, user) => {
     setAuth({ accessToken: token, user });
     setShowAuthModal(false);
-
-    // Fetch user profile after auth
     const profile = await fetchUserProfile();
     if (profile && !(await checkAndHandleLimit(profile))) {
-      return; // Don't proceed if limit exceeded
+      return;
     }
-
-    // Proceed to get universities if limit is okay
     await handleGetUniversities(true);
   };
-
+  useEffect(() => {
+    if (isAuthenticated() && !userProfile) {
+      fetchUserProfile();
+    }
+  }, [isAuthenticated, userProfile]);
+  useEffect(() => {
+    if (userProfile?.universityFinderLlmResponseLimit > 0) {
+      setShowUpgradeModal(false);
+    }
+  }, [userProfile]);
+  // MAIN FUNCTION: Get Universities (with cache-first logic)
   const handleGetUniversities = async (skipAuthCheck = false) => {
+    // 1. Check cache first — instant redirect if exists
+    const cached = checkExistingCache();
+    if (cached) {
+      toast.success('Welcome back! Loading your saved recommendations...');
+      navigate('/university-finder/results', {
+        state: {
+          recommendations: cached.recommendations,
+          aiInsights: cached.aiInsights || 'Your personalized university matches are ready!',
+        }
+      });
+      return;
+    }
+
+    // 2. Normal flow if no cache
     if (!skipAuthCheck && !isAuthenticated()) {
       setShowAuthModal(true);
       return;
     }
 
-    // Fetch user profile if not already fetched
     let profile = userProfile;
     if (!profile) {
       profile = await fetchUserProfile();
     }
     if (!profile || !(await checkAndHandleLimit(profile))) {
-      return; // Don't proceed if limit exceeded
+      return;
     }
 
     setIsSubmitting(true);
@@ -349,28 +379,23 @@ const QuestionnaireForm = () => {
         degreeLength: isMaster
           ? formData.degreeLength === '3 years' ? '3 YEARS' : formData.degreeLength === '4 years' ? '4 YEARS' : null
           : null,
-
         intakeMode: formData.intakeMode?.includes('Advanced') ? 'ADVANCED' : 'BASIC',
-
         stemRequired: boolEnum(formData.stemRequired),
         f1Required: boolEnum(formData.f1Required),
-
         programDetails: {
           program: formData.program || null,
           intake: formData.intake || formData.intakeTarget || null,
           duration: formData.duration || null,
           validity: null,
         },
-
         schoolDetails: isBachelor
           ? {
-              schoolName: formData.schoolSystem || null,
-              board: formData.schoolBoard || null,
-              yearOfPassing: null,
-              percentage: formData.averageMarks ? num(formData.averageMarks.replace('%', '').trim()) : null,
-            }
+            schoolName: formData.schoolSystem || null,
+            board: formData.schoolBoard || null,
+            yearOfPassing: null,
+            percentage: formData.averageMarks ? num(formData.averageMarks.replace('%', '').trim()) : null,
+          }
           : { schoolName: null, board: null, yearOfPassing: null, percentage: null },
-
         satDetails: {
           satPlan: null,
           satDate: null,
@@ -381,7 +406,6 @@ const QuestionnaireForm = () => {
             total: num(formData.satBreakdown?.total) || num(formData.satScore),
           },
         },
-
         actDetails: {
           actPlan: null,
           actDate: null,
@@ -392,75 +416,71 @@ const QuestionnaireForm = () => {
             total: num(formData.actBreakdown?.composite) || num(formData.actScore),
           },
         },
-
         collegeDetails: isMaster
           ? {
-              branch: formData.undergradDegree || null,
-              highestDegree: formData.mastersDegree === 'Yes' ? 'MASTER' : 'BACHELOR',
-              university: formData.university || null,
-              college: formData.university || null,
-              tier: formData.universityTier ? tierMap[formData.universityTier] || null : null,
-              gpa: num(formData.gpa),
-              gpaScale: formData.gpaScale === '4.0' ? 4 : formData.gpaScale === '10.0' ? 10 : formData.gpaScale === 'Percentage' ? 100 : null,
-              toppersGPA: null,
-              noOfBacklogs: null,
-              admissionTerm: formData.intake || formData.intakeTarget || null,
-              coursesApplying: formData.program ? [formData.program] : [],
-            }
+            branch: formData.undergradDegree || null,
+            highestDegree: formData.mastersDegree === 'Yes' ? 'MASTER' : 'BACHELOR',
+            university: formData.university || null,
+            college: formData.university || null,
+            tier: formData.universityTier ? tierMap[formData.universityTier] || null : null,
+            gpa: num(formData.gpa),
+            gpaScale: formData.gpaScale === '4.0' ? 4 : formData.gpaScale === '10.0' ? 10 : formData.gpaScale === 'Percentage' ? 100 : null,
+            toppersGPA: null,
+            noOfBacklogs: null,
+            admissionTerm: formData.intake || formData.intakeTarget || null,
+            coursesApplying: formData.program ? [formData.program] : [],
+          }
           : {
-              branch: null,
-              highestDegree: null,
-              university: null,
-              college: null,
-              tier: null,
-              gpa: null,
-              gpaScale: null,
-              toppersGPA: null,
-              noOfBacklogs: null,
-              admissionTerm: formData.intakeTarget || null,
-              coursesApplying: formData.program ? [formData.program] : [],
-            },
-
+            branch: null,
+            highestDegree: null,
+            university: null,
+            college: null,
+            tier: null,
+            gpa: null,
+            gpaScale: null,
+            toppersGPA: null,
+            noOfBacklogs: null,
+            admissionTerm: formData.intakeTarget || null,
+            coursesApplying: formData.program ? [formData.program] : [],
+          },
         greDetails: isMaster
           ? {
-              grePlan: null,
-              greDate: null,
-              greScoreCard: null,
-              greScore: {
-                verbal: num(formData.greVerbal),
-                quant: num(formData.greQuant),
-                awa: num(formData.greAWA),
-              },
-              retakingGRE: null,
-            }
-          : {
-              grePlan: null,
-              greDate: null,
-              greScoreCard: null,
-              greScore: { verbal: null, quant: null, awa: null },
-              retakingGRE: null,
+            grePlan: null,
+            greDate: null,
+            greScoreCard: null,
+            greScore: {
+              verbal: num(formData.greVerbal),
+              quant: num(formData.greQuant),
+              awa: num(formData.greAWA),
             },
-
+            retakingGRE: null,
+          }
+          : {
+            grePlan: null,
+            greDate: null,
+            greScoreCard: null,
+            greScore: { verbal: null, quant: null, awa: null },
+            retakingGRE: null,
+          },
         gmatDetails: isMaster
           ? {
-              gmatPlan: null,
-              gmatDate: null,
-              gmatScoreCard: null,
-              gmatScore: {
-                verbal: null,
-                quant: num(formData.gmatQuant),
-                total: num(formData.gmatTotal),
-              },
-              retakingGMAT: null,
-            }
-          : {
-              gmatPlan: null,
-              gmatDate: null,
-              gmatScoreCard: null,
-              gmatScore: { verbal: null, quant: null, total: null },
-              retakingGMAT: null,
+            gmatPlan: null,
+            gmatDate: null,
+            gmatScoreCard: null,
+            gmatScore: {
+              verbal: null,
+              quant: num(formData.gmatQuant),
+              total: num(formData.gmatTotal),
             },
-
+            retakingGMAT: null,
+          }
+          : {
+            gmatPlan: null,
+            gmatDate: null,
+            gmatScoreCard: null,
+            gmatScore: { verbal: null, quant: null, total: null },
+            retakingGMAT: null,
+          },
         toeflDetails: {
           toeflPlan: null,
           toeflDate: null,
@@ -491,27 +511,22 @@ const QuestionnaireForm = () => {
             writing: num(formData.duolingo.writing),
             speaking: num(formData.duolingo.speaking),
             listening: num(formData.duolingo.listening),
-            // total: num(formData.duolingo.total)
           } : null,
           retakingDuolingo: null
         },
-
         experienceDetails: isMaster
           ? {
-              totalExperience: formData.experienceYears ? num(formData.experienceYears) : null,
-              experienceIndustry: formData.experienceIndustry || null,
-            }
+            totalExperience: formData.experienceYears ? num(formData.experienceYears) : null,
+            experienceIndustry: formData.experienceIndustry || null,
+          }
           : { totalExperience: null, experienceIndustry: null },
-
         leadershipActivities: formData.leadership?.has === 'Yes'
           ? formData.leadership.details || 'Yes'
           : formData.leadership?.has === 'No' ? 'No' : null,
-
         researchPublications: formData.researchProjects || null,
         certifications: formData.certifications?.has === 'Yes'
           ? formData.certifications.details || 'Yes'
           : formData.certifications?.has === 'No' ? 'No' : null,
-
         visa: {
           countriesPlanningToApply: ['USA'],
           visaInterviewDate: null,
@@ -525,7 +540,7 @@ const QuestionnaireForm = () => {
         ? `Your profile is competitive for mid-tier ${formData.program} programs with strong safe/backup options.`
         : `You have a solid high school profile with good chances at regional and mid-tier schools.`;
 
-      navigate('/college-finder/results', {
+      navigate('/university-finder/results', {
         state: { responses: formData, aiInsights: summary }
       });
       toast.success('Profile updated and recommendations ready!');
@@ -553,7 +568,7 @@ const QuestionnaireForm = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center p-8">
-          <div className="w-16 h-16 bg-[#145044] rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-[#145044] rounded-full flex items-center justify-center mx-auto mb-6 relative">
             <Brain className="h-8 w-8 text-white" />
             <Loader2 className="absolute h-6 w-6 text-white animate-spin" />
           </div>
@@ -636,6 +651,17 @@ const QuestionnaireForm = () => {
           </Tabs>
         </DialogContent>
       </Dialog>
+      {showUpgradeModal && (
+        <LLMCreditUpgradeModal
+          open={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          onSuccess={async () => {
+            await fetchUserProfile();
+            setShowUpgradeModal(false);        // This line fixes everything
+            await handleGetUniversities(true);
+          }}
+        />
+      )}
     </div>
   );
 };

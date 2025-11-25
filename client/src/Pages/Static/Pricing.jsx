@@ -20,11 +20,11 @@ const Pricing = () => {
   // Removed processingPayment state as it's no longer needed
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Check if user is coming from auth flow and needs to make a payment
   const fromAuth = location.state?.fromAuth;
   const userData = location.state?.user;
-  
+
   useEffect(() => {
     const getPlans = async () => {
       try {
@@ -38,7 +38,7 @@ const Pricing = () => {
         setLoading(false);
       }
     };
-    
+
     getPlans();
   }, []);
 
@@ -54,7 +54,7 @@ const Pricing = () => {
       }
     });
   };
-  
+
   // Removed initiatePayment function as we're now handling payment in the PaymentRequired component
 
   const getPlanDetailsForCategory = (planType, category) => {
@@ -78,7 +78,7 @@ const Pricing = () => {
           document.body.appendChild(script);
         });
       };
-      
+
       const loadScript = async () => {
         if (!window.Razorpay) {
           const res = await loadRazorpayScript();
@@ -87,7 +87,7 @@ const Pricing = () => {
           }
         }
       };
-      
+
       loadScript();
     }
   }, [fromAuth, userData]);
@@ -112,7 +112,7 @@ const Pricing = () => {
           <h2 className="text-2xl font-bold mb-4 text-red-600">Error Loading Plans</h2>
           <p>We encountered an error while loading the pricing plans.</p>
           <p className="text-gray-600 mt-2">{error}</p>
-          <Button 
+          <Button
             className="mt-4 bg-[#145044] hover:bg-[#145044]/90 text-white"
             onClick={() => window.location.reload()}
           >
@@ -146,13 +146,19 @@ const Pricing = () => {
               🎓 Choose Your Plan
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Invest in Your
+              Choose the Right Support for Your
               <br />
-              <span style={{ color: '#145044' }}>Academic Future</span>
+              <span
+                className="block mt-2 md:mt-4 text-[#145044]"
+                style={{ color: '#145044' }}
+              >
+                Study Abroad Journey
+              </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
-              Choose the perfect plan for your academic journey. From basic guidance to comprehensive support, we have everything you need to succeed.
-            </p>
+              Explore personalized services designed to help you find the right
+              universities, craft strong applications, and study abroad with confidence. Every plan
+              is transparent, mentor-led, and tailored to your goals.            </p>
 
             {/* Category Selection */}
             <div className="flex flex-wrap justify-center gap-4 mb-16">
@@ -290,12 +296,13 @@ const Pricing = () => {
                   <div className="text-3xl font-bold mb-4" style={{ color: '#145044' }}>₹7,000 / university</div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-center gap-3">
-                      <CheckCircle className="w-5 h-5" style={{ color: '#145044' }} />
-                      <span>If you wish to apply to more universities than those included</span>
+                      <CheckCircle className="w-5 h-5 -mt-6" style={{ color: '#145044' }} />
+                      <span>If you plan to apply to additional universities beyond those included in your
+                        plan.</span>
                     </div>
                     <div className="flex items-center justify-center gap-3">
-                      <CheckCircle className="w-5 h-5" style={{ color: '#145044' }} />
-                      <span>We offer additional document preparation services at an extended price</span>
+                      <CheckCircle className="w-5 h-5 -mt-4" style={{ color: '#145044' }} />
+                      <span>Includes full document preparation and review for each extra university.</span>
                     </div>
                   </div>
                 </CardContent>

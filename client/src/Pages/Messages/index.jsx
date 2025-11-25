@@ -48,10 +48,12 @@ const Chat = () => {
             try {
                 setLoading(true)
                 const response = await getChatsStudents({ page: currentChatPage })
+                console.log(response)
                 if (isMounted && response.data?.data?.chatRooms) {
                     setConversations(response.data.data.chatRooms)
                     setChatPagination(response.data.data.pagination)
                 }
+                console.log(conversations)
             } catch (error) {
                 if (isMounted) {
                     toast.error(error.response?.data?.message || 'Failed to fetch conversations')

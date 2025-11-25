@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, Globe, Users, Award, GraduationCap, Star } from 'lucide-react';
-
+import { ArrowRight, BookOpen, Globe, Users, Award, GraduationCap, Star , School  } from 'lucide-react';
+import { FaUserGraduate } from "react-icons/fa";
 const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-primary-100 overflow-hidden">
@@ -17,23 +17,23 @@ const Hero = () => {
         <div className="absolute -top-10 -right-10 w-30 h-30 bg-primary-600 rounded-full blur-3xl"></div>
 
         {/* Small accent gradient - middle left */}
-        <div s  style={{
-        backgroundImage: 'radial-gradient(circle, #58BCA880, #88D3C440, #88D3C400)'
-      }} className="absolute  top-1/2 -left-20 w-40 h-40 rounded-full blur-sm"></div>
+        <div s style={{
+          backgroundImage: 'radial-gradient(circle, #58BCA880, #88D3C440, #88D3C400)'
+        }} className="absolute  top-1/2 -left-20 w-40 h-40 rounded-full blur-sm"></div>
 
         {/* Large bottom gradient - bottom right */}
         {/* <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-primary-600 rounded-full blur-3xl"></div> */}
 
         {/* Small floating gradient - center */}
-        <div  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/3 w-20 h-20 bg-primary-600 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/3 w-20 h-20 bg-primary-600 rounded-full blur-3xl animate-pulse"></div>
 
         {/* Additional small gradients for depth */}
         <div style={{
-        backgroundImage: 'radial-gradient(circle, #58BCA880, #88D3C440, #88D3C400)'
-      }} className="absolute bottom-1/4 left-1/4 w-20 h-20  rounded-full blur-sm"></div>
-        <div  style={{
-        backgroundImage: 'radial-gradient(circle, #58BCA880, #88D3C440, #88D3C400)'
-      }}  className="absolute top-1/4 right-1/3 w-20 h-20  rounded-full blur-lg"></div>
+          backgroundImage: 'radial-gradient(circle, #58BCA880, #88D3C440, #88D3C400)'
+        }} className="absolute bottom-1/4 left-1/4 w-20 h-20  rounded-full blur-sm"></div>
+        <div style={{
+          backgroundImage: 'radial-gradient(circle, #58BCA880, #88D3C440, #88D3C400)'
+        }} className="absolute top-1/4 right-1/3 w-20 h-20  rounded-full blur-lg"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -47,18 +47,19 @@ const Hero = () => {
             </Badge>
 
             {/* Main Heading */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
-              Your Gateway to{' '}
+            <h1 className="text-4xl sm:text-5xl md:text-5xl font-bold text-gray-900 leading-tight">
+              Built by International Students. {' '}
               <span className="text-gradient bg-gradient-to-r from-primary to-primary-600 bg-clip-text text-transparent">
-                International
+                Trusted by Thousands.
               </span>{' '}
-              Universities
+
             </h1>
 
             {/* Subheading */}
             <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
-              Transform your international education dreams into reality. Find the perfect university,
-              secure scholarships, and connect with a global community of ambitious students.
+              We make studying in the U.S. simpler, transparent,
+              and stress-free, combining verified data, real mentors, and expert admissions
+              guidance trusted by 10,000+ students worldwide.
             </p>
 
             {/* Stats Cards */}
@@ -119,67 +120,67 @@ const Hero = () => {
 
             {/* Floating Academic Achievement Elements */}
             {/* Top Left - University Ranking */}
-            <Card className="absolute -top-4 -left-6 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float">
+            <Card className="absolute -top-4 -left-6 max-sm:p-3 max-w-48 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float">
               <CardContent className=" text-center max-sm:px-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Award className="w-4 h-4 text-yellow-500" />
-                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Success Rate</span>
+                <div className="flex items-center justify-center gap-2 mb-1 ">
+                  <GraduationCap  className="w-4 h-4 text-yellow-500 " />
+                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700 ">Success Rate</span>
                 </div>
-                <div className="text-xl max-sm:text-[14px] font-bold text-primary-800">98%</div>
-                <div className="text-xs max-sm:text-[10px] text-gray-500">Students get admitted</div>
+                <div className="text-xl max-sm:text-[14px] font-bold text-primary-800">100%</div>
+                <div className="text-xs max-sm:text-[10px] text-gray-500">Students who got admitted</div>
               </CardContent>
             </Card>
 
             {/* Top Right - Global Recognition */}
-            <Card className="absolute -top-6 -right-8 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+            <Card className="absolute -top-6 -right-8 max-sm:p-3 max-w-48 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '1s' }}>
               <CardContent className=" text-center max-sm:px-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center justify-center gap-2 mb-1">
                   <Globe className="w-4 h-4 text-blue-500" />
-                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Global Reach</span>
+                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Countries</span>
                 </div>
-                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">25+</div>
-                <div className="text-xs max-sm:text-[10px] text-gray-500">Countries</div>
+                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">10+</div>
+                <div className="text-xs max-sm:text-[10px] text-gray-500">Global reach of our  mentors</div>
               </CardContent>
             </Card>
 
             {/* Middle Left - Academic Programs */}
-            <Card className="absolute top-1/3 -left-12 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '2s' }}>
+            <Card className="absolute top-1/3 -left-12 max-sm:p-3 max-w-48 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '2s' }}>
               <CardContent className=" text-center max-sm:px-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <BookOpen className="w-4 h-4 text-green-500" />
-                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Programs</span>
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <Users className="w-4 h-4 text-green-500" />
+                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Scholarships Secured</span>
                 </div>
-                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">1000+</div>
-                <div className="text-xs max-sm:text-[10px] text-gray-500">Study options</div>
+                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">200 Crore+</div>
+                <div className="text-xs max-sm:text-[10px] text-gray-500">Real funding, verified  outcomes</div>
               </CardContent>
             </Card>
 
             {/* Middle Right - Student Community */}
-            <Card className="absolute top-1/3 -right-12 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '3s' }}>
+            <Card className="absolute top-1/3 -right-12 max-w-48 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '3s' }}>
               <CardContent className=" text-center max-sm:px-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4 text-purple-500" />
-                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Scholarships</span>
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <School  className="w-4 h-4 text-purple-500" />
+                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Universities</span>
                 </div>
-                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">$50M+</div>
-                <div className="text-xs max-sm:text-[10px] text-gray-500">Available funding</div>
+                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">500+</div>
+                <div className="text-xs max-sm:text-[10px] text-gray-500">Curated and verified by  our experts</div>
               </CardContent>
             </Card>
 
             {/* Bottom Left - Scholarships */}
-            <Card className="absolute -bottom-4 max-lg:bottom-1 max-sm:bottom-4 -left-8 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '4s' }}>
+            <Card className="absolute -bottom-8 max-lg:bottom-1 max-sm:bottom-4 max-w-48 -left-8 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '4s' }}>
               <CardContent className=" text-center max-sm:px-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Star className="w-4 h-4 text-orange-500" />
-                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Community</span>
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <FaUserGraduate  className="w-4 h-4 text-orange-500" />
+                  <span className="text-xs max-sm:text-[10px] font-semibold text-gray-700">Graduates</span>
                 </div>
-                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">50K+</div>
-                <div className="text-xs max-sm:text-[10px] text-gray-500">Active students</div>
+                <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">400+</div>
+                <div className="text-xs max-sm:text-[10px] text-gray-500">Success stories from our growing community</div>
               </CardContent>
             </Card>
 
             {/* Bottom Right - Graduation Success */}
-            <Card className="absolute -bottom-6 max-lg:bottom-1 max-sm:bottom-5 -right-4 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '5s' }}>
+            {/* <Card className="absolute -bottom-6 max-lg:bottom-1 max-sm:bottom-5 -right-4 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '5s' }}>
               <CardContent className=" text-center max-sm:px-0">
                 <div className="flex items-center gap-2 mb-1">
                   <GraduationCap className="w-4 h-4 text-indigo-500" />
@@ -188,7 +189,7 @@ const Hero = () => {
                 <div className="text-xl  max-sm:text-[14px] font-bold text-primary-800">15K+</div>
                 <div className="text-xs max-sm:text-[10px] text-gray-500">Success Stories</div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>

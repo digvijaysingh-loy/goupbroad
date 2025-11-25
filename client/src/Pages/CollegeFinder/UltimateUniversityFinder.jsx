@@ -430,7 +430,7 @@ Please provide detailed insights on this student's admission prospects and unive
       });
 
       // Navigate to results
-      navigate('/college-finder/results', {
+      navigate('/university-finder/results', {
         state: {
           recommendations,
           responses: formData,

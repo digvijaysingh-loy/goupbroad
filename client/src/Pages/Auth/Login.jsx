@@ -17,7 +17,7 @@ const Login = () => {
     email: '',
     password: '',
   });
-  useEffect(() => {  
+  useEffect(() => {
     clearAuth();
 
     if (isAuthenticated()) {
@@ -35,7 +35,7 @@ const Login = () => {
       setSuccessMessage(location.state.message);
       window.history.replaceState({}, document.title);
     }
-    
+
     const tokenExpired = searchParams.get('expired');
     if (tokenExpired === 'true') {
       setApiError('Your session has expired. Please log in again.');
@@ -48,7 +48,7 @@ const Login = () => {
       ...prev,
       [name]: value
     }));
-    
+
     if (apiError) {
       setApiError('');
     }
@@ -56,27 +56,27 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     setApiError('');
-    
+
     try {
       setIsLoading(true);
-      
+
       const userData = {
         email: formData.email,
         password: formData.password
       };
-      
+
       const response = await loginUser(userData);
-      
+
       if (response.success) {
         setAuth({
           accessToken: response.data.accessToken,
           user: response.data.user
         });
-        
+
         const userRole = response.data.user.role;
-        
+
         if (userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'VIEWER') {
           navigate('/admin/dashboard');
         } else {
@@ -91,7 +91,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login failed:', error);
-      
+
       if (error.response && error.response.data) {
         setApiError(error.response.data.message || 'Invalid email or password. Please try again.');
       } else {
@@ -109,7 +109,7 @@ const Login = () => {
         <div className="max-w-md mx-auto w-full">
 
           <div className="mb-10">
-            <img src="/logo.svg" alt="GoupBroad Logo" className="h-10 w-10" />
+            <img src="/logo.svg" alt="Goupbroad Logo" className="h-10 w-10" />
           </div>
 
           <h1 className="text-2xl font-semibold mb-2">Login</h1>
@@ -149,8 +149,8 @@ const Login = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="text-sm text-gray-500 flex items-center"
                 >
@@ -172,8 +172,8 @@ const Login = () => {
               </div>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full cursor-pointer bg-primary-1 hover:bg-primary-1/90 text-white py-2 rounded-md transition-colors"
               disabled={isLoading}
             >
@@ -189,7 +189,7 @@ const Login = () => {
 
           <div className="mt-8 pt-4 border-t border-gray-200">
             <p className="text-xs text-center text-gray-500">
-              By continuing, you agree to GoupBroad&apos;s <a href="#" className="text-primary-1 hover:underline">Terms of Service</a> and <a href="#" className="text-primary-1 hover:underline">Privacy Policy</a>.
+              By continuing, you agree to Goupbroad&apos;s <a href="#" className="text-primary-1 hover:underline">Terms of Service</a> and <a href="#" className="text-primary-1 hover:underline">Privacy Policy</a>.
             </p>
           </div>
         </div>

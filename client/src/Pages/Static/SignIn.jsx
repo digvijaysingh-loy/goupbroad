@@ -44,32 +44,32 @@ const SignIn = () => {
     const authError = searchParams.get('error');
 
     if (tokenExpired === 'true') {
-       setTimeout(() => {
-    toast.error('Your session has expired. Please sign in again.');
-  }, 0);
+      setTimeout(() => {
+        toast.error('Your session has expired. Please sign in again.');
+      }, 0);
       urlWasCleaned = true;
     }
-    
+
     if (authError) {
       // 3. Display the error from the URL as a toast
-       setTimeout(() => {
-    toast.error(decodeURIComponent(authError));
-  }, 0);
+      setTimeout(() => {
+        toast.error(decodeURIComponent(authError));
+      }, 0);
       urlWasCleaned = true;
     }
-    
+
     // 4. If we showed a toast from a URL param, clean the URL
     if (urlWasCleaned) {
       navigate('/signin', { replace: true });
     }
-    
+
   }, [location.state, searchParams, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
     setIsLoading(true);
-    
+
     try {
       const userData = { email, password };
       const response = await loginUser(userData);
@@ -79,9 +79,9 @@ const SignIn = () => {
           accessToken: response.data.accessToken,
           user: response.data.user
         });
-        
+
         const userRole = response.data.user.role;
-        
+
         if (userRole === 'ADMIN' || userRole === 'EDITOR' || userRole === 'VIEWER') {
           navigate('/admin/dashboard');
         } else {
@@ -104,14 +104,14 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-      
+
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
         {/* Left Side - Branding & Info */}
         <div className="hidden lg:flex flex-col justify-center space-y-8 px-8">
           <div className="space-y-6">
-            <div className="flex items-center space-x-3">
-              <img src={logo} alt="goupbroadlogo" className='w-[50px] h-[50px] '/>
-              <h1 className="text-3xl font-bold text-primary-700">GoupBroad</h1>
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+              <img src={logo} alt="Goupbroadlogo" className='w-[50px] h-[50px] ' />
+              <h1 className="text-3xl font-bold text-primary-700">Goupbroad</h1>
             </div>
             <div className="space-y-4">
               <h2 className="text-4xl font-bold text-gray-800 leading-tight">
@@ -249,8 +249,8 @@ const SignIn = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="h-12"
                   onClick={() => window.location.href = `${import.meta.env.VITE_SERVER_URL}/v1/auth/google`}
                   type="button"

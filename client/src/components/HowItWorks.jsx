@@ -48,7 +48,7 @@ export const HowItWorks = () => {
   });
   const timelineLineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
   const stepRef = useRef(null);
-              const isInView = useInView(stepRef, { once: true });
+  const isInView = useInView(stepRef, { once: true });
   return (
     <section id="how-it-works" className="py-20 relative overflow-hidden">
       <div
@@ -62,10 +62,10 @@ export const HowItWorks = () => {
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
-            How GoupBroad Works
+            How Goupbroad Works
           </h2>
           <p className="text-lg text-gray-600">
-            From research to takeoff, GoupBroad simplifies your study abroad journey with expert support at every step.
+            From research to takeoff, Goupbroad simplifies your study abroad journey with expert support at every step.
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export const HowItWorks = () => {
 
           <div className="space-y-16 relative">
             {steps.map((step, index) => {
-              
+
 
               return (
                 <motion.div
@@ -90,9 +90,8 @@ export const HowItWorks = () => {
                   className="relative md:grid md:grid-cols-2 md:gap-12 md:items-center"
                 >
                   <div
-                    className={`md:col-span-1 ${
-                      index % 2 === 0 ? 'md:order-1' : 'md:order-2'
-                    }`}
+                    className={`md:col-span-1 ${index % 2 === 0 ? 'md:order-1' : 'md:order-2'
+                      }`}
                   >
                     <div className="md:pr-8 md:pl-0 px-4">
                       <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative z-10">

@@ -53,7 +53,7 @@ export const InputField = ({
   // Always reserve space for error
   const ErrorMessage = () =>
     hasError ? (
-      <p className="text-red-600 text-xs flex items-center mt-1">
+      <p className="text-red-600 text-xs flex flex-row items-center mt-1">
         <AlertCircle className="h-3 w-3 mr-1 flex-shrink-0" />
         {hasError}
       </p>

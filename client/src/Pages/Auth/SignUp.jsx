@@ -196,8 +196,8 @@ const SignUp = () => {
         <div className="hidden lg:flex flex-col justify-center space-y-8 px-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <img src={logo} alt="goupbroadlogo" className='w-[50px] h-[50px] ' />
-              <h1 className="text-3xl font-bold text-primary-700">GoupBroad</h1>
+              <img src={logo} alt="Goupbroadlogo" className='w-[50px] h-[50px] ' />
+              <h1 className="text-3xl font-bold text-primary-700">Goupbroad</h1>
             </div>
 
             <div className="space-y-4">
@@ -246,8 +246,8 @@ const SignUp = () => {
                 {otpSent && !editingEmail ? 'Verify OTP' : 'Create Account'}
               </CardTitle>
               <CardDescription className="text-gray-600">
-                {otpSent && !editingEmail 
-                  ? 'Enter the 6-digit code sent to your email' 
+                {otpSent && !editingEmail
+                  ? 'Enter the 6-digit code sent to your email'
                   : 'Enter your details to create your account'
                 }
               </CardDescription>
@@ -431,8 +431,8 @@ const SignUp = () => {
                   className="w-full h-12 bg-primary-800 cursor-pointer text-white font-semibold"
                   disabled={isLoading}
                 >
-                  {isLoading 
-                    ? (otpSent ? 'Verifying...' : 'Sending OTP...') 
+                  {isLoading
+                    ? (otpSent ? 'Verifying...' : 'Sending OTP...')
                     : (otpSent ? 'Verify & Create Account' : 'Continue')
                   }
                 </Button>

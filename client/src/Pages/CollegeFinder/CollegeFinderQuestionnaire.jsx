@@ -411,7 +411,7 @@ const CollegeFinderQuestionnaire = () => {
   };
 
   if (showResults) {
-    navigate('/college-finder/results', { state: { recommendations, responses } });
+    navigate('/university-finder/results', { state: { recommendations, responses } });
     return null;
   }
 

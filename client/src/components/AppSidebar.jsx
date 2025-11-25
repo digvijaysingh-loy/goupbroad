@@ -1,10 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-   User, Home,
-   MessageSquare, Settings, LogOut,
+  User, Home,
+  MessageSquare, Settings, LogOut,
   HelpCircle,
-   FileText, School, ListChecks,
-   CheckSquare, BriefcaseBusiness
+  FileText, School, ListChecks,
+  CheckSquare, BriefcaseBusiness
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logout } from '@/lib/auth';
@@ -58,19 +58,19 @@ const AppSidebar = ({ isSidebarOpen }) => {
             <img src="/logo.svg" height={35} width={35} />
           </div>
         )} */}
-         
+
         <Link to="/" className="md:py-6 flex md:items-center md:space-x-3 px-1 "
         >
-            <>
-              <img src="/logo.svg" height={40} width={40} />
-              <span className="text-2xl font-bold text-gray-900">GoupBroad</span>
-            </>
+          <>
+            <img src="/logo.svg" height={40} width={40} />
+            <span className="text-2xl font-bold text-gray-900">Goupbroad</span>
+          </>
         </Link>
-          {/* )} */}
+        {/* )} */}
       </SidebarHeader>
 
       <SidebarContent className={cn('bg-white', !isSidebarOpen && 'px-2')}>
-      
+
         <SidebarMenu className={cn('px-3', !isSidebarOpen && 'px-1')}>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.id}>

@@ -35,3 +35,11 @@ export const getAdminUpcomingDeadlines = async (page = 1, limit = 10) => {
     throw err.response?.data || err;
   }
 };
+export const markStudentActivityAsRead = async (activityId) => {
+  try {
+    const response = await servicesAxiosInstance.put(`/admin/student-activities/${activityId}/mark-read`);
+    return response.data;
+  } catch (err) {
+    throw err.response?.data || err;
+  }
+};

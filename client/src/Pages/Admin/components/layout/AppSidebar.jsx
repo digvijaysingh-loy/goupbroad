@@ -40,7 +40,7 @@ const sidebarItems = [
     title: 'Student Management',
     path: '/admin/students',
     icon: Users,
-  },  {
+  }, {
     title: 'Tasks',
     path: '/admin/tasks',
     icon: ClipboardList,
@@ -50,11 +50,11 @@ const sidebarItems = [
     path: '/admin/subtasks',
     icon: FileText,
   },
-  {
-    title: 'Application & Essays',
-    path: '/admin/applications',
-    icon: FileText,
-  },
+  // {
+  //   title: 'Application & Essays',
+  //   path: '/admin/applications',
+  //   icon: FileText,
+  // },
   {
     title: 'University Management',
     path: '/admin/universities',
@@ -90,28 +90,28 @@ const sidebarItems = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const [isOpen , setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(true)
 
   return (
     <>
       <Sidebar collapsible='icon' className={`border-r border-border overflow-hidden `}>
 
-        <SidebarHeader  className={'bg-white'} >
+        <SidebarHeader className={'bg-white'} >
           {collapsed && (
             <div className="py-4 ml-1">
               <img src="/logo.svg" height={35} width={35} />
             </div>
           )}
-            {!collapsed && (
-          <div className="md:py-6 flex items-center space-x-3 px-1">
+          {!collapsed && (
+            <div className="md:py-6 flex items-center space-x-3 px-1">
               <>
                 <img src="/logo.svg" height={40} width={40} />
-                <span className={cn("text-2xl font-bold text-gray-900" )}>GoupBroad</span>
+                <span className={cn("text-2xl font-bold text-gray-900")}>Goupbroad</span>
               </>
-          </div>
-            )}
-      </SidebarHeader>
- 
+            </div>
+          )}
+        </SidebarHeader>
+
         <SidebarContent className={`p-2 w-fit`}>
           <SidebarGroup>
             <SidebarGroupContent>
@@ -150,9 +150,9 @@ export function AppSidebar() {
           </div>
         )}
       </Sidebar>
-      
+
       <div className="mt-5">
-        <SidebarTrigger onClick={()=>{setIsOpen(!isOpen) ; console.log("worked")}}>
+        <SidebarTrigger onClick={() => { setIsOpen(!isOpen); console.log("worked") }}>
           <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50 rounded-full shadow-lg">
             <ChevronRight className="h-4 w-4" />
           </Button>

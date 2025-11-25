@@ -10,7 +10,7 @@ const Testimonials = () => {
       university: 'University of Toronto, Canada',
       course: 'Computer Science',
       image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=150&h=150&fit=crop&crop=face',
-      text: 'GoupBroad made my dream of studying in Canada a reality. Their personalized university matching helped me find the perfect program, and I secured a $15,000 scholarship through their platform!',
+      text: 'Goupbroad made my dream of studying in Canada a reality. Their personalized university matching helped me find the perfect program, and I secured a $15,000 scholarship through their platform!',
       rating: 5,
       achievement: 'Secured $15K Scholarship'
     },
@@ -46,7 +46,7 @@ const Testimonials = () => {
       university: 'University of Edinburgh, UK',
       course: 'International Relations',
       image: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=150&h=150&fit=crop&crop=face',
-      text: 'GoupBroad\'s scholarship finder helped me discover funding opportunities I never knew existed. I\'m now studying in the UK with 70% of my tuition covered!',
+      text: 'Goupbroad\'s scholarship finder helped me discover funding opportunities I never knew existed. I\'m now studying in the UK with 70% of my tuition covered!',
       rating: 5,
       achievement: '70% Tuition Covered'
     },
@@ -55,7 +55,7 @@ const Testimonials = () => {
       university: 'University of British Columbia, Canada',
       course: 'Environmental Engineering',
       image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      text: 'From university selection to visa guidance, GoupBroad supported me at every step. Their comprehensive approach made what seemed impossible, possible!',
+      text: 'From university selection to visa guidance, Goupbroad supported me at every step. Their comprehensive approach made what seemed impossible, possible!',
       rating: 5,
       achievement: 'End-to-End Support'
     }
@@ -66,11 +66,12 @@ const Testimonials = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Success Stories from Our Students
+            Success Stories from Students Like You
+
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Join thousands of students who have successfully transformed their international education dreams into reality with GoupBroad.
-          </p>
+            Hear how students turned their study abroad dreams into real success with Upbroad’s
+            transparent, mentor-led guidance.          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -94,8 +95,8 @@ const Testimonials = () => {
 
                 {/* Student Info */}
                 <div className="flex items-center">
-                  <img 
-                    src={testimonial.image} 
+                  <img
+                    src={testimonial.image}
                     alt={testimonial.name}
                     className="w-12 h-12 rounded-full mr-4 object-cover"
                   />
@@ -112,9 +113,9 @@ const Testimonials = () => {
 
         {/* Trust Indicators */}
         <div className="mt-16 text-center">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary-700 mb-2">98%</div>
+              <div className="text-3xl font-bold text-primary-700 mb-2">100%</div>
               <div className="text-sm text-gray-600">Success Rate</div>
             </div>
             <div className="text-center">
@@ -122,13 +123,13 @@ const Testimonials = () => {
               <div className="text-sm text-gray-600">Student Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary-700 mb-2">15K+</div>
+              <div className="text-3xl font-bold text-primary-700 mb-2">400+</div>
               <div className="text-sm text-gray-600">Happy Students</div>
             </div>
-            <div className="text-center">
+            {/* <div className="text-center">
               <div className="text-3xl font-bold text-primary-700 mb-2">24/7</div>
               <div className="text-sm text-gray-600">Support Available</div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

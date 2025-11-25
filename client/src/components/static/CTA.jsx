@@ -8,7 +8,7 @@ import { ArrowRight, CheckCircle, Users, Globe, Award } from 'lucide-react';
 
 const CTA = () => {
   const highlights = [
-    { icon: CheckCircle, text: 'Free Platform Access', color: 'text-green-400' },
+    // { icon: CheckCircle, text: 'Free Platform Access', color: 'text-green-400' },
     { icon: Users, text: 'Expert Guidance Available', color: 'text-blue-400' },
     { icon: Globe, text: 'Global University Network', color: 'text-purple-400' },
     { icon: Award, text: 'Scholarship Opportunities', color: 'text-yellow-400' }
@@ -26,15 +26,16 @@ const CTA = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
           <Badge variant="secondary" className="mb-6 rounded-full bg-white/20 text-white border-white/30 backdrop-blur-sm">
-            Join 10,000+ Students Worldwide
+            Start Your Study Abroad Journey with Upbroad
           </Badge>
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-            Ready to Start Your International Education Journey?
+           Take the Next Step Toward Your Global Education Journey
           </h2>
           <p className="text-lg md:text-xl text-primary-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Join thousands of students who have successfully secured admissions and scholarships
-            to top universities worldwide. Your dream education is just one click away.
+            Get personalized guidance, verified shortlists, and expert mentorship, all in one
+platform.
+
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -43,7 +44,7 @@ const CTA = () => {
                 size="lg"
                 className="bg-white text-primary-700 hover:bg-gray-100 px-8 py-6 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
-                Get Started Free
+                Book My Free Consultation
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
@@ -59,7 +60,7 @@ const CTA = () => {
         </div>
 
         {/* Feature highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {highlights.map((highlight, index) => (
             <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300 group">
               <CardContent className="p-6 text-center">

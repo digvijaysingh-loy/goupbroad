@@ -57,7 +57,7 @@ export const Features = () => {
                         Simplify Your Study Abroad Journey
                     </h2>
                     <p className="text-lg text-gray-600 dark:text-gray-300">
-                        GoupBroad streamlines every step of your international education process—from college selection to application tracking
+                        Goupbroad streamlines every step of your international education process—from college selection to application tracking
                     </p>
                 </div>
 
