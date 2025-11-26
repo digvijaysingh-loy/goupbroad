@@ -33,6 +33,42 @@ import {
 
 const CACHE_KEY_PREFIX = 'college_finder_cache_';
 
+const TypewriterText = ({ text }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    // Reset when the message changes
+    setDisplayedText('');
+    setCurrentIndex(0);
+
+    if (!text) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => {
+        const next = prev + 1;
+        if (next <= text.length) {
+          setDisplayedText(text.slice(0, next));
+          return next;
+        }
+        clearInterval(interval);
+        return prev;
+      });
+    }, 40); // Adjust speed here (40ms = natural typing speed)
+
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return (
+    <h2 className="text-xl text-center max-w-2xl px-6 font-medium text-gray-800 leading-relaxed">
+      <span>{displayedText}</span>
+      {/* Blinking cursor */}
+      {currentIndex < text.length && (
+        <span className="inline-block w-0.5 h-7 bg-primary-600 ml-1 animate-pulse align-middle" />
+      )}
+    </h2>
+  );
+};
 const CollegeFinderResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -302,7 +338,7 @@ const CollegeFinderResults = () => {
           <div className="grid grid-cols-2 gap-4">
             {[
               { icon: Clock, label: 'Duration', value: college.length || 'N/A' },
-              { icon: DollarSign, label: 'Tuition', value: college.tuition ? `$${college.tuition.toLocaleString()}` : 'N/A' },
+              { icon: DollarSign, label: 'Tuition', value: college.tuition ? `${college.tuition.toLocaleString()}` : 'N/A' },
               { icon: Award, label: 'Ranking', value: college.ranking?.natioal ? `#${college.ranking.national}` : 'N/A' },
               { icon: Users, label: 'Acceptance Rate', value: college.acceptanceRate ? `${college.acceptanceRate}%` : 'N/A' }
             ].map((item, i) => (
@@ -356,17 +392,32 @@ const CollegeFinderResults = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
       <Navigation />
 
-      {isLoading && (
-        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-          <div className="relative mb-8">
-            <Loader2 className="h-20 w-20 animate-spin text-primary-600" />
-            <Brain className="absolute inset-0 m-auto h-10 w-10 text-primary-600" />
-          </div>
-          <h2 className="text-xl text-center max-w-2xl px-6">
-            {loadingMessages[currentMessageIndex]}
-          </h2>
-        </div>
-      )}
+     {isLoading && (
+  <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+    
+    {/* Message ABOVE the loader */}
+    <div className="text-center mb-12 px-6">
+      <p className="text-2xl font-bold text-gray-800 mb-3">
+        Please wait — do not refresh or go back
+      </p>
+      <p className="text-lg text-gray-700">
+        Your personalized university results are coming soon!
+      </p>
+      <p className="text-sm text-gray-500 mt-5">
+        This may take up to a minute
+      </p>
+    </div>
+
+    {/* Existing loader + brain */}
+    <div className="relative mb-8">
+      <Loader2 className="h-20 w-20 animate-spin text-primary-600" />
+      <Brain className="absolute inset-0 m-auto h-10 w-10 text-primary-600" />
+    </div>
+
+    {/* Your existing rotating message stays exactly here, below the loader */}
+   <TypewriterText text={loadingMessages[currentMessageIndex]} />
+  </div>
+)}
 
       {error && !isLoading && (
         <div className="pt-24 text-center">
