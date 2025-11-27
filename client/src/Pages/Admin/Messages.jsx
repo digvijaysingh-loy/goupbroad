@@ -989,7 +989,7 @@ const Messages = () => {
                                     <CommandGroup heading="Students">
                                         {students.map((student) => (
                                             <CommandItem
-                                                className="mb-2 cursor-pointer"
+                                                className="mb-2 cursor-pointer "
                                                 key={student.id}
                                                 onSelect={() => generateRoomToken(student)}>
                                                 <div className="flex gap-2 items-center">
@@ -1085,10 +1085,10 @@ const Messages = () => {
                     className="w-10 h-10 rounded-full"
                 />
             </Avatar>
-
+{console.log(convo)}
             <div className="flex-1 overflow-hidden">
                 <h4 className="font-medium text-base truncate">
-                    {convo.participants.student.name === "Unnamed Student"
+                    {convo.participants.student.name === "Student"
                         ? convo.participants.student.email
                         : convo.participants.student.name}
                 </h4>
