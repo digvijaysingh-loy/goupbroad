@@ -18,9 +18,9 @@ export default async (req, _res, next) => {
                 return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 401);
             }
 
-            if (!student.isFeePaid) {
-                return httpError(next, new Error(responseMessage.CUSTOM_MESSAGE("Please Paid The Fee")), req, 401);
-            }
+            // if (!student.isFeePaid) {
+            //     return httpError(next, new Error(responseMessage.CUSTOM_MESSAGE("Please Paid The Fee")), req, 401);
+            // }
 
             if (!student.isVerified) {
                 return httpError(next, new Error(responseMessage.CUSTOM_MESSAGE("Your Not Verified To Perform This Action")), req, 401);

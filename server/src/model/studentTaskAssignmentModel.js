@@ -11,6 +11,16 @@ const studentTaskAssignmentSchema = new mongoose.Schema({
         ref: 'Task',
         required: true
     },
+    subtaskId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subtask',
+        required: true
+    },
+    questionnaireId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Questionnaire',
+        required: false
+    },
     assignedAt: {
         type: Date,
         default: Date.now

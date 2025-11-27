@@ -7,11 +7,228 @@ import StudentTaskAssignment from '../../model/studentTaskAssignmentModel.js';
 import TaskSubtaskAssignment from '../../model/taskSubtaskAssignmentModel.js';
 import Student from '../../model/studentModel.js';
 import Subtask from '../../model/subtaskModel.js';
+import Response from '../../model/responseModel.js';
+import Questionnaire from '../../model/questionnaireModel.js';
+import mongoose from 'mongoose';
+import { TaskAssignedTemplate } from '../../service/emailTemplates.js';
+import mailer from '../../service/email.service.js';
 import Member from '../../model/membersModel.js';
 import TaskCategory from '../../model/taskCategoryModel.js';
+import SubtaskQuestionnaireAssignment from '../../model/subtaskQuestionnaireAssignmentModel.js';
 
 export default {
     // Create a new task with associated students and subtasks (ADMIN only)
+    // createTask: async (req, res, next) => {
+    //     try {
+    //     const { taskId } = req.params;
+
+    //     // 1. Validate
+    //     if (!mongoose.Types.ObjectId.isValid(taskId)) {
+    //         return httpError(next, new Error("Invalid task ID"), req, 400);
+    //     }
+    //     if (req.authenticatedMember.role !== "ADMIN") {
+    //         return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
+    //     }
+
+    //     const page = Math.max(1, parseInt(req.query.page) || 1);
+    //     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+    //     const skip = (page - 1) * limit;
+
+    //     // 2. Fetch task
+    //     const task = await Task.findById(taskId).select("title description").lean();
+    //     if (!task) return httpError(next, new Error("Task not found"), req, 404);
+
+    //     // 3. Get all subtasks of this task
+    //     const subtasks = await Subtask.find({ taskId }).select("title").lean();
+    //     if (!subtasks.length) {
+    //         return httpResponse(req, res, 200, responseMessage.SUCCESS, {
+    //             task,
+    //             summary: { totalStudents: 0, totalSubtasks: 0, totalQuestionnaires: 0, totalResponses: 0 },
+    //             data: [],
+    //             pagination: { page, limit, total: 0, totalPages: 0 }
+    //         });
+    //     }
+    //     const subtaskIds = subtasks.map(s => s._id);
+
+    //     // 4. Get all questionnaires linked to these subtasks
+    //     const sqAssignments = await SubtaskQuestionnaireAssignment.find({
+    //         subtaskId: { $in: subtaskIds }
+    //     })
+    //     .populate({
+    //         path: "questionnaireId",
+    //         select: "title description status"
+    //     })
+    //     .lean();
+
+    //     const questionnaireIds = sqAssignments
+    //         .map(sq => sq.questionnaireId?._id?.toString())
+    //         .filter(Boolean);
+
+    //     // 5. Get all StudentTaskAssignment for this task
+    //     const assignments = await StudentTaskAssignment.find({ taskId })
+    //         .populate("studentId", "name email")
+    //         .populate("subtaskId", "title")
+    //         .populate("questionnaireId", "title")
+    //         .lean();
+
+    //     const studentIds = [...new Set(assignments.map(a => a.studentId._id.toString()))];
+
+    //     // 6. Fetch ALL responses
+    //     const responses = await Response.find({
+    //         taskId,
+    //         questionnaireId: { $in: questionnaireIds.map(id => new mongoose.Types.ObjectId(id)) },
+    //         studentId: { $in: studentIds.map(id => new mongoose.Types.ObjectId(id)) }
+    //     })
+    //     .populate("questionId", "question ansType options")
+    //     .lean();
+
+    //     // 7. Build lookup: qId → qId → response
+    //     const responseMap = new Map(); // qId → Map<questionId, response>
+    //     responses.forEach(r => {
+    //         const qKey = r.questionnaireId.toString();
+    //         if (!responseMap.has(qKey)) responseMap.set(qKey, new Map());
+    //         responseMap.get(qKey).set(r.questionId._id.toString(), r);
+    //     });
+
+    //     // 8. Cache questionnaire questions
+    //     const qCache = new Map();
+    //     const getQuestions = async (qId) => {
+    //         if (qCache.has(qId)) return qCache.get(qId);
+    //         const doc = await Questionnaire.findById(qId).select("questions").lean();
+    //         const questions = doc?.questions || [];
+    //         qCache.set(qId, questions);
+    //         return questions;
+    //     };
+
+    //     // 9. Build per-student structure
+    //     const studentMap = new Map();
+
+    //     for (const studentId of studentIds) {
+    //         const student = assignments.find(a => a.studentId._id.toString() === studentId)?.studentId;
+    //         if (!student) continue;
+
+    //         const studentObj = {
+    //             _id: student._id,
+    //             name: student.name,
+    //             email: student.email,
+    //             subtasks: subtasks.map(st => ({
+    //                 _id: st._id,
+    //                 title: st.title,
+    //                 questionnaires: []
+    //             }))
+    //         };
+    //         studentMap.set(studentId, studentObj);
+    //     }
+
+    //     // 10. Fill questionnaires & questions
+    //     for (const sq of sqAssignments) {
+    //         const subtaskId = sq.subtaskId.toString();
+    //         const qId = sq.questionnaireId._id.toString();
+
+    //         const questions = await getQuestions(qId);
+    //         const respMap = responseMap.get(qId) || new Map();
+
+    //         for (const studentId of studentIds) {
+    //             const studentObj = studentMap.get(studentId);
+    //             if (!studentObj) continue;
+
+    //             const subtaskEntry = studentObj.subtasks.find(s => s._id.toString() === subtaskId);
+    //             if (!subtaskEntry) continue;
+
+    //             let qEntry = subtaskEntry.questionnaires.find(q => q.questionnaireId.toString() === qId);
+    //             if (!qEntry) {
+    //                 qEntry = {
+    //                     questionnaireId: sq.questionnaireId._id,
+    //                     title: sq.questionnaireId.title,
+    //                     description: sq.questionnaireId.description,
+    //                     status: sq.questionnaireId.status,
+    //                     assignmentStatus: "PENDING",
+    //                     assignedAt: null,
+    //                     questions: []
+    //                 };
+    //                 subtaskEntry.questionnaires.push(qEntry);
+    //             }
+
+    //             // Update assignment status
+    //             const ass = assignments.find(a =>
+    //                 a.studentId._id.toString() === studentId &&
+    //                 a.subtaskId._id.toString() === subtaskId &&
+    //                 a.questionnaireId?._id?.toString() === qId
+    //             );
+    //             if (ass) {
+    //                 qEntry.assignmentStatus = ass.status;
+    //                 qEntry.assignedAt = ass.assignedAt;
+    //             }
+
+    //             // Add all questions
+    //             for (const q of questions) {
+    //                 const resp = respMap.get(q._id.toString());
+    //                 const studentResp = resp && resp.studentId.toString() === studentId ? resp : null;
+
+    //                 if (qEntry.questions.some(x => x._id.toString() === q._id.toString())) continue;
+
+    //                 qEntry.questions.push({
+    //                     _id: q._id,
+    //                     question: q.question,
+    //                     ansType: q.ansType,
+    //                     options: q.options || [],
+    //                     answer: studentResp?.answer ?? null,
+    //                     status: studentResp?.status ?? "PENDING",
+    //                     submittedAt: studentResp?.submittedAt ?? null,
+    //                     feedback: studentResp?.feedback ?? null
+    //                 });
+    //             }
+    //         }
+    //     }
+
+    //     // 11. Final array + pagination
+    //     const studentsArray = Array.from(studentMap.values())
+    //         .map(s => ({
+    //             ...s,
+    //             subtasks: s.subtasks.filter(st => st.questionnaires.some(q => q.questions.length > 0))
+    //         }))
+    //         .filter(s => s.subtasks.length > 0);
+
+    //     const totalStudents = studentsArray.length;
+    //     const paginated = studentsArray.slice(skip, skip + limit);
+
+    //     // 12. Summary
+    //     const totalSubtasks = subtasks.length;
+    //     const totalQuestionnaires = sqAssignments.length;
+    //     const totalResponses = responses.length;
+
+    //     const pagination = {
+    //         total: totalStudents,
+    //         page,
+    //         limit,
+    //         totalPages: Math.ceil(totalStudents / limit),
+    //         hasNextPage: page < Math.ceil(totalStudents / limit),
+    //         hasPrevPage: page > 1
+    //     };
+
+    //     // 13. Response — matches your format
+    //     httpResponse(req, res, 200, responseMessage.SUCCESS, {
+    //         task: {
+    //             _id: task._id,
+    //             title: task.title,
+    //             description: task.description
+    //         },
+    //         summary: {
+    //             totalStudents,
+    //             totalSubtasks,
+    //             totalQuestionnaires,
+    //             totalResponses
+    //         },
+    //         data: paginated,
+    //         pagination
+    //     });
+
+    // } catch (err) {
+    //     console.error("getTaskStudentReport error:", err);
+    //     httpError(next, err, req, 500);
+    // }
+    // },
+
     createTask: async (req, res, next) => {
         try {
             const { value, error } = validateJoiSchema(ValidateCreateTask, req.body);
@@ -42,49 +259,69 @@ export default {
                 if (subtasks.length !== subtaskIds.length) return httpError(next, new Error('One or more subtaskIds are invalid'), req, 400);
             }
 
+            const questionnaireIds = await Promise.all(subtaskIds.map(subtaskId => SubtaskQuestionnaireAssignment.find({ subtaskId }).distinct('questionnaireId').lean()));
+
             const task = new Task({ ...taskData, category });
             await task.save();
 
-            if (studentIds?.length > 0) {
-                await Promise.all(studentIds.map(studentId => new StudentTaskAssignment({
-                    studentId,
-                    taskId: task._id,
-                    assignedAt: new Date(),
-                    status: "PENDING",
-                    isLocked: false,
-                    dueDate: null
-                }).save()));
-            }
-
             if (subtaskIds?.length > 0 && studentIds?.length > 0) {
-                await Promise.all(studentIds.flatMap(studentId => subtaskIds.map(subtaskId => new TaskSubtaskAssignment({
-                    studentId,
-                    taskId: task._id,
-                    subtaskId,
-                    assignedAt: new Date(),
-                    status: "PENDING",
-                    isLocked: false,
-                    dueDate: null
-                }).save())));
+                await Promise.all(
+                    studentIds.flatMap(studentId => 
+                        subtaskIds.flatMap((subtaskId, subIndex) => {
+                            const questionnaires = questionnaireIds[subIndex];
+                            if (questionnaires.length === 0) {
+                                return [new StudentTaskAssignment({
+                                    studentId,
+                                    taskId: task._id,
+                                    subtaskId,
+                                    assignedAt: new Date(),
+                                    status: "PENDING",
+                                    isLocked: false,
+                                    dueDate: null
+                                }).save()];
+                            } else {
+                                return questionnaires.map(questionnaireId => new StudentTaskAssignment({
+                                    studentId,
+                                    taskId: task._id,
+                                    subtaskId,
+                                    questionnaireId,
+                                    assignedAt: new Date(),
+                                    status: "PENDING",
+                                    isLocked: false,
+                                    dueDate: null
+                                }).save());
+                            }
+                        })
+                    )
+                );
             }
 
             const populatedTask = await Task.findById(task._id).populate('category', 'name description').lean();
-            const studentAssignments = await StudentTaskAssignment.find({ taskId: task._id }).populate('studentId', '-password').lean();
-            const taskSubtaskAssignments = await TaskSubtaskAssignment.find({ taskId: task._id })
+
+            const assignments = await StudentTaskAssignment.find({ taskId: task._id })
                 .populate('studentId', '-password')
                 .populate('subtaskId')
+                .populate('questionnaireId')
                 .lean();
 
-            populatedTask.students = studentAssignments.map(assignment => assignment.studentId);
-            populatedTask.subtasks = taskSubtaskAssignments.map(assignment => ({
+            populatedTask.students = [...new Map(assignments.map(a => [a.studentId._id.toString(), a.studentId])).values()];
+
+            populatedTask.subtasks = assignments.map(assignment => ({
                 subtask: assignment.subtaskId,
                 student: assignment.studentId,
+                questionnaire: assignment.questionnaireId,
                 status: assignment.status,
                 isLocked: assignment.isLocked,
                 dueDate: assignment.dueDate
             }));
-
+            await Promise.all(studentIds.map(async (studentId) => {
+                const student = await Student.findById(studentId).lean();
+                if (student && student.email) {
+                    await mailer.sendEmail(student.email, TaskAssignedTemplate(student.name, populatedTask.title));
+                };
+            }));
             httpResponse(req, res, 201, responseMessage.SUCCESS, { message: 'Task created successfully', task: populatedTask });
+            
         } catch (err) {
             httpError(next, err, req, 500);
         }
@@ -192,18 +429,216 @@ export default {
         }
     },
 
-    // Get all tasks with associated students and subtasks (accessible to all members)
+    // ADMIN: Get all student responses for a task (by questionnaire)
+    // ADMIN – Get every student’s questionnaire responses for a task
+getStudentQuestionnaireResponses: async (req, res, next) => {
+    try {
+        const { taskId } = req.params;
+
+        // 1. Validate taskId
+        if (!mongoose.Types.ObjectId.isValid(taskId)) {
+            return httpError(next, new Error("Invalid task ID"), req, 400);
+        }
+
+        // 2. Admin check
+        if (req.authenticatedMember.role !== "ADMIN") {
+            return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
+        }
+
+        // 3. Pagination
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+        const skip = (page - 1) * limit;
+
+        // 4. Fetch task
+        const task = await Task.findById(taskId).select("title description").lean();
+        if (!task) {
+            return httpError(next, new Error("Task not found"), req, 404);
+        }
+
+        // 5. Fetch all StudentTaskAssignment entries
+        const assignments = await StudentTaskAssignment.find({ taskId })
+            .populate({
+                path: "studentId",
+                select: "name email"
+            })
+            .populate({
+                path: "subtaskId",
+                select: "title"
+            })
+            .populate({
+                path: "questionnaireId",
+                select: "title description status"
+            })
+            .lean();
+
+        if (!assignments.length) {
+            return httpResponse(req, res, 200, responseMessage.SUCCESS, {
+                task,
+                summary: { totalStudents: 0, totalQuestionnaires: 0, totalResponses: 0 },
+                data: [],
+                pagination: { page, limit, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false }
+            });
+        }
+
+        // 6. Extract unique IDs
+        const studentIds = [...new Set(assignments.map(a => a.studentId._id.toString()))];
+        const questionnaireIds = [...new Set(
+            assignments
+                .map(a => a.questionnaireId?._id?.toString())
+                .filter(Boolean)
+        )];
+
+        // 7. Fetch all responses
+        const responses = await Response.find({
+            taskId,
+            questionnaireId: { $in: questionnaireIds.map(id => new mongoose.Types.ObjectId(id)) },
+            studentId: { $in: studentIds.map(id => new mongoose.Types.ObjectId(id)) }
+        })
+        .populate({
+            path: "questionId",
+            select: "question ansType options"
+        })
+        .lean();
+
+        // 8. Build response lookup: questionnaireId → questionId → response
+        const responseMap = new Map(); // qId → Map<questionId, response>
+        responses.forEach(r => {
+            const qKey = r.questionnaireId.toString();
+            if (!responseMap.has(qKey)) responseMap.set(qKey, new Map());
+            responseMap.get(qKey).set(r.questionId._id.toString(), r);
+        });
+
+        // 9. Cache for Questionnaire questions
+        const questionnaireCache = new Map();
+
+        const getQuestionnaireQuestions = async (qId) => {
+            if (questionnaireCache.has(qId)) {
+                return questionnaireCache.get(qId);
+            }
+            const qDoc = await Questionnaire.findById(qId)
+                .select("questions")
+                .lean();
+            const questions = qDoc?.questions || [];
+            questionnaireCache.set(qId, questions);
+            return questions;
+        };
+
+        // 10. Build per-student data
+        const studentMap = new Map();
+
+        for (const ass of assignments) {
+            const sId = ass.studentId._id.toString();
+            if (!studentMap.has(sId)) {
+                studentMap.set(sId, {
+                    _id: ass.studentId._id,
+                    name: ass.studentId.name,
+                    email: ass.studentId.email,
+                    questionnaires: []
+                });
+            }
+
+            const qId = ass.questionnaireId?._id?.toString();
+            if (!qId) continue;
+
+            const studentObj = studentMap.get(sId);
+
+            let qEntry = studentObj.questionnaires.find(q => q.questionnaireId.toString() === qId);
+            if (!qEntry) {
+                qEntry = {
+                    questionnaireId: ass.questionnaireId._id,
+                    title: ass.questionnaireId.title,
+                    description: ass.questionnaireId.description,
+                    status: ass.questionnaireId.status,
+                    subtask: {
+                        _id: ass.subtaskId._id,
+                        title: ass.subtaskId.title
+                    },
+                    assignmentStatus: ass.status,
+                    assignedAt: ass.assignedAt,
+                    questions: []
+                };
+                studentObj.questionnaires.push(qEntry);
+            }
+
+            // Fetch full questions
+            const allQuestions = await getQuestionnaireQuestions(qId);
+            const qResponseMap = responseMap.get(qId) || new Map();
+
+            for (const q of allQuestions) {
+                const qResp = qResponseMap.get(q._id.toString());
+
+                const exists = qEntry.questions.some(x => x._id.toString() === q._id.toString());
+                if (exists) continue;
+
+                qEntry.questions.push({
+                    _id: q._id,
+                    question: q.question,
+                    ansType: q.ansType,
+                    options: q.options || [],
+                    answer: qResp?.answer ?? null,
+                    status: qResp?.status ?? "PENDING",
+                    submittedAt: qResp?.submittedAt ?? null,
+                    feedback: qResp?.feedback ?? null
+                });
+            }
+        }
+
+        // 11. Convert to array and paginate
+        const studentsArray = Array.from(studentMap.values())
+            .map(s => ({
+                ...s,
+                questionnaires: s.questionnaires.filter(q => q.questions.length > 0)
+            }))
+            .filter(s => s.questionnaires.length > 0);
+
+        const totalStudents = studentsArray.length;
+        const paginated = studentsArray.slice(skip, skip + limit);
+
+        // 12. Summary
+        const totalQuestionnaires = questionnaireIds.length;
+        const totalResponses = responses.length;
+
+        const pagination = {
+            total: totalStudents,
+            page,
+            limit,
+            totalPages: Math.ceil(totalStudents / limit),
+            hasNextPage: page < Math.ceil(totalStudents / limit),
+            hasPrevPage: page > 1
+        };
+
+        // 13. Final response
+        httpResponse(req, res, 200, responseMessage.SUCCESS, {
+            task: {
+                _id: task._id,
+                title: task.title,
+                description: task.description
+            },
+            summary: {
+                totalStudents,
+                totalQuestionnaires,
+                totalResponses
+            },
+            data: paginated,
+            pagination
+        });
+
+    } catch (err) {
+        console.error("getStudentQuestionnaireResponses error:", err);
+        httpError(next, err, req, 500);
+    }
+},
     getAllTasks: async (req, res, next) => {
         try {
-            // Extract pagination parameters
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
 
-            // Fetch total count for pagination
+            // 1. Fetch total count
             const totalTasks = await Task.countDocuments();
 
-            // Fetch paginated tasks
+            // 2. Fetch paginated tasks
             const tasks = await Task.find()
                 .skip(skip)
                 .limit(limit)
@@ -211,34 +646,69 @@ export default {
 
             const taskIds = tasks.map(task => task._id);
 
-            // Fetch associated assignments
-            const studentAssignments = await StudentTaskAssignment.find({ taskId: { $in: taskIds } })
+            // 3. Fetch all StudentTaskAssignment for these tasks
+            const studentTaskAssignments = await StudentTaskAssignment.find({
+                taskId: { $in: taskIds }
+            })
                 .populate('studentId', '-password')
-                .lean();
-            const taskSubtaskAssignments = await TaskSubtaskAssignment.find({ taskId: { $in: taskIds } })
                 .populate('subtaskId')
+                .populate('questionnaireId', 'title') // optional: for future use
                 .lean();
 
-            // Map assignments to tasks
+            // 4. Build response with students and subtasks
             const tasksWithAssignments = tasks.map(task => {
-                const taskStudentAssignments = studentAssignments.filter(assignment => assignment.taskId.toString() === task._id.toString());
-                const taskSubtaskAssignmentsForTask = taskSubtaskAssignments.filter(assignment => assignment.taskId.toString() === task._id.toString());
+                const taskAssignments = studentTaskAssignments.filter(
+                    a => a.taskId.toString() === task._id.toString()
+                );
 
-                task.students = taskStudentAssignments.map(assignment => assignment.studentId);
-                // Get unique subtasks by subtaskId
-                const uniqueSubtasks = [...new Map(taskSubtaskAssignmentsForTask.map(assignment => [assignment.subtaskId._id.toString(), {
-                    subtask: assignment.subtaskId,
-                    status: assignment.status,
-                    isLocked: assignment.isLocked,
-                    dueDate: assignment.dueDate
-                }])).values()];
-                task.subtasks = uniqueSubtasks;
-                task.totalStudent = task.students.length;
-                task.totalSubtask = task.subtasks.length;
-                return task;
+                // --- Students (unique) ---
+                const uniqueStudents = [...new Map(
+                    taskAssignments.map(a => [a.studentId._id.toString(), a.studentId])
+                ).values()];
+
+                // --- Subtasks with status (one per student-subtask pair) ---
+                const subtaskMap = new Map();
+
+                taskAssignments.forEach(assignment => {
+                    const subtaskId = assignment.subtaskId._id.toString();
+                    const studentId = assignment.studentId._id.toString();
+
+                    if (!subtaskMap.has(subtaskId)) {
+                        subtaskMap.set(subtaskId, {
+                            subtask: assignment.subtaskId,
+                            students: [],
+                            status: assignment.status,
+                            isLocked: assignment.isLocked,
+                            dueDate: assignment.dueDate
+                        });
+                    }
+
+                    const entry = subtaskMap.get(subtaskId);
+                    entry.students.push({
+                        student: assignment.studentId,
+                        status: assignment.status,
+                        isLocked: assignment.isLocked,
+                        dueDate: assignment.dueDate
+                    });
+                });
+
+                const subtasks = Array.from(subtaskMap.values()).map(entry => ({
+                    subtask: entry.subtask,
+                    status: entry.status, // fallback: use first student's status
+                    isLocked: entry.isLocked,
+                    dueDate: entry.dueDate
+                }));
+
+                return {
+                    ...task,
+                    students: uniqueStudents,
+                    subtasks,
+                    totalStudent: uniqueStudents.length,
+                    totalSubtask: subtasks.length
+                };
             });
 
-            // Pagination metadata
+            // 5. Pagination
             const pagination = {
                 total: totalTasks,
                 page,

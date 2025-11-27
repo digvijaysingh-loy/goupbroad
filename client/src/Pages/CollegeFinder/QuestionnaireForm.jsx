@@ -28,8 +28,13 @@ import LLMCreditUpgradeModal from './LLMCreditUpgradeModal';
 // MUST MATCH THE KEY USED IN CollegeFinderResults.jsx
 const CACHE_KEY_PREFIX = 'college_finder_cache_';
 
+// -----------------------------
+// Main form component
+// -----------------------------
 const QuestionnaireForm = () => {
   const navigate = useNavigate();
+
+  // same state as your original file  :contentReference[oaicite:2]{index=2}
   const [currentStep, setCurrentStep] = useState(1);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataValidation, setDataValidation] = useState(null);
@@ -564,6 +569,9 @@ const QuestionnaireForm = () => {
     />
   );
 
+  // -----------------------------
+  // loading screen
+  // -----------------------------
   if (isSubmitting) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -578,6 +586,9 @@ const QuestionnaireForm = () => {
     );
   }
 
+  // -----------------------------
+  // page layout (unchanged visual hierarchy)
+  // -----------------------------
   return (
     <div className="min-h-screen bg-white">
       <Navigation />

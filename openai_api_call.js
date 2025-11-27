@@ -94,7 +94,7 @@ Calculate user's score based on their program group, then assign universities:
 Output exactly 20 programs distributed as: 5 Ambitious, 5 Target, 5 Safe, 5 Backup
 
 Output Format:
-| University | Program | Length | Tuition | Location | STEM | F-1 | Chance |`;
+RESPOND ONLY in JSON format with proper key value pair with these as keys - University , Program , Length , Tuition , Location , STEM , F-1 , Chance `;
 
 const userMessage = `User Profile:
 Program: ${sampleUserData.program}
@@ -124,10 +124,12 @@ IMMEDIATE REQUIREMENTS:
 - Distribute as: 5 Ambitious, 5 Target, 5 Safe, 5 Backup
 - Base scoring on provided profile data
 
-RESPOND ONLY with the table format:
-| University | Program | Length | Tuition | Location | STEM | F-1 | Chance |
+RESPOND ONLY in JSON format with proper key value pair with these as keys - University , Program , Length , Tuition , Location , STEM , F-1 , Chance 
 
 NO questions, NO additional requests - just the 20 universities table.`;
+
+// RESPOND ONLY with the table format:
+// | University | Program | Length | Tuition | Location | STEM | F-1 | Chance |
 
 // Parser to extract universities from GPT response
 function parseAIResponse(aiText) {

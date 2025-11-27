@@ -137,6 +137,7 @@ export default {
     getChatRooms: async (req, res, next) => {
         try {
             const { authenticatedStudent, authenticatedMember } = req;
+            console.log("Hii")
             const db = getFirestore();
             if (!db) {
                 return httpError(next, new Error('Failed to initialize Firestore'), req, 500);

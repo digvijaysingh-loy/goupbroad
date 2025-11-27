@@ -41,8 +41,18 @@ export default {
             }
 
             const taskAssignmentIds = taskAssignments;
-            const validAssignments = await StudentTaskAssignment.find({ taskId: { $in: taskAssignmentIds }, studentId }).lean();
-            if (validAssignments.length !== taskAssignmentIds.length) {
+            const assignments = await StudentTaskAssignment.find({ taskId: { $in: taskAssignmentIds }, studentId }).lean();
+            const seen = new Set();
+        const uniqueAssignments = [];
+
+        for (const ass of assignments) {
+            const taskIdStr = ass.taskId?._id?.toString();
+            if (taskIdStr && !seen.has(taskIdStr)) {
+                seen.add(taskIdStr);
+                uniqueAssignments.push(ass);           // keep the whole assignment object
+            }
+        }
+            if (uniqueAssignments.length !== taskAssignmentIds.length) {
                 return httpError(next, new Error('One or more task assignments are invalid or not assigned to the student'), req, 400);
             }
 
@@ -58,7 +68,7 @@ export default {
             const application = new Application({
                 studentId,
                 universityId,
-                taskAssignments: validAssignments.map(taskAssignmentId => ({ taskAssignmentId: taskAssignmentId._id })),
+                taskAssignments: uniqueAssignments.map(taskAssignmentId => ({ taskAssignmentId: taskAssignmentId._id })),
                 assignTo: assingToMember?._id || req.authenticatedMember._id
             });
             await application.save();
@@ -96,11 +106,20 @@ export default {
             if (progress !== undefined) application.progress = progress;
             if (taskAssignments) {
                 const taskAssignmentIds = taskAssignments;
-                const validAssignments = await StudentTaskAssignment.find({ taskId: { $in: taskAssignmentIds }, studentId: application.studentId }).lean();
-                if (validAssignments.length !== taskAssignmentIds.length) {
+                const assignments = await StudentTaskAssignment.find({ taskId: { $in: taskAssignmentIds }, studentId: application.studentId }).lean();
+                const seen = new Set();
+                const uniqueAssignments = [];
+                for (const ass of assignments) {
+                    const taskIdStr = ass.taskId?._id?.toString();
+                    if (taskIdStr && !seen.has(taskIdStr)) {
+                        seen.add(taskIdStr);
+                        uniqueAssignments.push(ass);           // keep the whole assignment object
+                    }
+                }
+                if (uniqueAssignments.length !== taskAssignmentIds.length) {
                     return httpError(next, new Error('One or more task assignments are invalid or not assigned to the student'), req, 400);
                 }
-                application.taskAssignments = validAssignments.map(taskAssignmentId => ({ taskAssignmentId: taskAssignmentId._id }))
+                application.taskAssignments = uniqueAssignments.map(taskAssignmentId => ({ taskAssignmentId: taskAssignmentId._id }))
             }
             if (assignTo) {
                 let assingToMember = null

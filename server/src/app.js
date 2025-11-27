@@ -50,6 +50,10 @@ app.use(session({
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+    console.log("req body", req.body);
+    next();
+})
 
 app.use('/v1', router);
 
@@ -73,3 +77,4 @@ try {
 
 
 export default app;
+
