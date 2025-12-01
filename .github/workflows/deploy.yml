@@ -3,7 +3,7 @@ name: Deploy to VPS Server
 on:
   push:
     branches:
-      - main
+      - goupbroad-dev
   workflow_dispatch:
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H 82.29.164.111 >> ~/.ssh/known_hosts
 
       - name: Deploy to Server
@@ -25,8 +25,8 @@ jobs:
           DEPLOY_PATH: /home/GoAbroad
           DEPLOY_HOST: 82.29.164.111
           DEPLOY_USER: root
-          GITHUB_USERNAME: EasyTechInnovate
-          GITHUB_REPO: GoAbroad
+          GITHUB_USERNAME: digvijaysingh-loy
+          GITHUB_REPO: goupbroad
           GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
         run: |
           ssh $DEPLOY_USER@$DEPLOY_HOST "
@@ -48,8 +48,8 @@ jobs:
             fi
 
             # Fetch and reset to match remote
-            git fetch origin main
-            git reset --hard origin/main
+            git fetch origin goupbroad-dev
+            git reset --hard origin/goupbroad-dev
 
             # Continue with deployment...
             if [ ! -f "docker-compose.prod.yml" ]; then
