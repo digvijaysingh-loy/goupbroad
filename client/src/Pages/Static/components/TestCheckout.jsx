@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Checkout from '../pages/Checkout';
+import Checkout from '../Pages/Checkout';
 
 const TestCheckout = () => {
   const navigate = useNavigate();

@@ -6,8 +6,8 @@ import Footer from "@/components/static/Footer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SignInModal from "@/pages/CollegeFinder/SignInModal";
-import SignUpModal from "@/pages/CollegeFinder/SignUpModal";
+import SignInModal from "@/Pages/CollegeFinder/SignInModal";
+import SignUpModal from "@/Pages/CollegeFinder/SignUpModal";
 import { isAuthenticated, setAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
