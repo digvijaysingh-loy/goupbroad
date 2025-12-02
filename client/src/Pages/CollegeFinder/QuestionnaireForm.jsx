@@ -40,7 +40,7 @@ const QuestionnaireForm = () => {
   const [dataValidation, setDataValidation] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authTab, setAuthTab] = useState('signin');
+  const [authTab, setAuthTab] = useState('signup');
   const [userProfile, setUserProfile] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [formData, setFormData] = useState({

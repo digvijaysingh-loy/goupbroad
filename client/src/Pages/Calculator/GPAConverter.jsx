@@ -221,6 +221,7 @@ function computeTranscriptGPA(rows, opts = {}) {
 
 /* ──────────────────────── MAIN COMPONENT ──────────────────────── */
 export default function CGPAToGPAConverter() {
+  const [cgpaError, setCgpaError] = useState("");
   const [activeTab, setActiveTab] = useState(1);
   const [cgpa, setCgpa] = useState("");
   const [factor, setFactor] = useState(9.5);
@@ -235,7 +236,7 @@ export default function CGPAToGPAConverter() {
   const [uploadedFile, setUploadedFile] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authTab, setAuthTab] = useState("signin");
+  const [authTab, setAuthTab] = useState("signup");
   const [hasCalculated, setHasCalculated] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -297,12 +298,39 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
     const a = document.createElement("a");
     a.href = url; a.download = "sample_transcript.csv"; a.click();
   };
+  const validateCgpa = (value) => {
+    setCgpa(value);
+
+    if (value === "") {
+      setCgpaError("CGPA is required");
+      return false;
+    }
+
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+      setCgpaError("Please enter a valid number");
+      return false;
+    }
+    if (num < 0 || num > 10) {
+      setCgpaError("CGPA must be between 0 and 10");
+      return false;
+    }
+
+    setCgpaError("");
+    return true;
+  };
 
   const handleCalculate = () => {
+    // Validate CGPA first (for all tiers)
+    if (!validateCgpa(cgpa)) {
+      return;
+    }
+
     if (!isAuthenticated()) {
       setShowAuthModal(true);
       return;
     }
+
     setIsCalculating(true);
     setTimeout(() => {
       setHasCalculated(true);
@@ -310,6 +338,7 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
       toast.success("GPA calculated successfully!");
     }, 800);
   };
+
 
   const handleAuthSuccess = (token, user) => {
     setAuth({ accessToken: token, user });
@@ -319,10 +348,17 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
   };
 
   const resetCalculator = () => {
-    setCgpa(""); setFactor(9.5); setCap(95);
-    setProgramLength(4); setCreditsTotal(146);
-    setAShare(60); setBShare(30); setCShare(10);
-    setCsvText(""); setUploadedFile(false);
+    setCgpa("");
+    setCgpaError("");
+    setFactor(9.5);
+    setCap(95);
+    setProgramLength(4);
+    setCreditsTotal(146);
+    setAShare(60);
+    setBShare(30);
+    setCShare(10);
+    setCsvText("");
+    setUploadedFile(false);
     setHasCalculated(false);
   };
 
@@ -363,7 +399,9 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
           {activeTab === 1 && (
             <div className="space-y-6">
               <div>
-                <label className="block text-gray-700 font-medium mb-2">CGPA</label>
+                <label className="block text-gray-700 font-medium mb-2">
+                  CGPA <span className="text-red-500">*</span>
+                </label>
                 <div className="relative">
                   <input
                     type="number"
@@ -371,17 +409,31 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
                     min="0"
                     max="10"
                     value={cgpa}
-                    onChange={(e) => setCgpa(e.target.value)}
+                    onChange={(e) => validateCgpa(e.target.value)}
                     placeholder="Enter your CGPA"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${cgpaError
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-teal-600"
+                      }`}
                   />
+                  {cgpaError && (
+                    <p className="mt-2 text-sm text-red-600 flex items-center">
+                      <span className="mr-1">Warning:</span> {cgpaError}
+                    </p>
+                  )}
                 </div>
               </div>
+
 
               <div className="flex justify-center space-x-4">
                 <Button
                   onClick={handleCalculate}
-                  disabled={!cgpa || isCalculating}
+                  disabled={
+                    isCalculating ||
+                    !cgpa ||
+                    cgpaError ||
+                    (activeTab === 3 && !csvText.trim())
+                  }
                   className="bg-[#145044] hover:bg-[#0f3c34]"
                 >
                   {isCalculating ? (
@@ -417,17 +469,29 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
           {activeTab === 2 && (
             <div className="space-y-6">
               <div>
-                <label className="block text-gray-700 font-medium mb-2">CGPA</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={cgpa}
-                  onChange={(e) => setCgpa(e.target.value)}
-                  placeholder="Enter your CGPA"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600"
-                />
+                <label className="block text-gray-700 font-medium mb-2">
+                  CGPA <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="10"
+                    value={cgpa}
+                    onChange={(e) => validateCgpa(e.target.value)}
+                    placeholder="Enter your CGPA"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${cgpaError
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-teal-600"
+                      }`}
+                  />
+                  {cgpaError && (
+                    <p className="mt-2 text-sm text-red-600 flex items-center">
+                      <span className="mr-1">Warning:</span> {cgpaError}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="mt-6 space-y-6">
@@ -470,7 +534,8 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
               <div className="flex justify-center space-x-4">
                 <Button
                   onClick={handleCalculate}
-                  disabled={!cgpa || isCalculating}
+                  disabled={isCalculating || !cgpa || cgpaError}
+
                   className="bg-[#145044] hover:bg-[#0f3c34]"
                 >
                   {isCalculating ? (
