@@ -21,6 +21,15 @@ const studentTaskAssignmentSchema = new mongoose.Schema({
         ref: 'Questionnaire',
         required: false
     },
+    documentURL: {
+        type: String,
+        default: null
+    },
+    documentStatus: {
+        type: String,
+        enum: ["NOT_UPLOADED", "UPLOADED", "UNDER_REVIEW", "APPROVED", "REJECTED"],
+        default: "NOT_UPLOADED"
+    },
     assignedAt: {
         type: Date,
         default: Date.now

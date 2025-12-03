@@ -266,7 +266,7 @@ export default {
 
             if (subtaskIds?.length > 0 && studentIds?.length > 0) {
                 await Promise.all(
-                    studentIds.flatMap(studentId => 
+                    studentIds.flatMap(studentId =>
                         subtaskIds.flatMap((subtaskId, subIndex) => {
                             const questionnaires = questionnaireIds[subIndex];
                             if (questionnaires.length === 0) {
@@ -321,7 +321,7 @@ export default {
                 };
             }));
             httpResponse(req, res, 201, responseMessage.SUCCESS, { message: 'Task created successfully', task: populatedTask });
-            
+
         } catch (err) {
             httpError(next, err, req, 500);
         }
@@ -431,204 +431,284 @@ export default {
 
     // ADMIN: Get all student responses for a task (by questionnaire)
     // ADMIN – Get every student’s questionnaire responses for a task
-getStudentQuestionnaireResponses: async (req, res, next) => {
-    try {
-        const { taskId } = req.params;
+    getStudentQuestionnaireResponses: async (req, res, next) => {
+        try {
+            const { taskId } = req.params;
 
-        // 1. Validate taskId
-        if (!mongoose.Types.ObjectId.isValid(taskId)) {
-            return httpError(next, new Error("Invalid task ID"), req, 400);
-        }
-
-        // 2. Admin check
-        if (req.authenticatedMember.role !== "ADMIN") {
-            return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
-        }
-
-        // 3. Pagination
-        const page = Math.max(1, parseInt(req.query.page) || 1);
-        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
-        const skip = (page - 1) * limit;
-
-        // 4. Fetch task
-        const task = await Task.findById(taskId).select("title description").lean();
-        if (!task) {
-            return httpError(next, new Error("Task not found"), req, 404);
-        }
-
-        // 5. Fetch all StudentTaskAssignment entries
-        const assignments = await StudentTaskAssignment.find({ taskId })
-            .populate({
-                path: "studentId",
-                select: "name email"
-            })
-            .populate({
-                path: "subtaskId",
-                select: "title"
-            })
-            .populate({
-                path: "questionnaireId",
-                select: "title description status"
-            })
-            .lean();
-
-        if (!assignments.length) {
-            return httpResponse(req, res, 200, responseMessage.SUCCESS, {
-                task,
-                summary: { totalStudents: 0, totalQuestionnaires: 0, totalResponses: 0 },
-                data: [],
-                pagination: { page, limit, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false }
-            });
-        }
-
-        // 6. Extract unique IDs
-        const studentIds = [...new Set(assignments.map(a => a.studentId._id.toString()))];
-        const questionnaireIds = [...new Set(
-            assignments
-                .map(a => a.questionnaireId?._id?.toString())
-                .filter(Boolean)
-        )];
-
-        // 7. Fetch all responses
-        const responses = await Response.find({
-            taskId,
-            questionnaireId: { $in: questionnaireIds.map(id => new mongoose.Types.ObjectId(id)) },
-            studentId: { $in: studentIds.map(id => new mongoose.Types.ObjectId(id)) }
-        })
-        .populate({
-            path: "questionId",
-            select: "question ansType options"
-        })
-        .lean();
-
-        // 8. Build response lookup: questionnaireId → questionId → response
-        const responseMap = new Map(); // qId → Map<questionId, response>
-        responses.forEach(r => {
-            const qKey = r.questionnaireId.toString();
-            if (!responseMap.has(qKey)) responseMap.set(qKey, new Map());
-            responseMap.get(qKey).set(r.questionId._id.toString(), r);
-        });
-
-        // 9. Cache for Questionnaire questions
-        const questionnaireCache = new Map();
-
-        const getQuestionnaireQuestions = async (qId) => {
-            if (questionnaireCache.has(qId)) {
-                return questionnaireCache.get(qId);
+            // 1. Validate taskId
+            if (!mongoose.Types.ObjectId.isValid(taskId)) {
+                return httpError(next, new Error("Invalid task ID"), req, 400);
             }
-            const qDoc = await Questionnaire.findById(qId)
-                .select("questions")
+
+            // 2. Admin check
+            if (req.authenticatedMember.role !== "ADMIN") {
+                return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 403);
+            }
+
+            // 3. Pagination
+            const page = Math.max(1, parseInt(req.query.page) || 1);
+            const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+            const skip = (page - 1) * limit;
+
+            // 4. Fetch task
+            const task = await Task.findById(taskId).select("title description").lean();
+            if (!task) {
+                return httpError(next, new Error("Task not found"), req, 404);
+            }
+
+            // 5. Fetch all StudentTaskAssignment entries
+            const assignments = await StudentTaskAssignment.find({ taskId })
+                .populate({
+                    path: "studentId",
+                    select: "name email"
+                })
+                .populate({
+                    path: "subtaskId",
+                    select: "title"
+                })
+                .populate({
+                    path: "questionnaireId",
+                    select: "title description status"
+                })
                 .lean();
-            const questions = qDoc?.questions || [];
-            questionnaireCache.set(qId, questions);
-            return questions;
-        };
 
-        // 10. Build per-student data
-        const studentMap = new Map();
-
-        for (const ass of assignments) {
-            const sId = ass.studentId._id.toString();
-            if (!studentMap.has(sId)) {
-                studentMap.set(sId, {
-                    _id: ass.studentId._id,
-                    name: ass.studentId.name,
-                    email: ass.studentId.email,
-                    questionnaires: []
+            if (!assignments.length) {
+                return httpResponse(req, res, 200, responseMessage.SUCCESS, {
+                    task,
+                    summary: { totalStudents: 0, totalQuestionnaires: 0, totalResponses: 0 },
+                    data: [],
+                    pagination: { page, limit, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false }
                 });
             }
 
-            const qId = ass.questionnaireId?._id?.toString();
-            if (!qId) continue;
+            // 6. Extract unique IDs
+            const studentIds = [...new Set(assignments.map(a => a.studentId._id.toString()))];
+            const questionnaireIds = [...new Set(
+                assignments
+                    .map(a => a.questionnaireId?._id?.toString())
+                    .filter(Boolean)
+            )];
 
-            const studentObj = studentMap.get(sId);
+            // 7. Fetch all responses
+            const responses = await Response.find({
+                taskId,
+                questionnaireId: { $in: questionnaireIds.map(id => new mongoose.Types.ObjectId(id)) },
+                studentId: { $in: studentIds.map(id => new mongoose.Types.ObjectId(id)) }
+            })
+                .populate({
+                    path: "questionId",
+                    select: "question ansType options"
+                })
+                .lean();
 
-            let qEntry = studentObj.questionnaires.find(q => q.questionnaireId.toString() === qId);
-            if (!qEntry) {
-                qEntry = {
-                    questionnaireId: ass.questionnaireId._id,
-                    title: ass.questionnaireId.title,
-                    description: ass.questionnaireId.description,
-                    status: ass.questionnaireId.status,
-                    subtask: {
-                        _id: ass.subtaskId._id,
-                        title: ass.subtaskId.title
-                    },
-                    assignmentStatus: ass.status,
-                    assignedAt: ass.assignedAt,
-                    questions: []
-                };
-                studentObj.questionnaires.push(qEntry);
+            // 8. Build response lookup: questionnaireId → questionId → response
+            const responseMap = new Map(); // qId → Map<questionId, response>
+            responses.forEach(r => {
+                const qKey = r.questionnaireId.toString();
+                if (!responseMap.has(qKey)) responseMap.set(qKey, new Map());
+                responseMap.get(qKey).set(r.questionId._id.toString(), r);
+            });
+
+            // 9. Cache for Questionnaire questions
+            const questionnaireCache = new Map();
+
+            const getQuestionnaireQuestions = async (qId) => {
+                if (questionnaireCache.has(qId)) {
+                    return questionnaireCache.get(qId);
+                }
+                const qDoc = await Questionnaire.findById(qId)
+                    .select("questions")
+                    .lean();
+                const questions = qDoc?.questions || [];
+                questionnaireCache.set(qId, questions);
+                return questions;
+            };
+
+            // 10. Build per-student data
+            const studentMap = new Map();
+
+            for (const ass of assignments) {
+                const sId = ass.studentId._id.toString();
+                if (!studentMap.has(sId)) {
+                    studentMap.set(sId, {
+                        _id: ass.studentId._id,
+                        name: ass.studentId.name,
+                        email: ass.studentId.email,
+                        questionnaires: []
+                    });
+                }
+
+                const qId = ass.questionnaireId?._id?.toString();
+                if (!qId) continue;
+
+                const studentObj = studentMap.get(sId);
+
+                let qEntry = studentObj.questionnaires.find(q => q.questionnaireId.toString() === qId);
+                if (!qEntry) {
+                    qEntry = {
+                        questionnaireId: ass.questionnaireId._id,
+                        title: ass.questionnaireId.title,
+                        description: ass.questionnaireId.description,
+                        status: ass.questionnaireId.status,
+                        documentURL: ass.documentURL || null,
+                        documentStatus: ass.documentStatus || "NOT_UPLOADED",
+                        subtask: {
+                            _id: ass.subtaskId._id,
+                            title: ass.subtaskId.title
+                        },
+                        assignmentStatus: ass.status,
+                        assignedAt: ass.assignedAt,
+                        questions: []
+                    };
+                    studentObj.questionnaires.push(qEntry);
+                }
+
+                // Fetch full questions
+                const allQuestions = await getQuestionnaireQuestions(qId);
+                const qResponseMap = responseMap.get(qId) || new Map();
+
+                for (const q of allQuestions) {
+                    const qResp = qResponseMap.get(q._id.toString());
+
+                    const exists = qEntry.questions.some(x => x._id.toString() === q._id.toString());
+                    if (exists) continue;
+
+                    qEntry.questions.push({
+                        _id: q._id,
+                        question: q.question,
+                        ansType: q.ansType,
+                        options: q.options || [],
+                        answer: qResp?.answer ?? null,
+                        status: qResp?.status ?? "PENDING",
+                        submittedAt: qResp?.submittedAt ?? null,
+                        feedback: qResp?.feedback ?? null
+                    });
+                }
             }
 
-            // Fetch full questions
-            const allQuestions = await getQuestionnaireQuestions(qId);
-            const qResponseMap = responseMap.get(qId) || new Map();
+            // 11. Convert to array and paginate
+            const studentsArray = Array.from(studentMap.values())
+                .map(s => ({
+                    ...s,
+                    questionnaires: s.questionnaires.filter(q => q.questions.length > 0)
+                }))
+                .filter(s => s.questionnaires.length > 0);
 
-            for (const q of allQuestions) {
-                const qResp = qResponseMap.get(q._id.toString());
+            const totalStudents = studentsArray.length;
+            const paginated = studentsArray.slice(skip, skip + limit);
 
-                const exists = qEntry.questions.some(x => x._id.toString() === q._id.toString());
-                if (exists) continue;
+            // 12. Summary
+            const totalQuestionnaires = questionnaireIds.length;
+            const totalResponses = responses.length;
 
-                qEntry.questions.push({
-                    _id: q._id,
-                    question: q.question,
-                    ansType: q.ansType,
-                    options: q.options || [],
-                    answer: qResp?.answer ?? null,
-                    status: qResp?.status ?? "PENDING",
-                    submittedAt: qResp?.submittedAt ?? null,
-                    feedback: qResp?.feedback ?? null
-                });
-            }
+            const pagination = {
+                total: totalStudents,
+                page,
+                limit,
+                totalPages: Math.ceil(totalStudents / limit),
+                hasNextPage: page < Math.ceil(totalStudents / limit),
+                hasPrevPage: page > 1
+            };
+
+            // 13. Final response
+            httpResponse(req, res, 200, responseMessage.SUCCESS, {
+                task: {
+                    _id: task._id,
+                    title: task.title,
+                    description: task.description
+                },
+                summary: {
+                    totalStudents,
+                    totalQuestionnaires,
+                    totalResponses
+                },
+                data: paginated,
+                pagination
+            });
+
+        } catch (err) {
+            console.error("getStudentQuestionnaireResponses error:", err);
+            httpError(next, err, req, 500);
         }
+    },
+    // update document status and document url
+    // update document status and document url
+    updateStudentQuestinnaireResponse: async (req, res, next) => {
+        try {
+            const { taskId } = req.params;
+            const { questionnaireId, studentId, documentURL, documentStatus } = req.body;
 
-        // 11. Convert to array and paginate
-        const studentsArray = Array.from(studentMap.values())
-            .map(s => ({
-                ...s,
-                questionnaires: s.questionnaires.filter(q => q.questions.length > 0)
-            }))
-            .filter(s => s.questionnaires.length > 0);
+            // 1. Basic validations
+            if (!mongoose.Types.ObjectId.isValid(taskId)) {
+                return httpError(next, new Error("Invalid task ID"), req, 400);
+            }
 
-        const totalStudents = studentsArray.length;
-        const paginated = studentsArray.slice(skip, skip + limit);
+            if (!questionnaireId || !mongoose.Types.ObjectId.isValid(questionnaireId)) {
+                return httpError(next, new Error("Invalid questionnaire ID"), req, 400);
+            }
 
-        // 12. Summary
-        const totalQuestionnaires = questionnaireIds.length;
-        const totalResponses = responses.length;
+            // Ensure at least one field to update is provided
+            if (typeof documentURL === "undefined" && typeof documentStatus === "undefined") {
+                return httpError(
+                    next,
+                    new Error("Nothing to update. Provide documentURL and/or documentStatus."),
+                    req,
+                    400
+                );
+            }
 
-        const pagination = {
-            total: totalStudents,
-            page,
-            limit,
-            totalPages: Math.ceil(totalStudents / limit),
-            hasNextPage: page < Math.ceil(totalStudents / limit),
-            hasPrevPage: page > 1
-        };
+            // // 2. Identify student from auth (adjust if your auth structure is different)
+            // const studentId = req.authenticatedMember?.studentId || req.authenticatedMember?._id;
+            // if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
+            //     return httpError(next, new Error(responseMessage.UNAUTHORIZED), req, 401);
+            // }
 
-        // 13. Final response
-        httpResponse(req, res, 200, responseMessage.SUCCESS, {
-            task: {
-                _id: task._id,
-                title: task.title,
-                description: task.description
-            },
-            summary: {
-                totalStudents,
-                totalQuestionnaires,
-                totalResponses
-            },
-            data: paginated,
-            pagination
-        });
+            // 3. Build dynamic update object
+            const updateData = {};
+            if (typeof documentURL !== "undefined") {
+                updateData.documentURL = documentURL; // can be null to clear
+            }
+            if (typeof documentStatus !== "undefined") {
+                updateData.documentStatus = documentStatus; // e.g. "UPLOADED", "PENDING", "REJECTED"
+            }
 
-    } catch (err) {
-        console.error("getStudentQuestionnaireResponses error:", err);
-        httpError(next, err, req, 500);
-    }
-},
+            console.log("taskId, questionnaireId, studentId:", taskId, questionnaireId, studentId);
+
+            // 4. Update the StudentTaskAssignment record
+            const updatedAssignment = await StudentTaskAssignment.findOneAndUpdate(
+                {
+                    taskId: new mongoose.Types.ObjectId(taskId),
+                    questionnaireId: new mongoose.Types.ObjectId(questionnaireId),
+                    studentId: new mongoose.Types.ObjectId(studentId),
+                },
+                { $set: updateData },
+                { new: true }
+            )
+                .populate({ path: "studentId", select: "name email" })
+                .populate({ path: "subtaskId", select: "title" })
+                .populate({ path: "questionnaireId", select: "title description status" })
+                .lean();
+
+            if (!updatedAssignment) {
+                return httpError(
+                    next,
+                    new Error("Assignment not found for this task, questionnaire, and student"),
+                    req,
+                    404
+                );
+            }
+
+            // 5. Respond
+            return httpResponse(req, res, 200, responseMessage.SUCCESS, {
+                message: "Document info updated successfully",
+                assignment: updatedAssignment,
+            });
+        } catch (err) {
+            console.error("updateStudentQuestinnaireResponse error:", err);
+            return httpError(next, err, req, 500);
+        }
+    },
+
     getAllTasks: async (req, res, next) => {
         try {
             const page = parseInt(req.query.page) || 1;

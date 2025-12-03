@@ -203,8 +203,6 @@ export const OtpEmailTemplate = (otp) => {
   return { subject, text, html };
 };
 
-
-
 export const WelcomeEmailTemplate = (studentName ) => {
   const subject = `Welcome to GoUpBroad, ${studentName || 'Student'}!`;
   const text = `Hi ${studentName || 'Student'},\n\nWelcome to GoUpBroad! We're thrilled to have you on board.\n\nYour account is now active. Explore your dashboard, complete your first task, and start your learning journey.\n\nNeed help? We're here 24/7.\n\nBest regards,\nGoUpBroad Team`;
@@ -409,7 +407,6 @@ export const WelcomeEmailTemplate = (studentName ) => {
   return { subject, text, html };
 };
 
-
 export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, taskTitle, subtaskTitle, questionnaireTitle) => {
     const subject = `New Submission: ${questionnaireTitle} by ${studentName}`;
     const text = `A new questionnaire has been submitted.\n\nStudent: ${studentName} (${studentEmail})\nQuestionnaire: ${questionnaireTitle}\nSubtask: ${subtaskTitle}\nTask: ${taskTitle}\n\nPlease review in the admin dashboard.`;
@@ -609,8 +606,6 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
 
     return { subject, text, html };
 };
-
-
 
 export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questionnaireTitle) => {
     const subject = `Submission Received: ${questionnaireTitle} - GoUpBroad`;
@@ -831,7 +826,6 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
 
     return { subject, text, html };
 };
-
 
 export const TaskAssignedTemplate = (studentName, taskTitle) => {
     const subject = `New Task Assigned: ${taskTitle} - GoUpBroad`;
@@ -1074,4 +1068,241 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
     `;
 
     return { subject, text, html };
+};
+
+
+export const PaymentConfirmationEmailTemplate = (data) => {
+  const {
+    studentName,
+    studentEmail,
+    planName,
+    planPrice,
+    orderId,
+    paymentId,
+    features = [],
+    category,
+  } = data;
+
+  const subject = 'Payment Confirmation - UpBroad';
+  const text = `Hi ${studentName},
+
+Thank you for your payment!
+
+Plan: ${planName}
+Category: ${category}
+Amount: ₹${planPrice}
+Order ID: ${orderId}
+Payment ID: ${paymentId}
+
+Your plan is now active. Welcome to UpBroad!
+`;
+
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Payment Confirmation - UpBroad</title>
+      <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #145044; color: white; padding: 30px 20px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background-color: #f9f9f9; padding: 30px 20px; border-radius: 0 0 10px 10px; }
+          .success-icon { width: 60px; height: 60px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 32px; }
+          .order-details { background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .order-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+          .order-row:last-child { border-bottom: none; }
+          .features-list { background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .feature-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+          .feature-item:last-child { border-bottom: none; }
+          .next-steps { background-color: #e8f5f3; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .step { margin: 15px 0; padding: 15px; background-color: white; border-radius: 5px; }
+          .step-number { display: inline-block; width: 25px; height: 25px; background-color: #145044; color: white; border-radius: 50%; text-align: center; line-height: 25px; margin-right: 10px; font-size: 12px; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+          .price { font-size: 24px; font-weight: bold; color: #145044; }
+          .badge { background-color: #145044; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+      </style>
+  </head>
+  <body>
+      <div class="header">
+          <div class="success-icon">✓</div>
+          <h1>Payment Successful!</h1>
+          <p>Thank you for choosing UpBroad. Your journey to success starts now!</p>
+      </div>
+      
+      <div class="content">
+          <div class="order-details">
+              <h2 style="color: #145044; margin-top: 0;">Order Summary</h2>
+              <div style="margin-bottom: 20px;">
+                  <h3 style="margin: 0;">${planName}</h3>
+                  <span class="badge">${category
+                    .charAt(0)
+                    .toUpperCase() + category.slice(1)}</span>
+              </div>
+              <div class="price">₹${planPrice.toLocaleString('en-IN')}</div>
+              <div style="color: #666; margin-top: 5px;">Paid</div>
+              
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                  <div class="order-row">
+                      <span>Order ID:</span>
+                      <span style="font-family: monospace; font-weight: bold;">${orderId}</span>
+                  </div>
+                  <div class="order-row">
+                      <span>Payment ID:</span>
+                      <span style="font-family: monospace; font-weight: bold;">${paymentId}</span>
+                  </div>
+                  <div class="order-row">
+                      <span>Date:</span>
+                      <span>${new Date().toLocaleDateString('en-IN')}</span>
+                  </div>
+                  <div class="order-row">
+                      <span>Customer:</span>
+                      <span>${studentName} (${studentEmail})</span>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="features-list">
+              <h3 style="color: #145044; margin-top: 0;">What's Included in Your Plan</h3>
+              ${
+                features && features.length
+                  ? features
+                      .map(
+                        (feature) =>
+                          `<div class="feature-item">✓ ${feature}</div>`
+                      )
+                      .join('')
+                  : '<div class="feature-item">✓ Access to your selected plan</div>'
+              }
+          </div>
+          
+          <div class="next-steps">
+              <h3 style="color: #145044; margin-top: 0;">What Happens Next?</h3>
+              <div class="step">
+                  <span class="step-number">1</span>
+                  <strong>Confirmation Email</strong><br>
+                  <small>You're reading it! Keep this email for your records.</small>
+              </div>
+              <div class="step">
+                  <span class="step-number">2</span>
+                  <strong>Counselor Assignment</strong><br>
+                  <small>Our team will assign a dedicated counselor to your case within 24-48 hours.</small>
+              </div>
+              <div class="step">
+                  <span class="step-number">3</span>
+                  <strong>Initial Consultation</strong><br>
+                  <small>Your counselor will schedule an initial consultation call to understand your goals.</small>
+              </div>
+              <div class="step">
+                  <span class="step-number">4</span>
+                  <strong>Get Started</strong><br>
+                  <small>Begin your journey with expert guidance every step of the way!</small>
+              </div>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #f0f8f6; border-radius: 8px;">
+              <h3 style="color: #145044; margin-top: 0;">Need Help?</h3>
+              <p style="margin: 10px 0;">Our support team is here to assist you</p>
+              <p style="margin: 5px 0;">📧 support@upbroad.com</p>
+              <p style="margin: 5px 0;">📞 +91 98765 43210</p>
+          </div>
+      </div>
+      
+      <div class="footer">
+          <p>© 2024 UpBroad. All rights reserved.</p>
+          <p>This is an automated email. Please do not reply to this email.</p>
+      </div>
+  </body>
+  </html>
+  `;
+
+  return { subject, text, html };
+};
+
+export const PaymentInitiationAdminEmailTemplate = (data) => {
+  const {
+    studentName,
+    studentEmail,
+    planName,
+    planPrice,
+    orderId,
+    category,
+  } = data;
+
+  const subject = 'New Payment Initiated - UpBroad';
+  const text = `New payment initiated on UpBroad:
+
+Student: ${studentName} (${studentEmail})
+Plan: ${planName}
+Category: ${category}
+Amount: ₹${planPrice}
+Order ID: ${orderId}
+Date: ${new Date().toLocaleString('en-IN')}
+
+This is an initiation notification. Final status depends on verification and capture.`;
+
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Payment Initiated - UpBroad</title>
+      <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #145044; color: white; padding: 24px 20px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background-color: #f9f9f9; padding: 24px 20px; border-radius: 0 0 10px 10px; }
+          .order-details { background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .order-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+          .order-row:last-child { border-bottom: none; }
+          .badge { background-color: #145044; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+          .price { font-size: 20px; font-weight: bold; color: #145044; }
+          .footer { text-align: center; padding: 16px; color: #666; font-size: 13px; }
+      </style>
+  </head>
+  <body>
+      <div class="header">
+          <h2>New Payment Initiated</h2>
+          <p>A student has initiated a payment on UpBroad.</p>
+      </div>
+      <div class="content">
+          <div class="order-details">
+              <h3 style="margin-top:0;color:#145044;">Payment Details</h3>
+              <div class="order-row">
+                  <span>Student:</span>
+                  <span>${studentName} (${studentEmail})</span>
+              </div>
+              <div class="order-row">
+                  <span>Plan:</span>
+                  <span>${planName}</span>
+              </div>
+              <div class="order-row">
+                  <span>Category:</span>
+                  <span class="badge">${category
+                    .charAt(0)
+                    .toUpperCase() + category.slice(1)}</span>
+              </div>
+              <div class="order-row">
+                  <span>Order ID:</span>
+                  <span style="font-family: monospace;">${orderId}</span>
+              </div>
+              <div class="order-row">
+                  <span>Amount:</span>
+                  <span class="price">₹${planPrice.toLocaleString('en-IN')}</span>
+              </div>
+              <div class="order-row">
+                  <span>Date:</span>
+                  <span>${new Date().toLocaleDateString('en-IN')}</span>
+              </div>
+          </div>
+          <p>This is just an initiation notification. Final status will depend on the payment verification and capture.</p>
+      </div>
+      <div class="footer">
+          <p>© 2024 UpBroad. Internal notification email.</p>
+      </div>
+  </body>
+  </html>
+  `;
+
+  return { subject, text, html };
 };

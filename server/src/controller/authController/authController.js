@@ -259,74 +259,74 @@ export default {
         }
     },
 
-   sendEmailOtp: async (req, res, next) => {
-    try {
-        const { body } = req;
+    sendEmailOtp: async (req, res, next) => {
+        try {
+            const { body } = req;
 
-        const { value, error } = validateJoiSchema(validateEmailOtp, { ...body });
-        if (error) return httpError(next, error, req, 422);
+            const { value, error } = validateJoiSchema(validateEmailOtp, { ...body });
+            if (error) return httpError(next, error, req, 422);
 
-        const { email } = value;
+            const { email } = value;
 
-        // 1) Find student by email
-        const existingStudent = await Student.findOne({ email }).lean();
+            // 1) Find student by email
+            const existingStudent = await Student.findOne({ email }).lean();
 
-        // 2) If student exists and is already verified → BLOCK
-        if (existingStudent && existingStudent.isVerified) {
-            return httpResponse(
-                req,
-                res,
-                409,
-                responseMessage.SOMETHING_WENT_WRONG + ' - Email already verified. Please login.'
+            // 2) If student exists and is already verified → BLOCK
+            if (existingStudent && existingStudent.isVerified) {
+                return httpResponse(
+                    req,
+                    res,
+                    409,
+                    responseMessage.SOMETHING_WENT_WRONG + ' - Email already verified. Please login.'
+                );
+            }
+
+            // 3) Resend cooldown check (even for unverified accounts)
+            const recent = await EmailOtp.findOne({
+                email,
+                isUsed: false,
+                createdAt: { $gt: new Date(Date.now() - RESEND_COOLDOWN_SECONDS * 1000) },
+                expiresAt: { $gt: new Date() },
+            }).lean();
+
+            if (recent) {
+                return httpResponse(req, res, 429, 'Please wait before requesting another OTP.');
+            }
+
+            // 4) Invalidate any old unused OTPs for this email
+            await EmailOtp.updateMany(
+                { email, isUsed: false },
+                { $set: { isUsed: true } }
             );
+
+            // 5) Generate new OTP
+            const otp = generateOtp();
+            const expiresAt = new Date(Date.now() + OTP_TTL_SECONDS * 1000);
+
+            await EmailOtp.create({
+                email,
+                otp,
+                isUsed: false,
+                expiresAt,
+            });
+
+            // 6) Send email
+            await mailer.sendEmail(email, OtpEmailTemplate(otp));
+
+            // 7) Response — same format
+            const userData = {
+                emailMasked: email.replace(/(^.).*(@.*$)/, (_, a, b) => a + '*****' + b),
+                expiresIn: OTP_TTL_SECONDS,
+                cooldown: RESEND_COOLDOWN_SECONDS,
+            };
+
+            return httpResponse(req, res, 201, responseMessage.SUCCESS, { user: userData });
+
+        } catch (error) {
+            console.error("sendEmailOtp error:", error);
+            return httpError(next, error, req, 500);
         }
-
-        // 3) Resend cooldown check (even for unverified accounts)
-        const recent = await EmailOtp.findOne({
-            email,
-            isUsed: false,
-            createdAt: { $gt: new Date(Date.now() - RESEND_COOLDOWN_SECONDS * 1000) },
-            expiresAt: { $gt: new Date() },
-        }).lean();
-
-        if (recent) {
-            return httpResponse(req, res, 429, 'Please wait before requesting another OTP.');
-        }
-
-        // 4) Invalidate any old unused OTPs for this email
-        await EmailOtp.updateMany(
-            { email, isUsed: false },
-            { $set: { isUsed: true } }
-        );
-
-        // 5) Generate new OTP
-        const otp = generateOtp();
-        const expiresAt = new Date(Date.now() + OTP_TTL_SECONDS * 1000);
-
-        await EmailOtp.create({
-            email,
-            otp,
-            isUsed: false,
-            expiresAt,
-        });
-
-        // 6) Send email
-        await mailer.sendEmail(email, OtpEmailTemplate(otp));
-
-        // 7) Response — same format
-        const userData = {
-            emailMasked: email.replace(/(^.).*(@.*$)/, (_, a, b) => a + '*****' + b),
-            expiresIn: OTP_TTL_SECONDS,
-            cooldown: RESEND_COOLDOWN_SECONDS,
-        };
-
-        return httpResponse(req, res, 201, responseMessage.SUCCESS, { user: userData });
-
-    } catch (error) {
-        console.error("sendEmailOtp error:", error);
-        return httpError(next, error, req, 500);
-    }
-},
+    },
 
     signup: async (req, res, next) => {
         try {
@@ -369,24 +369,24 @@ export default {
                     return httpResponse(req, res, 400, 'Invalid or expired OTP');
                 }
 
-               
+
             }
 
-             // 3) Hash password & create student
-                const hashedPassword = await quicker.hashPassword(password);
+            // 3) Hash password & create student
+            const hashedPassword = await quicker.hashPassword(password);
 
-                const student = await Student.create({
-                    email,
-                    password: hashedPassword,
-                    isVerified: true,
-                    lastLogin: Date.now()
-                });
+            const student = await Student.create({
+                email,
+                password: hashedPassword,
+                isVerified: true,
+                lastLogin: Date.now()
+            });
 
-                // 4) (Optional) Invalidate any other active OTPs for this email
-                await EmailOtp.updateMany(
-                    { email, isUsed: false },
-                    { $set: { isUsed: true } }
-                );
+            // 4) (Optional) Invalidate any other active OTPs for this email
+            await EmailOtp.updateMany(
+                { email, isUsed: false },
+                { $set: { isUsed: true } }
+            );
 
             const accessToken = quicker.generateToken(
                 { email: student.email, studentId: student._id },
@@ -394,13 +394,19 @@ export default {
                 config.ACCESS_TOKEN.EXPIRY
             );
 
-            // const activity = new StudentActivity({
-            //     studentId: student._id,
-            //     activityType: ACTIVITY_TYPES.SIGNUP,
-            //     message: `Student ${student.email} signed up`,
-            //     status: ACTIVITY_STATUSES.COMPLETED
-            // });
-            // await activity.save();
+            const activity = new StudentActivity({
+                studentId: student._id,
+                activityType: ACTIVITY_TYPES.SIGNUP,
+                message: `Student ${student.email} signed up`,
+                status: ACTIVITY_STATUSES.COMPLETED
+            });
+            try {
+                await activity.save();
+                console.log("Activity saved successfully");
+            } catch (err) {
+                console.error("Activity save failed:", err);
+            }
+
             res.cookie('accessToken', accessToken, {
                 httpOnly: true,
                 secure: process.env.ENV === 'production',
@@ -412,7 +418,7 @@ export default {
             const userData = { ...student.toObject(), password: undefined };
             await mailer.sendEmail(email, WelcomeEmailTemplate(student.name));
             return httpResponse(req, res, 201, responseMessage.SUCCESS, { accessToken, user: userData });
-            
+
         } catch (err) {
             console.error(err);
             return httpError(next, err, req, 500);
@@ -421,6 +427,9 @@ export default {
 
     oauthSuccess: async (req, res, next) => {
         try {
+
+            console.log("Success triggered")
+
             const user = req.user;
 
             if (!user) {
@@ -456,9 +465,9 @@ export default {
             delete userObject.password;
 
             const isNewUser = !user.isFeePaid;
-            // const redirectUrl = isNewUser
-            //     ? `${config.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?accesstoken=${accessToken}&user=${encodeURIComponent(JSON.stringify(userObject))}&redirectTo=/pricing`
-            //     : `${config.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?accesstoken=${accessToken}&user=${encodeURIComponent(JSON.stringify(userObject))}&redirectTo=/dashboard`;
+            const redirectUrl = isNewUser
+                ? `${config.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?accesstoken=${accessToken}&user=${encodeURIComponent(JSON.stringify(userObject))}&redirectTo=/pricing`
+                : `${config.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?accesstoken=${accessToken}&user=${encodeURIComponent(JSON.stringify(userObject))}&redirectTo=/dashboard`;
 
 
 
@@ -479,8 +488,60 @@ export default {
         }
     },
 
+    //     oauthSuccess: async (req, res, next) => {
+    //     try {
+    //         const user = req.user;
+
+    //         if (!user) {
+    //             return httpError(next, new Error('OAuth authentication failed'), req, 401);
+    //         }
+
+    //         // Generate access token
+    //         const accessToken = quicker.generateToken(
+    //             { email: user.email, studentId: user._id },
+    //             config.ACCESS_TOKEN.SECRET,
+    //             config.ACCESS_TOKEN.EXPIRY
+    //         );
+
+    //         // Attach cookie
+    //         res.cookie('accessToken', accessToken, {
+    //             httpOnly: true,
+    //             secure: process.env.NODE_ENV === 'production',
+    //             maxAge: 24 * 60 * 60 * 1000, // 24 hrs
+    //             path: '/',
+    //             sameSite: 'strict',
+    //         });
+
+    //         // Sanitize user data
+    //         const userData = user.toObject();
+    //         delete userData.password;
+
+    //         // Determine if user needs to pay
+    //         const requiresPayment = !user.isFeePaid;
+
+    //         // Return to original page (from OAuth "state")
+    //         const redirectUrl =
+    //             req.query.state || `${config.FRONTEND_URL || 'http://localhost:3000'}`;
+
+    //         // Send JSON response
+    //         return httpResponse(req, res, 200, responseMessage.SUCCESS, {
+    //             accessToken,
+    //             user: userData,
+    //             requiresPayment,
+    //             message: requiresPayment
+    //                 ? 'Registration successful. Payment required to access dashboard.'
+    //                 : 'Login successful',
+    //             redirectUrl,
+    //         });
+    //     } catch (err) {
+    //         const errorRedirectUrl = `${config.FRONTEND_URL || 'http://localhost:3000'}/signin?error=${encodeURIComponent(err?.message || err)}`;
+    //         return res.redirect(errorRedirectUrl);
+    //     }
+    // },
+
     oauthFailure: (req, res, next) => {
         try {
+            console.log("Failure triggered")
             if (req.accepts('html')) {
                 const errorMessage = req.flash('error') || 'Authentication failed';
                 const redirectUrl = `${config.FRONTEND_URL || 'http://localhost:3000'}/signin?error=${encodeURIComponent(errorMessage)}`;

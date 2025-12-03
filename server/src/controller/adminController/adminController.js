@@ -445,13 +445,28 @@ export default {
                     message: activity.message,
                     status: activity.status,
                     details: activity.details,
-
+                    isRead: activity.isRead,
                     createdAt: activity.createdAt,
                     updatedAt: activity.updatedAt
                 }))
             };
 
             httpResponse(req, res, 200, responseMessage.SUCCESS, responseData);
+        } catch (err) {
+            httpError(next, err, req, 500);
+        }
+    },
+
+    markStudentActivityAsRead: async (req, res, next) => {
+        try {
+            const { activityId } = req.params;
+            const activity = await StudentActivity.findById(activityId);
+            if (!activity) {
+                return httpError(next, new Error(responseMessage.NOT_FOUND('Student Activity')), req, 404);
+            }
+            activity.isRead = true;
+            await activity.save();
+            httpResponse(req, res, 200, responseMessage.SUCCESS, { message: 'Student activity marked as read' });
         } catch (err) {
             httpError(next, err, req, 500);
         }
