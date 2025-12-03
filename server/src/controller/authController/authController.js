@@ -33,7 +33,11 @@ export default {
             const { email, password } = value;
 
             const student = await Student.findOne({ email });
-            if (!student || !await quicker.comparePassword(password, student.password)) {
+            console.log("Student", student)
+            if(!student || !student.password){
+                return httpResponse(req, res, 401, responseMessage.CUSTOM_MESSAGE("Your Password is not set"));
+            }
+            if (!student || !await quicker.comparePassword(password, student.password )) {
                 return httpResponse(req, res, 401, responseMessage.CUSTOM_MESSAGE("Invalid Credentials"));
             }
 
@@ -66,6 +70,7 @@ export default {
             // await activity.save();
             httpResponse(req, res, 200, responseMessage.SUCCESS, { accessToken, user: userData });
         } catch (err) {
+            console.log("ERROR", err)
             httpError(next, err, req, 500);
         }
     },
@@ -131,7 +136,7 @@ export default {
         </div>
       `;
 
-            await mailer.sendEmail(email, subject, text, html); // uses your transporter
+            await mailer.sendEmail(email, {subject, text, html}); // uses your transporter
 
             // 5) Respond (do not reveal OTP)
             const userData = {

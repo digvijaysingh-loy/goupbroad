@@ -189,16 +189,22 @@ export default {
                 universityResults = await getUniversitiesAccurate(student, student.degree);
             }
 
-            // Save to DB
-            const recommendation = new UniversityRecommendation({
-                student: studentId,
-                mode: preferredSpeed,
-                degreeKind: student.degree || "Masters",
-                results: universityResults,
-                // rawLlmOutput: rawOutput, // if you capture it
-            });
+            console.log("results", universityResults)
 
-            await recommendation.save();
+            try {
+                // Save to DB
+                const recommendation = new UniversityRecommendation({
+                    student: studentId,
+                    mode: preferredSpeed,
+                    degreeKind: student.degree || "Masters",
+                    results: universityResults,
+                    // rawLlmOutput: rawOutput, // if you capture it
+                });
+
+                await recommendation.save();
+            } catch (error) {
+                console.log("recommendation saving error", error)
+            }
 
             // Decrement limit
             student.universityFinderLlmResponseLimit -= 1;
@@ -210,9 +216,8 @@ export default {
             console.log(`LLM University Finder (${preferredSpeed}) took ${(end - start) / 1000} s`);
 
             httpResponse(req, res, 200, responseMessage.SUCCESS, {
-                recommendationId: recommendation._id,
-                generatedAt: recommendation.generatedAt,
-                universityResults: recommendation.results
+
+                universityResults
             });
 
         } catch (err) {
