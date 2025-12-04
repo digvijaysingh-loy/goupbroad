@@ -20,7 +20,7 @@ const studentSchema = new mongoose.Schema({
     degree: {
         type: String,
         enum: ['BACHELOR', 'MASTER', 'MBA', 'PHD', 'OTHER'],
-        default: null
+        default: 'MASTER'
     },
     degreeLength: {
         type: String,
