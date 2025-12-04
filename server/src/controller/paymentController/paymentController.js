@@ -639,12 +639,13 @@ export default {
 
       const planDetails =
         PAYMENT_PLANS[payment.planCategory][payment.planType];
-
+      const degree = payment.planCategory === 'masters' ? 'MASTER' : 'BACHELOR';
       const UpdateStudent = await Student.findByIdAndUpdate(
         studentId,
         {
           isFeePaid: true,
           isVerified: true,
+          degree: degree,
           planDetails: {
             course: payment.planCategory,
             planId: payment.planId,
