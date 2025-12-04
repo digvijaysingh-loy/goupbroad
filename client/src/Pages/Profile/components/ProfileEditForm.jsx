@@ -34,7 +34,7 @@ const strToArr = (s) => (s && typeof s === 'string' ? s.split(',').map((i) => i.
 const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
   const isBachelor = userData?.degree === 'BACHELOR';
   const isMaster = userData?.degree === 'MASTER';
-
+console.log(userData.degree)
   const [formData, setFormData] = useState({
     name: userData?.name || '',
     phoneNumber: userData?.phoneNumber || '',
@@ -561,7 +561,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
           </Card>
 
           {/* GMAT */}
-          <Card>
+          {userData.degree === "MASTER" && (
+             <Card>
             <CardHeader><CardTitle>GMAT</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -574,6 +575,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
               </div>
             </CardContent>
           </Card>
+          )}
+         
         </>
       )}
 
@@ -610,7 +613,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
       </Card>
 
       {/* GRE */}
-      <Card>
+         {userData.degree === "MASTER" && (
+     <Card>
         <CardHeader><CardTitle>GRE</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -639,6 +643,8 @@ const ProfileEditForm = ({ userData, onClose, onSuccess }) => {
           </div>
         </CardContent>
       </Card>
+         )}
+ 
 
       {/* IELTS */}
       <Card>

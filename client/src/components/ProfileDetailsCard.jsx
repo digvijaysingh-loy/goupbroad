@@ -35,16 +35,16 @@ const ProfileDetailsCard = ({ title, children, className, onEdit, canEdit = fals
   };
   
   return (
-    <div className={cn('bg-white rounded-lg p-2 sm:p-2 shadow-sm relative', className)}>
+    <div className={cn('bg-white rounded-lg p-2 sm:p-2 shadow-sm relative ', className)}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="text-lg font-semibold  min-h-14 ">{title}</h2>
         {canEdit && (
           <div>
             {isEditing && !useModal ? (
-              <div className="flex gap-2">
+              <div className="flex gap-2 ">
                 <button 
                   onClick={handleCancel}
-                  className="p-1 text-gray-500 hover:text-gray-700"
+                  className="p-1 text-gray-500 hover:text-gray-700 "
                   title="Cancel"
                 >
                   <X className="w-5 h-5" />
@@ -60,7 +60,7 @@ const ProfileDetailsCard = ({ title, children, className, onEdit, canEdit = fals
             ) : (
               <button 
                 onClick={handleEditToggle}
-                className="p-1 text-gray-500 hover:text-gray-700"
+                className="p-1 text-gray-500 hover:text-gray-700 "
                 title="Edit"
               >
                 <Edit className="w-5 h-5" />
@@ -69,7 +69,7 @@ const ProfileDetailsCard = ({ title, children, className, onEdit, canEdit = fals
           </div>
         )}
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 ">
         {React.Children.map(children, child => {
           if (React.isValidElement(child) && child.type === DataField) {
             return React.cloneElement(child, { isEditing: isEditing && !useModal });
@@ -80,12 +80,12 @@ const ProfileDetailsCard = ({ title, children, className, onEdit, canEdit = fals
 
       {/* Shadcn UI Dialog component */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg ">
           <DialogHeader>
             <DialogTitle>Edit {title}</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 ">
             {React.Children.map(children, (child, index) => {
               if (React.isValidElement(child) && child.type === DataField) {
 
@@ -98,7 +98,7 @@ const ProfileDetailsCard = ({ title, children, className, onEdit, canEdit = fals
             })}
           </div>
           
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 ">
             <button 
               onClick={handleCancel}
               className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"

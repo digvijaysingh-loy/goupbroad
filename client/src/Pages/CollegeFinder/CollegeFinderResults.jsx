@@ -392,32 +392,32 @@ const CollegeFinderResults = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
       <Navigation />
 
-     {isLoading && (
-  <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-    
-    {/* Message ABOVE the loader */}
-    <div className="text-center mb-12 px-6">
-      <p className="text-2xl font-bold text-gray-800 mb-3">
-        Please wait — do not refresh or go back
-      </p>
-      <p className="text-lg text-gray-700">
-        Your personalized university results are coming soon!
-      </p>
-      <p className="text-sm text-gray-500 mt-5">
-        This may take up to a minute
-      </p>
-    </div>
+      {isLoading && (
+        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
 
-    {/* Existing loader + brain */}
-    <div className="relative mb-8">
-      <Loader2 className="h-20 w-20 animate-spin text-primary-600" />
-      <Brain className="absolute inset-0 m-auto h-10 w-10 text-primary-600" />
-    </div>
+          {/* Message ABOVE the loader */}
+          <div className="text-center mb-12 px-6">
+            <p className="text-2xl font-bold text-gray-800 mb-3">
+              Please wait — do not refresh or go back
+            </p>
+            <p className="text-lg  text-gray-700">
+              Your personalized university results are coming soon!
+            </p>
+            <p className="text-sm text-gray-500 mt-5">
+              This may take up to a minute
+            </p>
+          </div>
 
-    {/* Your existing rotating message stays exactly here, below the loader */}
-   <TypewriterText text={loadingMessages[currentMessageIndex]} />
-  </div>
-)}
+          {/* Existing loader + brain */}
+          <div className="relative mb-8">
+            <Loader2 className="h-20 w-20 animate-spin text-primary-600" />
+            <Brain className="absolute inset-0 m-auto h-10 w-10 text-primary-600" />
+          </div>
+
+          {/* Your existing rotating message stays exactly here, below the loader */}
+          <TypewriterText text={loadingMessages[currentMessageIndex]} />
+        </div>
+      )}
 
       {error && !isLoading && (
         <div className="pt-24 text-center">
@@ -443,11 +443,11 @@ const CollegeFinderResults = () => {
             </div> */}
           </section>
 
-          <section className="pt-10 pb-20 px-4 sm:px-6 lg:px-8">
+          <section className="sm:pt-10 pb-20 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-10">
                 <Trophy className="h-12 w-12 text-primary-600 mx-auto mb-4" />
-                <h1 className="text-4xl font-bold text-gray-900">Your Personalized University Matches</h1>
+                <h1 className="sm:text-4xl text-2xl  font-bold text-gray-900">Your Personalized University Matches</h1>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
@@ -467,48 +467,98 @@ const CollegeFinderResults = () => {
                 })}
               </div>
 
-              <div className="flex justify-start gap-4 mb-10">
-                <Button onClick={() => {
-                  // Clear this user's specific cache
-                  localStorage.removeItem(`${CACHE_KEY_PREFIX}${userId}`);
-                  // toast.success('Cache cleared! Starting fresh...');
-                  navigate('/university-finder');
-                }} variant="outline" className='cursor-pointer hover:scale-105 transition-all'>
+
+
+
+              {/* Actions + Credits */}
+              <div className="grid grid-cols-2 gap-4 mb-10 md:grid-cols-4 md:items-center">
+                {/* 1️⃣ New Query */}
+                <Button
+                  onClick={() => {
+                    localStorage.removeItem(`${CACHE_KEY_PREFIX}${userId}`);
+                    navigate('/university-finder');
+                  }}
+                  variant="outline"
+                  className="w-full md:w-auto cursor-pointer hover:scale-105 transition-all flex items-center"
+                >
                   <ArrowLeft className="h-4 w-4 mr-2" /> New Query
                 </Button>
-                <Button onClick={exportToExcel} variant="outline" className='cursor-pointer hover:scale-105 transition-all'>
+
+                {/* 2️⃣ Export to Excel */}
+                <Button
+                  onClick={exportToExcel}
+                  variant="outline"
+                  className="w-full md:w-auto cursor-pointer hover:scale-105 transition-all flex items-center"
+                >
                   <Download className="h-4 w-4 mr-2" /> Export to Excel
                 </Button>
-                <Button onClick={() => {
-                  navigate('/dashboard');
-                }} className="bg-gradient-to-r from-[#145044] to-[#0f3c34] text-white font-semibold text-base  rounded-md shadow-2xl cursor-pointer hover:scale-105 transition-all">
-                  <Sparkles className="h-4 w-4 mr-2" /> Start Applying Now
+
+                {/* 3️⃣ Start Applying Now */}
+                <Button
+                  onClick={() => {
+                    navigate('/dashboard');
+                  }}
+                  className="w-full md:w-auto bg-gradient-to-r from-[#145044] to-[#0f3c34] text-white font-semibold text-base rounded-md shadow-2xl cursor-pointer hover:scale-105 transition-all flex items-center justify-center"
+                >
+                  <Sparkles className="h-4 w-4 mr-2 hidden md:block" /> 
+                  Start Applying Now
                 </Button>
-                <div className="ml-auto flex items-center">
-                  <div className="bg-gradient-to-r from-[#145044] to-[#0f3c34] border-2 border-[#145044] rounded-md px-5 py-0 shadow-md">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-5 w-5 text-white" />
-                      <div className="flex items-baseline gap-2">
-                        <p className="text-xl font-bold text-white">
-                          {userProfile?.universityFinderLlmResponseLimit != null
-                            ? Math.max(0, userProfile.universityFinderLlmResponseLimit)
-                            : user?.universityFinderLlmResponseLimit != null
-                              ? Math.max(0, user.universityFinderLlmResponseLimit)
-                              : 0}
-                        </p>
-                        <p className="text-base font-medium text-white">
-                          {(userProfile?.universityFinderLlmResponseLimit ?? user?.universityFinderLlmResponseLimit ?? 0) === 1
-                            ? 'Credit'
-                            : 'Credits'}{' '}
-                          Left
-                        </p>
-                      </div>
+
+                {/* 4️⃣ Credits Box */}
+                <div className="w-full md:w-auto bg-gradient-to-r from-[#145044] to-[#0f3c34] border-2 border-[#145044] rounded-md px-5 py-0 shadow-md flex items-center justify-between md:justify-center">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-white hidden md:block" />
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-xl font-bold text-white">
+                        {userProfile?.universityFinderLlmResponseLimit != null
+                          ? Math.max(0, userProfile.universityFinderLlmResponseLimit)
+                          : user?.universityFinderLlmResponseLimit != null
+                            ? Math.max(0, user.universityFinderLlmResponseLimit)
+                            : 0}
+                      </p>
+                      <p className="text-base font-medium text-white">
+                        {(userProfile?.universityFinderLlmResponseLimit ??
+                          user?.universityFinderLlmResponseLimit ??
+                          0) === 1
+                          ? 'Credit'
+                          : 'Credits'}{' '}
+                        Left
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-2 gap-8">
+
+
+              {/* Filter Buttons */}
+              <div className="mb-4 sm:mb-10 overflow-x-auto md:overflow-visible">
+                <div className="flex flex-nowrap md:flex-wrap gap-2 w-max md:w-auto justify-end">
+                  {['all', 'ambitious', 'target', 'safe', 'backup'].map((tier) => {
+                    const isActive = selectedTier === tier;
+                    const cfg = tier === 'all' ? { title: 'All' } : tierConfig[tier];
+
+                    return (
+                      <Button
+                        key={tier}
+                        onClick={() => setSelectedTier(tier)}
+                        variant={isActive ? 'default' : 'outline'}
+                        className={`flex items-center gap-2 ${isActive ? 'bg-gradient-to-r from-[#145044] to-[#0f3c34] text-white' : ''}`}
+                        size="sm"
+                      >
+                        {cfg.icon && <cfg.icon className="h-4 w-4" />}
+                        {cfg.title}
+                        {tier !== 'all' && (
+                          <span className="text-xs bg-white/20 px-2 py-1 rounded-full ml-2">
+                            {recommendations[tier]?.length || 0}
+                          </span>
+                        )}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                 {filteredColleges.map(college => (
                   <CollegeCard key={college.id} college={college} />
                 ))}
@@ -516,7 +566,7 @@ const CollegeFinderResults = () => {
             </div>
             <Button
               size="lg"
-              className="w-1/2 mx-auto flex  cursor-pointer mt-6 bg-gradient-to-r from-[#145044] to-[#0f3c34] hover:from-[#0f3c34] hover:to-[#0b3029] text-white font-bold text-xl py-8 rounded-2xl shadow-xl"
+              className="w-full sm:w-1/2 mx-auto flex cursor-pointer mt-6 bg-gradient-to-r from-[#145044] to-[#0f3c34] hover:from-[#0f3c34] hover:to-[#0b3029] text-white font-bold text-xl py-6 sm:py-8 rounded-2xl shadow-xl"
               onClick={() => {
                 setShowApplyPopup(false);
                 navigate('/dashboard');

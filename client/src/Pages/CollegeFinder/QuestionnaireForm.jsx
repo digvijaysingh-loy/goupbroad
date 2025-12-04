@@ -24,17 +24,11 @@ import { updateUserProfile, getUserProfile } from '@/services/api.services';
 import { toast } from 'sonner';
 import LLMCreditUpgradeModal from './LLMCreditUpgradeModal';
 
-
-// MUST MATCH THE KEY USED IN CollegeFinderResults.jsx
 const CACHE_KEY_PREFIX = 'college_finder_cache_';
 
-// -----------------------------
-// Main form component
-// -----------------------------
 const QuestionnaireForm = () => {
   const navigate = useNavigate();
 
-  // same state as your original file  :contentReference[oaicite:2]{index=2}
   const [currentStep, setCurrentStep] = useState(1);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataValidation, setDataValidation] = useState(null);
@@ -94,11 +88,9 @@ const QuestionnaireForm = () => {
   const isAdvanced = formData.intakeMode?.includes('Advanced');
   const TOTAL_STEPS = useMemo(() => (isAdvanced ? 8 : 7), [isAdvanced]);
   const user = getUser();
-  const getUserId = user?._id;                    // safe, returns undefined if no user
+  const getUserId = user?._id;
   const currentUserId = isAuthenticated() ? getUserId : 'guest';
 
-  // console.log("user", currentUserId)
-  // Check if user already has cached results
   const checkExistingCache = useCallback(() => {
     try {
       const cachedRaw = localStorage.getItem(`${CACHE_KEY_PREFIX}${currentUserId}`);
@@ -106,7 +98,6 @@ const QuestionnaireForm = () => {
 
       const cached = JSON.parse(cachedRaw);
 
-      // Expire cache after 24 hours
       if (Date.now() - cached.timestamp > 24 * 60 * 60 * 1000) {
         localStorage.removeItem(`${CACHE_KEY_PREFIX}${currentUserId}`);
         return null;
@@ -114,7 +105,7 @@ const QuestionnaireForm = () => {
 
       if (cached.userId !== currentUserId) return null;
 
-      return cached; // contains recommendations + aiInsights
+      return cached;
     } catch (e) {
       console.warn('Failed to read cache:', e);
       return null;
@@ -133,7 +124,6 @@ const QuestionnaireForm = () => {
     }
   }, []);
 
-  // Clear irrelevant fields when degree changes
   useEffect(() => {
     if (formData.degreeLevel === 'Master') {
       setFormData(prev => ({
@@ -301,7 +291,6 @@ const QuestionnaireForm = () => {
   const fetchUserProfile = useCallback(async () => {
     try {
       const response = await getUserProfile();
-      console.log(response)
       if (response.success) {
         setUserProfile(response.data);
         return response.data;
@@ -331,19 +320,20 @@ const QuestionnaireForm = () => {
     }
     await handleGetUniversities(true);
   };
+
   useEffect(() => {
     if (isAuthenticated() && !userProfile) {
       fetchUserProfile();
     }
   }, [isAuthenticated, userProfile]);
+
   useEffect(() => {
     if (userProfile?.universityFinderLlmResponseLimit > 0) {
       setShowUpgradeModal(false);
     }
   }, [userProfile]);
-  // MAIN FUNCTION: Get Universities (with cache-first logic)
+
   const handleGetUniversities = async (skipAuthCheck = false) => {
-    // 1. Check cache first — instant redirect if exists
     const cached = checkExistingCache();
     if (cached) {
       toast.success('Welcome back! Loading your saved recommendations...');
@@ -356,7 +346,6 @@ const QuestionnaireForm = () => {
       return;
     }
 
-    // 2. Normal flow if no cache
     if (!skipAuthCheck && !isAuthenticated()) {
       setShowAuthModal(true);
       return;
@@ -569,79 +558,116 @@ const QuestionnaireForm = () => {
     />
   );
 
-  // -----------------------------
-  // loading screen
-  // -----------------------------
-  if (isSubmitting) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="w-16 h-16 bg-[#145044] rounded-full flex items-center justify-center mx-auto mb-6 relative">
-            <Brain className="h-8 w-8 text-white" />
-            <Loader2 className="absolute h-6 w-6 text-white animate-spin" />
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // or 'auto' for instant scroll
+    });
+    if (isSubmitting) {
+      return (
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center p-8">
+            <div className="w-16 h-16 bg-[#145044] rounded-full flex items-center justify-center mx-auto mb-6 relative">
+              <Brain className="h-8 w-8 text-white" />
+              <Loader2 className="absolute h-6 w-6 text-white animate-spin" />
+            </div>
+            <h2 className="text-2xl font-semibold">Processing Your Profile...</h2>
           </div>
-          <h2 className="text-2xl font-semibold">Processing Your Profile...</h2>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  // -----------------------------
-  // page layout (unchanged visual hierarchy)
-  // -----------------------------
+  }, [currentStep]);
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
       <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="w-16 h-16 bg-[#145044] rounded-xl flex items-center justify-center mx-auto mb-6">
+          <div className="text-center mb-10">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#145044] rounded-xl flex items-center justify-center mx-auto mb-5">
               <Brain className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold">University Questionnaire</h1>
-            <p className="text-gray-600 mt-2">Complete to get AI-powered recommendations.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold">University Questionnaire</h1>
+            <p className="text-gray-600 mt-2 text-sm sm:text-base">Complete to get AI-powered recommendations.</p>
           </div>
 
-          <div className="mb-8">
-            <div className="flex justify-center items-center space-x-4 mb-4">
-              {[...Array(TOTAL_STEPS)].map((_, i) => (
-                <div key={i + 1} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep >= i + 1 ? 'bg-[#145044] text-white' : 'bg-gray-200 text-gray-600'}`}>
-                    {currentStep > i + 1 ? <Check className="h-4 w-4" /> : i + 1}
-                  </div>
-                  {i < TOTAL_STEPS - 1 && (
-                    <div className={`w-12 h-0.5 mx-2 ${currentStep > i + 1 ? 'bg-[#145044]' : 'bg-gray-200'}`} />
-                  )}
+          {/* Desktop Horizontal Progress */}
+          <div className="hidden md:flex justify-center items-center space-x-4 mb-8">
+            {[...Array(TOTAL_STEPS)].map((_, i) => (
+              <div key={i + 1} className="flex items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all ${currentStep >= i + 1 ? 'bg-[#145044] text-white scale-110' : 'bg-gray-200 text-gray-600'}`}>
+                  {currentStep > i + 1 ? <Check className="h-5 w-5" /> : i + 1}
                 </div>
-              ))}
-            </div>
-            <div className="text-center text-sm text-gray-600">Step {currentStep} of {TOTAL_STEPS}</div>
+                {i < TOTAL_STEPS - 1 && (
+                  <div className={`w-16 h-1 mx-2 transition-all ${currentStep > i + 1 ? 'bg-[#145044]' : 'bg-gray-300'}`} />
+                )}
+              </div>
+            ))}
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <div className="p-6 md:p-8">{renderStepContent()}</div>
-            <div className="px-6 md:px-8 py-4 bg-gray-50 border-t flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
-              <Button onClick={prevStep} disabled={currentStep === 1} variant="outline" className="w-full md:w-auto">
-                <ArrowRight className="h-4 w-4 mr-2 rotate-180" /> Previous
-              </Button>
-              <div className="flex space-x-2">
-                {[...Array(TOTAL_STEPS)].map((_, i) => (
-                  <div key={i} className={`w-2 h-2 rounded-full ${i + 1 <= currentStep ? 'bg-[#145044]' : 'bg-gray-300'}`} />
-                ))}
+          {/* Mobile Step Text */}
+          <div className="md:hidden text-center text-sm text-gray-600 mb-4">
+            Step {currentStep} of {TOTAL_STEPS}
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-5 sm:p-6 md:p-8">
+              {renderStepContent()}
+            </div>
+
+            {/* Footer — Mobile: Pagination dots right above buttons, no extra space */}
+            <div className="px-5 sm:px-6 md:px-8 py-5 bg-gray-50 border-t">
+
+
+              <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
+                <Button
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  variant="outline"
+                  className="w-full sm:w-auto text-base py-4 sm:py-6"
+                >
+                  <ArrowRight className="h-4 w-4 mr-2 rotate-180" /> Previous
+                </Button>
+
+                {/* Desktop small dots */}
+                <div className="hidden md:flex space-x-2">
+                  {[...Array(TOTAL_STEPS)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-2 h-2 rounded-full ${i + 1 <= currentStep ? 'bg-[#145044]' : 'bg-gray-300'}`}
+                    />
+                  ))}
+                </div>
+
+                <Button
+                  onClick={nextStep}
+                  className="w-full sm:w-auto bg-[#145044] hover:bg-[#0f3c34] text-base py-4 sm:py-6 font-medium"
+                >
+                  {currentStep === TOTAL_STEPS ? (
+                    <> <Sparkles className="h-4 w-4 mr-2" /> Get Universities </>
+                  ) : (
+                    <> Continue <ArrowRight className="h-5 w-5 ml-2" /> </>
+                  )}
+                </Button>
               </div>
-              <Button onClick={nextStep} className="w-full md:w-auto bg-[#145044] hover:bg-[#0f3c34]">
-                {currentStep === TOTAL_STEPS ? (
-                  <> <Sparkles className="h-4 w-4 mr-2" /> Get Universities </>
-                ) : (
-                  <> Continue <ArrowRight className="h-4 w-4 ml-2" /> </>
-                )}
-              </Button>
+              {/* Mobile Dots — directly above buttons */}
+              <div className="md:hidden flex justify-center mb-4 mt-4">
+                <div className="flex space-x-2">
+                  {[...Array(TOTAL_STEPS)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i + 1 <= currentStep ? 'bg-[#145044] scale-125' : 'bg-gray-300'}`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <Footer />
 
+      {/* Auth Modal */}
       <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           <DialogHeader className="p-6 border-b">
@@ -662,13 +688,15 @@ const QuestionnaireForm = () => {
           </Tabs>
         </DialogContent>
       </Dialog>
+
+      {/* Upgrade Modal */}
       {showUpgradeModal && (
         <LLMCreditUpgradeModal
           open={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
           onSuccess={async () => {
             await fetchUserProfile();
-            setShowUpgradeModal(false);        // This line fixes everything
+            setShowUpgradeModal(false);
             await handleGetUniversities(true);
           }}
         />

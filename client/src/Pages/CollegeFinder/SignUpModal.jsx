@@ -8,6 +8,7 @@ import { Mail, Lock, Eye, EyeOff, RefreshCw, Edit2 } from 'lucide-react';
 import OTPInput from 'react-otp-input';
 import { sendEmailOtp, registerUser } from '@/services/api.services';
 import { toast } from 'sonner';
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 const SignUpModal = ({ onSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +27,9 @@ const SignUpModal = ({ onSuccess }) => {
   });
   const [otp, setOtp] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  const GOOGLE_CLIENT_ID =
+    import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
 
   // Countdown effect
   useEffect(() => {
@@ -159,6 +163,41 @@ const SignUpModal = ({ onSuccess }) => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const googleToken = credentialResponse?.credential;
+      if (!googleToken) {
+        toast.error('Missing Google token');
+        return;
+      }
+
+      setIsLoading(true);
+      setApiError('');
+
+      const userData = { google_credential: googleToken };
+      const registerResult = await registerUser(userData);
+      if (registerResult.success && registerResult.data?.data?.accessToken) {
+        onSuccess(registerResult.data.data.accessToken, registerResult.data.data.user);
+        toast.success('Account created successfully!');
+      } else {
+        setApiError(registerResult.error);
+      }
+    } catch (error) {
+      console.error('Google signup failed:', error);
+      if (error.response && error.response.data) {
+        setApiError(error.response?.data?.message || 'Google signup failed. Please try again.');
+      } else {
+        setApiError('Network error. Please check your connection and try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleFailure = () => {
+    toast.error('Google signup was cancelled');
+  };
+
   const isResendDisabled = isLoading || countdown > 0;
 
   return (
@@ -271,23 +310,24 @@ const SignUpModal = ({ onSuccess }) => {
             <Label className="text-sm font-medium text-gray-700">
               Verification Code
             </Label>
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-4 w-full overflow-x-auto px-4">
               <OTPInput
                 value={otp}
                 onChange={setOtp}
                 numInputs={6}
                 inputStyle={{
-                  width: '3rem',
+                  width: '2.5rem',
                   height: '3rem',
-                  margin: '0 0.5rem',
-                  fontSize: '1.25rem',
+                  margin: '0 0.25rem',
+                  fontSize: '1rem',
                   border: '2px solid #e5e7eb',
                   borderRadius: '0.5rem',
                   textAlign: 'center',
                   outline: 'none',
+                  minWidth: '2.5rem',
                 }}
-                inputType="text"
-                containerStyle={{ justifyContent: 'center' }}
+                inputType="tel"
+                containerStyle={{ justifyContent: 'center', minWidth: 'max-content' }}
                 inputMode="numeric"
                 renderInput={(props) => <input {...props} />}
               />
@@ -344,6 +384,31 @@ const SignUpModal = ({ onSuccess }) => {
           }
         </Button>
       </form>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-white px-2 text-gray-500">Or sign up with</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3">
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleFailure}
+            ux_mode="popup"
+            shape="rectangular"
+            text="signup_with"
+            size="large"
+            theme="outline"
+            width="100%"
+            disabled={isLoading}
+          />
+        </GoogleOAuthProvider>
+      </div>
     </div>
   );
 };

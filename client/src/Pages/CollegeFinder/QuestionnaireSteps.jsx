@@ -54,10 +54,10 @@ const Step2 = memo(({ formData, errors, handleInputChange }) => {
     <div className="space-y-4">
       <div className="text-center">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Program/Major Selection</h2>
-        <p className="text-gray-600 text-sm">Which program/major do you want to apply for?</p>
+        {/* <p className="text-gray-600 text-sm">Which program/major do you want to apply for?</p> */}
       </div>
       <Field
-        label="Q2. Which program/major do you want to apply for?"
+        label="Q2. Select program/major do you want to apply for?"
         field="program"
         type="select"
         options={isMaster
@@ -102,7 +102,7 @@ const Step4Master = memo(({ formData, errors, handleInputChange }) => (
       <Field label="Q5. Do you require only F-1 visa eligible programs?" field="f1Required" type="radio" options={['Yes', 'No']} required value={formData.f1Required} onChange={handleInputChange} hasError={!!errors.f1Required} />
     </div>
     <div className="grid md:grid-cols-2 gap-4">
-      <Field label="Q6. What is your undergraduate GPA?" field="gpa" placeholder="e.g., 3.5 or 8.5" required value={formData.gpa} onChange={handleInputChange} hasError={!!errors.gpa} />
+      <Field label="Q6. What is your undergraduate GPA?" field="gpa" type="number" placeholder="e.g., 3.5 or 8.5" required value={formData.gpa} onChange={handleInputChange} hasError={!!errors.gpa} />
       <Field label="GPA Scale" field="gpaScale" type="select" options={['4.0', '10.0', 'Percentage']} required value={formData.gpaScale} onChange={handleInputChange} hasError={!!errors.gpaScale} />
     </div>
     <Field label="Q7. What is the name of your undergraduate university?" field="university" placeholder="e.g., IIT Delhi" required value={formData.university} onChange={handleInputChange} hasError={!!errors.university} />
@@ -121,7 +121,7 @@ const Step4Bachelor = memo(({ formData, errors, handleInputChange }) => (
     </div>
     <div className="grid md:grid-cols-2 gap-4">
       <Field label="Q6. What is your school board?" field="schoolBoard" type="select" options={['CBSE', 'ICSE', 'State Board']} required value={formData.schoolBoard} onChange={handleInputChange} hasError={!!errors.schoolBoard} />
-      <Field label="Q7. What is your average/predicted marks for class (9-12)" field="averageMarks" placeholder="e.g., 85%" required value={formData.averageMarks} onChange={handleInputChange} hasError={!!errors.averageMarks} />
+      <Field label="Q7. What is your average/predicted marks for class (9-12)" field="averageMarks" type="number" placeholder="e.g., 85%" required value={formData.averageMarks} onChange={handleInputChange} hasError={!!errors.averageMarks} />
     </div>
   </div>
 ));
@@ -161,8 +161,8 @@ const Step5Bachelor = memo(({ formData, errors, handleInputChange }) => (
       hasError={!!errors.testTaken}
     />
     <div className="grid md:grid-cols-2 gap-4">
-      <Field label="Q9. SAT Score" field="satScore" placeholder="e.g., 1400" value={formData.satScore} onChange={handleInputChange} />
-      <Field label="Q10. ACT Score" field="actScore" placeholder="e.g., 30" value={formData.actScore} onChange={handleInputChange} />
+      <Field label="Q9. SAT Score" field="satScore" type="number" placeholder="e.g., 1400" value={formData.satScore} onChange={handleInputChange} />
+      <Field label="Q10. ACT Score" field="actScore" type="number" placeholder="e.g., 30" value={formData.actScore} onChange={handleInputChange} />
     </div>
   </div>
 ));
@@ -216,10 +216,10 @@ const Step6EnglishTests = memo(({ formData, errors, handleInputChange, setErrors
           <div className="border rounded-lg p-4 bg-gray-50">
             <h3 className="font-medium mb-3">TOEFL</h3>
             <div className="grid md:grid-cols-4 gap-3">
-              <Field label="Reading" field="toefl.reading" placeholder="e.g., 28" value={formData.toefl.reading} onChange={(_, v) => handleSubfield('toefl', 'reading', v)} />
-              <Field label="Writing" field="toefl.writing" placeholder="e.g., 26" value={formData.toefl.writing} onChange={(_, v) => handleSubfield('toefl', 'writing', v)} />
-              <Field label="Speaking" field="toefl.speaking" placeholder="e.g., 25" value={formData.toefl.speaking} onChange={(_, v) => handleSubfield('toefl', 'speaking', v)} />
-              <Field label="Listening" field="toefl.listening" placeholder="e.g., 27" value={formData.toefl.listening} onChange={(_, v) => handleSubfield('toefl', 'listening', v)} />
+              <Field label="Reading" field="toefl.reading" type="number" placeholder="e.g., 28" value={formData.toefl.reading} onChange={(_, v) => handleSubfield('toefl', 'reading', v)} />
+              <Field label="Writing" field="toefl.writing" type="number" placeholder="e.g., 26" value={formData.toefl.writing} onChange={(_, v) => handleSubfield('toefl', 'writing', v)} />
+              <Field label="Speaking" field="toefl.speaking" type="number" placeholder="e.g., 25" value={formData.toefl.speaking} onChange={(_, v) => handleSubfield('toefl', 'speaking', v)} />
+              <Field label="Listening" field="toefl.listening" type="number" placeholder="e.g., 27" value={formData.toefl.listening} onChange={(_, v) => handleSubfield('toefl', 'listening', v)} />
             </div>
           </div>
 
@@ -227,10 +227,10 @@ const Step6EnglishTests = memo(({ formData, errors, handleInputChange, setErrors
           <div className="border rounded-lg p-4 bg-gray-50">
             <h3 className="font-medium mb-3">IELTS</h3>
             <div className="grid md:grid-cols-4 gap-3">
-              <Field label="Reading" field="ielts.reading" placeholder="e.g., 7.5" value={formData.ielts.reading} onChange={(_, v) => handleSubfield('ielts', 'reading', v)} />
-              <Field label="Writing" field="ielts.writing" placeholder="e.g., 7.0" value={formData.ielts.writing} onChange={(_, v) => handleSubfield('ielts', 'writing', v)} />
-              <Field label="Speaking" field="ielts.speaking" placeholder="e.g., 7.0" value={formData.ielts.speaking} onChange={(_, v) => handleSubfield('ielts', 'speaking', v)} />
-              <Field label="Listening" field="ielts.listening" placeholder="e.g., 8.0" value={formData.ielts.listening} onChange={(_, v) => handleSubfield('ielts', 'listening', v)} />
+              <Field label="Reading" field="ielts.reading" type="number" placeholder="e.g., 7.5" value={formData.ielts.reading} onChange={(_, v) => handleSubfield('ielts', 'reading', v)} />
+              <Field label="Writing" field="ielts.writing" type="number" placeholder="e.g., 7.0" value={formData.ielts.writing} onChange={(_, v) => handleSubfield('ielts', 'writing', v)} />
+              <Field label="Speaking" field="ielts.speaking" type="number" placeholder="e.g., 7.0" value={formData.ielts.speaking} onChange={(_, v) => handleSubfield('ielts', 'speaking', v)} />
+              <Field label="Listening" field="ielts.listening" type="number" placeholder="e.g., 8.0" value={formData.ielts.listening} onChange={(_, v) => handleSubfield('ielts', 'listening', v)} />
             </div>
           </div>
 
@@ -238,10 +238,10 @@ const Step6EnglishTests = memo(({ formData, errors, handleInputChange, setErrors
           <div className="border rounded-lg p-4 bg-gray-50">
             <h3 className="font-medium mb-3">Duolingo</h3>
             <div className="grid md:grid-cols-4 gap-3">
-              <Field label="Reading" field="duolingo.reading" placeholder="e.g., 125" value={formData.duolingo.reading} onChange={(_, v) => handleSubfield('duolingo', 'reading', v)} />
-              <Field label="Writing" field="duolingo.writing" placeholder="e.g., 120" value={formData.duolingo.writing} onChange={(_, v) => handleSubfield('duolingo', 'writing', v)} />
-              <Field label="Speaking" field="duolingo.speaking" placeholder="e.g., 115" value={formData.duolingo.speaking} onChange={(_, v) => handleSubfield('duolingo', 'speaking', v)} />
-              <Field label="Listening" field="duolingo.listening" placeholder="e.g., 130" value={formData.duolingo.listening} onChange={(_, v) => handleSubfield('duolingo', 'listening', v)} />
+              <Field label="Reading" field="duolingo.reading" type="number" placeholder="e.g., 125" value={formData.duolingo.reading} onChange={(_, v) => handleSubfield('duolingo', 'reading', v)} />
+              <Field label="Writing" field="duolingo.writing" type="number" placeholder="e.g., 120" value={formData.duolingo.writing} onChange={(_, v) => handleSubfield('duolingo', 'writing', v)} />
+              <Field label="Speaking" field="duolingo.speaking" type="number" placeholder="e.g., 115" value={formData.duolingo.speaking} onChange={(_, v) => handleSubfield('duolingo', 'speaking', v)} />
+              <Field label="Listening" field="duolingo.listening" type="number" placeholder="e.g., 130" value={formData.duolingo.listening} onChange={(_, v) => handleSubfield('duolingo', 'listening', v)} />
               {/* <Field label="Total" field="duolingo.total" placeholder="e.g., 120" value={formData.duolingo.total} onChange={(_, v) => handleSubfield('duolingo', 'total', v)} /> */}
             </div>
           </div>
@@ -261,16 +261,16 @@ const Step7Final = memo(({ formData, errors, handleInputChange, isLastStep, data
         <p className="text-gray-600 text-sm">GRE / GMAT</p>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <Field label="GRE Total" field="greTotal" placeholder="e.g., 320" value={formData.greTotal} onChange={handleInputChange} />
-        <Field label="GRE Quant" field="greQuant" placeholder="e.g., 165" value={formData.greQuant} onChange={handleInputChange} />
+        <Field label="GRE Total" field="greTotal" type="number" placeholder="e.g., 320" value={formData.greTotal} onChange={handleInputChange} />
+        <Field label="GRE Quant" field="greQuant" type="number" placeholder="e.g., 165" value={formData.greQuant} onChange={handleInputChange} />
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <Field label="GRE Verbal" field="greVerbal" placeholder="e.g., 155" value={formData.greVerbal} onChange={handleInputChange} />
-        <Field label="GRE AWA" field="greAWA" placeholder="e.g., 4.0" value={formData.greAWA} onChange={handleInputChange} />
+        <Field label="GRE Verbal" field="greVerbal" type="number" placeholder="e.g., 155" value={formData.greVerbal} onChange={handleInputChange} />
+        <Field label="GRE AWA" field="greAWA" type="number" placeholder="e.g., 4.0" value={formData.greAWA} onChange={handleInputChange} />
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <Field label="GMAT Total" field="gmatTotal" placeholder="e.g., 650" value={formData.gmatTotal} onChange={handleInputChange} />
-        <Field label="GMAT Quant" field="gmatQuant" placeholder="e.g., 45" value={formData.gmatQuant} onChange={handleInputChange} />
+        <Field label="GMAT Total" field="gmatTotal" type="number" placeholder="e.g., 650" value={formData.gmatTotal} onChange={handleInputChange} />
+        <Field label="GMAT Quant" field="gmatQuant" type="number" placeholder="e.g., 45" value={formData.gmatQuant} onChange={handleInputChange} />
       </div>
       {isLastStep && <ReadyBox dataValidation={dataValidation} />}
     </div>
@@ -354,9 +354,9 @@ const Step8 = memo(({ formData, errors, handleInputChange, dataValidation }) => 
       {formData.degreeLevel === 'Bachelor' && (
         <>
           <div className="grid md:grid-cols-3 gap-4">
-            <Field label="Q14. SAT EBRW" field="satBreakdown.ebrw" placeholder="700" value={formData.satBreakdown?.ebrw} onChange={(f, v) => handleObject('satBreakdown', 'ebrw', v)} />
-            <Field label="Q15. SAT Math" field="satBreakdown.math" placeholder="750" value={formData.satBreakdown?.math} onChange={(f, v) => handleObject('satBreakdown', 'math', v)} />
-            <Field label="Q16. SAT Total" field="satBreakdown.total" placeholder="1450" value={formData.satBreakdown?.total} onChange={(f, v) => handleObject('satBreakdown', 'total', v)} />
+            <Field label="Q14. SAT EBRW" type="number" field="satBreakdown.ebrw" placeholder="700" value={formData.satBreakdown?.ebrw} onChange={(f, v) => handleObject('satBreakdown', 'ebrw', v)} />
+            <Field label="Q15. SAT Math" type="number" field="satBreakdown.math" placeholder="750" value={formData.satBreakdown?.math} onChange={(f, v) => handleObject('satBreakdown', 'math', v)} />
+            <Field label="Q16. SAT Total" field="satBreakdown.total" type="number" placeholder="1450" value={formData.satBreakdown?.total} onChange={(f, v) => handleObject('satBreakdown', 'total', v)} />
           </div>
           {/* <Field label="Test-optional?" field="testOptional" type="radio" options={['Yes', 'No']} value={formData.testOptional} onChange={handleInputChange} /> */}
           <Field label="Q17. Awards & achievements: Olympiads, hackathons, publications, or national-level recognition

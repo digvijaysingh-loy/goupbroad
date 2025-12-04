@@ -69,7 +69,7 @@ const Testimonials = () => {
             Success Stories from Students Like You
 
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-lg md:text-xl text-gray-600 max-w-4xl mx-auto sm:text-center text-justify">
             Hear how students turned their study abroad dreams into real success with Upbroad’s
             transparent, mentor-led guidance.          </p>
         </div>
@@ -113,7 +113,7 @@ const Testimonials = () => {
 
         {/* Trust Indicators */}
         <div className="mt-16 text-center">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-3xl font-bold text-primary-700 mb-2">100%</div>
               <div className="text-sm text-gray-600">Success Rate</div>

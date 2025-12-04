@@ -1,6 +1,13 @@
-/* GPAConverter.jsx – With Auth Check + Calculate Button + Modal */
+/* GPAConverter.jsx – Final Version: TripleScorler Logic in Tier 2 + Working Tier 3 */
 import React, { useMemo, useState, useRef } from "react";
-import { HelpCircle, Upload, Download, X, ArrowRight, Sparkles, Loader2, Brain } from "lucide-react";
+import {
+  HelpCircle,
+  Upload,
+  Download,
+  X,
+  Sparkles,
+  Loader2,
+} from "lucide-react";
 import Navigation from "@/components/static/Navigation";
 import Footer from "@/components/static/Footer";
 import { Button } from "@/components/ui/button";
@@ -11,7 +18,7 @@ import SignUpModal from "@/Pages/CollegeFinder/SignUpModal";
 import { isAuthenticated, setAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
-/* ──────────────────────── WES-STYLE CALCULATION HELPERS ──────────────────────── */
+/* ──────────────────────── MATH & WES HELPERS ──────────────────────── */
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 
@@ -47,7 +54,7 @@ function gpaFromMix({ s70, s75, s80, s60 }, percent) {
   return clamp(gpa, 0, 4);
 }
 
-/* Tier-2 anchors */
+/* Tier-2 */
 function anchorsABC(percent, sA = 0) {
   let A;
   if (percent >= 83) A = 3.92;
@@ -73,7 +80,7 @@ function gpaFromABC({ sA, sB, sC }, percent) {
   return clamp(gpa, 0, 4);
 }
 
-/* Range helpers */
+/* Range */
 function rangeForLevel(level, percent, creditsTotal, programLengthYears) {
   let baseWidth = level === 1 ? 0.20 : level === 2 ? 0.12 : 0.06;
   const edges = [73, 78, 83, 68, 63, 58, 53, 50];
@@ -90,7 +97,7 @@ function rangeForLevel(level, percent, creditsTotal, programLengthYears) {
   return baseWidth;
 }
 
-/* Tier-3 CSV helpers */
+/* Tier-3 CSV */
 function parseCSV(text) {
   const rows = [];
   let i = 0, field = "", row = [], inQuotes = false;
@@ -219,6 +226,70 @@ function computeTranscriptGPA(rows, opts = {}) {
   return { point: clamp(point, 0, 4), lo: clamp(lo - pad, 0, 4), hi: clamp(hi + pad, 0, 4) };
 }
 
+/* ──────────────────────── TRIPLE SCORLER REBALANCING (TIER 2) ──────────────────────── */
+const TOTAL = 100;
+
+function normalizeInitial(a, b, c) {
+  a = clamp(a, 0, 100);
+  b = clamp(b, 0, 100);
+  c = clamp(c, 0, 100);
+  const sum = a + b + c;
+  if (sum === 0) return { aShare: 100, bShare: 0, cShare: 0 };
+  const factor = TOTAL / sum;
+  let na = Math.round(a * factor);
+  let nb = Math.round(b * factor);
+  let nc = TOTAL - na - nb;
+  return { aShare: na, bShare: nb, cShare: nc };
+}
+
+function rebalanceFromA(desiredA, A, B, C) {
+  desiredA = clamp(desiredA, 0, 100);
+  const delta = desiredA - A;
+  if (delta > 0) {
+    const takeFromB = Math.min(delta, B);
+    const takeFromC = delta - takeFromB;
+    return { aShare: A + delta, bShare: B - takeFromB, cShare: C - takeFromC };
+  } else if (delta < 0) {
+    const freed = -delta;
+    const giveToB = Math.min(freed, 100 - B);
+    const giveToC = freed - giveToB;
+    return { aShare: A + delta, bShare: B + giveToB, cShare: C + giveToC };
+  }
+  return { aShare: A, bShare: B, cShare: C };
+}
+
+function rebalanceFromB(desiredB, A, B, C) {
+  desiredB = clamp(desiredB, 0, 100);
+  const delta = desiredB - B;
+  if (delta > 0) {
+    const takeFromC = Math.min(delta, C);
+    const takeFromA = delta - takeFromC;
+    return { aShare: A - takeFromA, bShare: B + delta, cShare: C - takeFromC };
+  } else if (delta < 0) {
+    const freed = -delta;
+    const giveToC = Math.min(freed, 100 - C);
+    const giveToA = freed - giveToC;
+    return { aShare: A + giveToA, bShare: B + delta, cShare: C + giveToC };
+  }
+  return { aShare: A, bShare: B, cShare: C };
+}
+
+function rebalanceFromC(desiredC, A, B, C) {
+  desiredC = clamp(desiredC, 0, 100);
+  const delta = desiredC - C;
+  if (delta > 0) {
+    const takeFromA = Math.min(delta, A);
+    const takeFromB = delta - takeFromA;
+    return { aShare: A - takeFromA, bShare: B - takeFromB, cShare: C + delta };
+  } else if (delta < 0) {
+    const freed = -delta;
+    const giveToA = Math.min(freed, 100 - A);
+    const giveToB = freed - giveToA;
+    return { aShare: A + giveToA, bShare: B + giveToB, cShare: C + delta };
+  }
+  return { aShare: A, bShare: B, cShare: C };
+}
+
 /* ──────────────────────── MAIN COMPONENT ──────────────────────── */
 export default function CGPAToGPAConverter() {
   const [cgpaError, setCgpaError] = useState("");
@@ -228,9 +299,11 @@ export default function CGPAToGPAConverter() {
   const [cap, setCap] = useState(95);
   const [programLength, setProgramLength] = useState(4);
   const [creditsTotal, setCreditsTotal] = useState(146);
-  const [aShare, setAShare] = useState(60);
-  const [bShare, setBShare] = useState(30);
-  const [cShare, setCShare] = useState(10);
+
+  // TripleScorler-style shares
+  const [shares, setShares] = useState(() => normalizeInitial(60, 30, 10));
+  const { aShare, bShare, cShare } = shares;
+
   const [csvText, setCsvText] = useState("");
   const fileInputRef = useRef(null);
   const [uploadedFile, setUploadedFile] = useState(false);
@@ -240,23 +313,26 @@ export default function CGPAToGPAConverter() {
   const [hasCalculated, setHasCalculated] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
 
-  /* ---------- derived values (only after calculate) ---------- */
-  const { percent, priorMix, point, lo, hi, confidence } = useMemo(() => {
+  const updateAShare = (val) => setShares(prev => rebalanceFromA(val, prev.aShare, prev.bShare, prev.cShare));
+  const updateBShare = (val) => setShares(prev => rebalanceFromB(val, prev.aShare, prev.bShare, prev.cShare));
+  const updateCShare = (val) => setShares(prev => rebalanceFromC(val, prev.aShare, prev.bShare, prev.cShare));
+
+  /* ---------- derived GPA values ---------- */
+  const { percent, point, lo, hi, confidence } = useMemo(() => {
     if (!hasCalculated) return {};
+
     const percent = round2(cgpaToPercent(cgpa, factor, cap));
-    const priorMix = priorMixFromPercent(percent);
 
     let point, lo, hi;
     if (activeTab === 1) {
+      const priorMix = priorMixFromPercent(percent);
       const g = gpaFromMix(priorMix, percent);
       const width = rangeForLevel(1, percent, creditsTotal, programLength);
       point = round2(g);
       lo = round2(clamp(g - width, 0, 4));
       hi = round2(clamp(g + width, 0, 4));
     } else if (activeTab === 2) {
-      const total = Math.max(1, aShare + bShare + cShare);
-      const scale = total > 100 ? 100 / total : 1;
-      const mix = { sA: aShare * scale, sB: bShare * scale, sC: cShare * scale };
+      const mix = { sA: aShare, sB: bShare, sC: cShare };
       const g = gpaFromABC(mix, percent);
       const width = rangeForLevel(2, percent, creditsTotal, programLength);
       point = round2(g);
@@ -273,7 +349,7 @@ export default function CGPAToGPAConverter() {
     }
 
     const confidence = activeTab === 1 ? "low" : activeTab === 2 ? "medium" : "high";
-    return { percent, priorMix, point, lo, hi, confidence };
+    return { percent, point, lo, hi, confidence };
   }, [hasCalculated, activeTab, cgpa, factor, cap, aShare, bShare, cShare, creditsTotal, programLength, csvText]);
 
   /* ---------- file handling ---------- */
@@ -287,6 +363,7 @@ export default function CGPAToGPAConverter() {
     };
     reader.readAsText(file);
   };
+
   const downloadSampleCSV = () => {
     const csv = `course,term,credits,grade,grade_type,description
 Thermodynamics,2018-Fall,4,73,percent,
@@ -298,6 +375,7 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
     const a = document.createElement("a");
     a.href = url; a.download = "sample_transcript.csv"; a.click();
   };
+
   const validateCgpa = (value) => {
     setCgpa(value);
 
@@ -305,7 +383,6 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
       setCgpaError("CGPA is required");
       return false;
     }
-
     const num = parseFloat(value);
     if (isNaN(num)) {
       setCgpaError("Please enter a valid number");
@@ -315,17 +392,12 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
       setCgpaError("CGPA must be between 0 and 10");
       return false;
     }
-
     setCgpaError("");
     return true;
   };
 
   const handleCalculate = () => {
-    // Validate CGPA first (for all tiers)
-    if (!validateCgpa(cgpa)) {
-      return;
-    }
-
+    if (activeTab !== 3 && !validateCgpa(cgpa)) return;
     if (!isAuthenticated()) {
       setShowAuthModal(true);
       return;
@@ -338,7 +410,6 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
       toast.success("GPA calculated successfully!");
     }, 800);
   };
-
 
   const handleAuthSuccess = (token, user) => {
     setAuth({ accessToken: token, user });
@@ -354,9 +425,7 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
     setCap(95);
     setProgramLength(4);
     setCreditsTotal(146);
-    setAShare(60);
-    setBShare(30);
-    setCShare(10);
+    setShares(normalizeInitial(60, 30, 10));
     setCsvText("");
     setUploadedFile(false);
     setHasCalculated(false);
@@ -365,16 +434,16 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
   return (
     <div className="min-h-screen bg-gray-50 relative">
       <Navigation />
-      <section className="bg-gradient-to-r from-primary via-primary-600 to-primary-700 text-white py-20 pt-[200px]">
+      <section className="bg-gradient-to-r from-primary via-primary-600 to-primary-700 text-white py-2 pt-[100px] sm:py-16 sm:pt-[150px]">
         <div className="text-center mb-10 flex flex-col justify-center items-center">
-          <h1 className="text-6xl md:w-[60%] text-center font-bold text-white mb-2">
+          <h1 className="text-2xl sm:text-5xl max-w-7xl text-center font-bold text-white mb-2">
             10 Point CGPA to 4 Point GPA Converter Online
           </h1>
-          <p className="text-white">Enter your scores, get instant conversions. Plan smart. Apply better</p>
+          <p className="text-white px-2 text-lg sm:text-xl">Enter your scores, get instant conversions. Plan smart. Apply better</p>
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto py-12">
+      <div className="max-w-4xl mx-auto py-8 sm:py-12">
         <div className="bg-white rounded-lg shadow-lg p-8">
           {/* Tabs */}
           <div className="flex justify-center mb-8">
@@ -386,7 +455,7 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
                   className={`pb-2 px-4 font-medium transition-all ${activeTab === i + 1
                     ? "text-teal-700 border-b-3 border-teal-700"
                     : "text-gray-500 hover:text-gray-700"
-                    }`}
+                  }`}
                   style={{ borderBottomWidth: activeTab === i + 1 ? "3px" : "0" }}
                 >
                   {t}
@@ -402,50 +471,29 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
                 <label className="block text-gray-700 font-medium mb-2">
                   CGPA <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="10"
-                    value={cgpa}
-                    onChange={(e) => validateCgpa(e.target.value)}
-                    placeholder="Enter your CGPA"
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${cgpaError
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-teal-600"
-                      }`}
-                  />
-                  {cgpaError && (
-                    <p className="mt-2 text-sm text-red-600 flex items-center">
-                      <span className="mr-1">Warning:</span> {cgpaError}
-                    </p>
-                  )}
-                </div>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="10"
+                  value={cgpa}
+                  onChange={(e) => validateCgpa(e.target.value)}
+                  placeholder="Enter your CGPA"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${cgpaError
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-teal-600"
+                  }`}
+                />
+                {cgpaError && (
+                  <p className="mt-2 text-sm text-red-600">{cgpaError}</p>
+                )}
               </div>
 
-
               <div className="flex justify-center space-x-4">
-                <Button
-                  onClick={handleCalculate}
-                  disabled={
-                    isCalculating ||
-                    !cgpa ||
-                    cgpaError ||
-                    (activeTab === 3 && !csvText.trim())
-                  }
-                  className="bg-[#145044] hover:bg-[#0f3c34]"
-                >
-                  {isCalculating ? (
-                    <>Calculating <Loader2 className="ml-2 h-4 w-4 animate-spin" /></>
-                  ) : (
-                    <>Calculate <Sparkles className="ml-2 h-4 w-4" /></>
-                  )}
+                <Button onClick={handleCalculate} disabled={isCalculating || !!cgpaError || !cgpa} className="bg-[#145044] hover:bg-[#0f3c34]">
+                  {isCalculating ? <>Calculating <Loader2 className="ml-2 h-4 w-4 animate-spin" /></> : <>Calculate <Sparkles className="ml-2 h-4 w-4" /></>}
                 </Button>
-                <button
-                  onClick={() => setShowPopup(true)}
-                  className="px-4 py-3 text-gray-600 hover:text-gray-800 flex items-center space-x-2"
-                >
+                <button onClick={() => setShowPopup(true)} className="px-4 py-3 text-gray-600 hover:text-gray-800 flex items-center space-x-2">
                   <HelpCircle size={18} />
                   <span>How it works?</span>
                 </button>
@@ -462,45 +510,33 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
             </div>
           )}
 
-          {/* ---------- Tier 2 & 3 similar with Calculate button ---------- */}
-          {/* (Same pattern – omitted for brevity, but included in full file) */}
-
-          {/* Full Tier 2 & 3 with Calculate button below */}
+          {/* ---------- Tier 2 – TripleScorler Logic ---------- */}
           {activeTab === 2 && (
             <div className="space-y-6">
               <div>
                 <label className="block text-gray-700 font-medium mb-2">
                   CGPA <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="10"
-                    value={cgpa}
-                    onChange={(e) => validateCgpa(e.target.value)}
-                    placeholder="Enter your CGPA"
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${cgpaError
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-teal-600"
-                      }`}
-                  />
-                  {cgpaError && (
-                    <p className="mt-2 text-sm text-red-600 flex items-center">
-                      <span className="mr-1">Warning:</span> {cgpaError}
-                    </p>
-                  )}
-                </div>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="10"
+                  value={cgpa}
+                  onChange={(e) => validateCgpa(e.target.value)}
+                  placeholder="Enter your CGPA"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${cgpaError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-teal-600"}`}
+                />
+                {cgpaError && <p className="mt-2 text-sm text-red-600">{cgpaError}</p>}
               </div>
 
               <div className="mt-6 space-y-6">
                 <h3 className="font-medium text-gray-700">Set your distribution by credits</h3>
                 {[
-                  { label: "A share (%)", state: aShare, set: setAShare },
-                  { label: "B share (%)", state: bShare, set: setBShare },
-                  { label: "C share (%)", state: cShare, set: setCShare },
-                ].map(({ label, state, set }) => (
+                  { label: "A share (%)", value: aShare, set: updateAShare },
+                  { label: "B share (%)", value: bShare, set: updateBShare },
+                  { label: "C share (%)", value: cShare, set: updateCShare },
+                ].map(({ label, value, set }) => (
                   <div key={label}>
                     <div className="flex justify-between items-center mb-2">
                       <label className="text-gray-700">{label}</label>
@@ -508,46 +544,34 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
                         type="number"
                         min="0"
                         max="100"
-                        value={state}
-                        onChange={(e) => set(Math.max(0, Math.min(100, Number(e.target.value))))}
-                        className="w-20 px-3 py-1 border border-gray-300 rounded text-center"
+                        step="1"
+                        value={value}
+                        onChange={(e) => set(Number(e.target.value))}
+                        className="w-24 px-3 py-1 border border-gray-300 rounded text-center"
                       />
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="100"
-                      value={state}
+                      step="1"
+                      value={value}
                       onChange={(e) => set(Number(e.target.value))}
                       className="w-full h-2 bg-teal-200 rounded-lg appearance-none cursor-pointer"
-                      style={{
-                        background: `linear-gradient(to right, #0f766e 0%, #0f766e ${state}%, #e5e7eb ${state}%, #e5e7eb 100%)`,
-                      }}
+                      style={{ background: `linear-gradient(to right, #0f766e 0%, #0f766e ${value}%, #e5e7eb ${value}%, #e5e7eb 100%)` }}
                     />
                   </div>
                 ))}
                 <p className="text-sm text-gray-600">
-                  Remaining auto-assigned to C: {clamp(100 - (aShare + bShare + cShare), 0, 100)}%
+                  Total: {aShare + bShare + cShare}% (always exactly 100%)
                 </p>
               </div>
 
               <div className="flex justify-center space-x-4">
-                <Button
-                  onClick={handleCalculate}
-                  disabled={isCalculating || !cgpa || cgpaError}
-
-                  className="bg-[#145044] hover:bg-[#0f3c34]"
-                >
-                  {isCalculating ? (
-                    <>Calculating <Loader2 className="ml-2 h-4 w-4 animate-spin" /></>
-                  ) : (
-                    <>Calculate <Sparkles className="ml-2 h-4 w-4" /></>
-                  )}
+                <Button onClick={handleCalculate} disabled={isCalculating || !!cgpaError || !cgpa} className="bg-[#145044] hover:bg-[#0f3c34]">
+                  {isCalculating ? <>Calculating <Loader2 className="ml-2 h-4 w-4 animate-spin" /></> : <>Calculate <Sparkles className="ml-2 h-4 w-4" /></>}
                 </Button>
-                <button
-                  onClick={() => setShowPopup(true)}
-                  className="px-4 py-3 text-gray-600 hover:text-gray-800 flex items-center space-x-2"
-                >
+                <button onClick={() => setShowPopup(true)} className="px-4 py-3 text-gray-600 hover:text-gray-800 flex items-center space-x-2">
                   <HelpCircle size={18} />
                   <span>How it works?</span>
                 </button>
@@ -564,6 +588,7 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
             </div>
           )}
 
+          {/* ---------- Tier 3 – FULLY WORKING ---------- */}
           {activeTab === 3 && (
             <div className="space-y-6">
               {!uploadedFile ? (
@@ -572,20 +597,13 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
                   <p className="text-sm text-gray-600 mb-4">
                     CSV columns (header required): course, credit, grade. Grades can be O, A+/A/A-, B+/B/B-, C+/C/C-, D, F, or PASS.
                   </p>
-                  <div className="flex space-x-4">
+                  <div className="flex space-x-4 flex-col sm:flex-row justify-center items-center gap-4 ">
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".csv" className="hidden" />
-                    <Button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="bg-[#145044] hover:bg-[#0f3c34] flex items-center space-x-2"
-                    >
+                    <Button onClick={() => fileInputRef.current?.click()} className="bg-[#145044] w-[300px] sm:w-[250px] hover:bg-[#0f3c34] flex items-center space-x-2">
                       <Upload size={18} />
                       <span>Choose CSV</span>
                     </Button>
-                    <Button
-                      onClick={downloadSampleCSV}
-                      variant="outline"
-                      className="flex items-center space-x-2"
-                    >
+                    <Button onClick={downloadSampleCSV} variant="outline" className="flex items-center space-x-2 w-[300px] sm:w-[250px]">
                       <Download size={18} />
                       <span>Download Sample</span>
                     </Button>
@@ -624,16 +642,8 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
                   </div>
 
                   <div className="flex justify-center mt-6">
-                    <Button
-                      onClick={handleCalculate}
-                      disabled={!csvText.trim() || isCalculating}
-                      className="bg-[#145044] hover:bg-[#0f3c34]"
-                    >
-                      {isCalculating ? (
-                        <>Calculating <Loader2 className="ml-2 h-4 w-4 animate-spin" /></>
-                      ) : (
-                        <>Calculate GPA <Sparkles className="ml-2 h-4 w-4" /></>
-                      )}
+                    <Button onClick={handleCalculate} disabled={!csvText.trim() || isCalculating} className="bg-[#145044] hover:bg-[#0f3c34]">
+                      {isCalculating ? <>Calculating <Loader2 className="ml-2 h-4 w-4 animate-spin" /></> : <>Calculate GPA <Sparkles className="ml-2 h-4 w-4" /></>}
                     </Button>
                   </div>
 
@@ -661,7 +671,7 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
             </button>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">How we calculate this</h2>
             {activeTab === 1 && <div className="space-y-4 text-gray-700"><p>We turn your CGPA into a percentage (CGPA × 9.5, capped at 95%).</p><p>Then we assume a realistic grade-mix for that average and convert it to the 4.0 scale.</p><p>Because we don’t have the exact transcript, we show a small range.</p></div>}
-            {activeTab === 2 && <div className="space-y-4 text-gray-700"><p>You tell us the credit-share of A / B / C grades.</p><p>Any remainder is conservatively put into C.</p><p>We use tuned anchors (A ≈ 3.75-3.96, B ≈ 3.05, C ≈ 2.20) that vary with overall percent.</p></div>}
+            {activeTab === 2 && <div className="space-y-4 text-gray-700"><p>You control the exact credit share of A/B/C grades.</p><p>Sliders always sum to 100% with smart rebalancing (A takes from B first, etc.).</p><p>Uses dynamic anchors based on your overall percentage.</p></div>}
             {activeTab === 3 && <div className="space-y-4 text-gray-700"><p>Course-by-course conversion exactly like WES.</p><p>Pass/Fail and repeats (latest kept) are excluded.</p><p>A tiny sensitivity band (±2% on marks) gives the range.</p></div>}
           </div>
         </div>

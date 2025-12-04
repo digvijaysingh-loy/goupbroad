@@ -29,12 +29,12 @@ const CTA = () => {
             Start Your Study Abroad Journey with Upbroad
           </Badge>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-           Take the Next Step Toward Your Global Education Journey
+          <h2 className="text-3xl md:text-4xl lg:text-4xl font-bold text-white mb-6 leading-tight">
+            Take the Next Step Toward Your Global Education Journey
           </h2>
-          <p className="text-lg md:text-xl text-primary-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-primary-100 mb-8 max-w-3xl mx-auto leading-relaxed sm:text-center text-justify">
             Get personalized guidance, verified shortlists, and expert mentorship, all in one
-platform.
+            platform.
 
           </p>
 
@@ -42,7 +42,7 @@ platform.
             <Link to="/signin">
               <Button
                 size="lg"
-                className="bg-white text-primary-700 hover:bg-gray-100 px-8 py-6 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
+                className="bg-white text-primary-700 hover:bg-gray-100 w-[320px] sm:w-[350px] px-8 py-6 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
                 Book My Free Consultation
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
