@@ -115,15 +115,15 @@ const TaskPopupInner = memo(({ task, onClose, specificStudentId, specificQuestio
     <Dialog open={!!task} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[820px] max-h-[90vh] overflow-y-auto p-0">
         {/* ---------- HEADER ---------- */}
-        <DialogHeader className="p-6 pb-3 border-b">
+        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-3 border-b">
           <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-                <FileText className="h-5 w-5" />
+            <div className="flex-1 pr-2 sm:pr-0">
+              <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl font-bold">
+                <FileText className="h-5 w-5 flex-shrink-0" />
                 {task.title}
               </DialogTitle>
               {task.description && (
-                <DialogDescription className="mt-1 text-sm">
+                <DialogDescription className="mt-1 text-sm line-clamp-2">
                   {task.description}
                 </DialogDescription>
               )}
@@ -135,7 +135,7 @@ const TaskPopupInner = memo(({ task, onClose, specificStudentId, specificQuestio
         </DialogHeader>
 
         {/* ---------- BODY ---------- */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -160,21 +160,21 @@ const TaskPopupInner = memo(({ task, onClose, specificStudentId, specificQuestio
                       {/* ----- HEADER (clickable) ----- */}
                       <button
                         onClick={() => toggle(student._id)}
-                        className="w-full text-left p-4 hover:bg-muted/50 transition-colors flex items-center justify-between"
+                        className="w-full text-left p-3 sm:p-4 hover:bg-muted/50 transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <User className="h-5 w-5 text-primary" />
                           </div>
-                          <div>
-                            <p className="font-semibold">{student.name}</p>
-                            <p className="text-sm text-muted-foreground">{student.email}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold truncate">{student.name}</p>
+                            <p className="text-sm text-muted-foreground truncate">{student.email}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <p className="text-sm font-medium">
+                        <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto">
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-sm font-medium hidden sm:block">
                               {completed}/{total} Completed
                             </p>
                             <p className="text-xs text-muted-foreground">{percent}%</p>
@@ -182,15 +182,15 @@ const TaskPopupInner = memo(({ task, onClose, specificStudentId, specificQuestio
 
                           <Badge
                             variant={completed === total ? 'success' : 'secondary'}
-                            className="capitalize"
+                            className="capitalize flex-shrink-0"
                           >
                             {completed === total ? 'Done' : 'In Progress'}
                           </Badge>
 
                           {isOpen ? (
-                            <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                            <ChevronUp className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           ) : (
-                            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                            <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           )}
                         </div>
                       </button>
@@ -201,14 +201,14 @@ const TaskPopupInner = memo(({ task, onClose, specificStudentId, specificQuestio
                           isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
                         }`}
                       >
-                        <div className="border-t p-4 bg-muted/5 space-y-4">
+                        <div className="border-t p-3 sm:p-4 bg-muted/5 space-y-4">
                           {student.questionnaires.map((q) => (
                             <Card key={q.questionnaireId} className="border">
-                              <CardHeader className="pb-3">
-                                <div className="flex items-center justify-between">
-                                  <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                              <CardHeader className="pb-2 sm:pb-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base font-semibold flex-1">
                                     {statusIcon(q.assignmentStatus)}
-                                    {q.title}
+                                    <span className="truncate">{q.title}</span>
                                   </CardTitle>
                                   <Badge
                                     variant={
@@ -216,54 +216,55 @@ const TaskPopupInner = memo(({ task, onClose, specificStudentId, specificQuestio
                                         ? 'success'
                                         : 'secondary'
                                     }
+                                    className="flex-shrink-0"
                                   >
                                     {q.assignmentStatus}
                                   </Badge>
                                 </div>
 
                                 {q.subtask && (
-                                  <p className="mt-1 text-sm text-muted-foreground">
+                                  <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
                                     Subtask: {q.subtask.title}
                                   </p>
                                 )}
 
                                 <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Calendar className="h-3 w-3" />
+                                  <Calendar className="h-3 w-3 flex-shrink-0" />
                                   Assigned: {new Date(q.assignedAt).toLocaleDateString()}
                                 </p>
                               </CardHeader>
 
-                              <CardContent className="space-y-3">
+                              <CardContent className="space-y-3 p-0">
                                 {q.questions.map((ques) => (
                                   <div
                                     key={ques._id}
-                                    className="p-3 bg-background rounded-md border space-y-2"
+                                    className="p-2 sm:p-3 bg-background rounded-md border space-y-2"
                                   >
-                                    <div className="flex items-start justify-between">
-                                      <p className="font-medium text-sm">{ques.question}</p>
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                                      <p className="font-medium text-sm line-clamp-2 sm:pr-2">{ques.question}</p>
                                       <Badge
                                         variant={ques.status === 'SUBMITTED' ? 'outline' : 'secondary'}
-                                        className="text-xs"
+                                        className="text-xs flex-shrink-0 self-start sm:self-auto"
                                       >
                                         {ques.status}
                                       </Badge>
                                     </div>
 
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="text-sm text-muted-foreground break-words">
                                       {answerDisplay(ques)}
                                     </div>
 
                                     {ques.submittedAt && (
                                       <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                                        <Calendar className="h-3 w-3" />
+                                        <Calendar className="h-3 w-3 flex-shrink-0" />
                                         {new Date(ques.submittedAt).toLocaleString()}
                                       </p>
                                     )}
 
                                     {ques.feedback && (
                                       <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
-                                        <p className="flex items-start gap-1 text-xs text-green-800">
-                                          <MessageSquare className="h-3 w-3 mt-0.5" />
+                                        <p className="flex items-start gap-1 text-xs text-green-800 break-words">
+                                          <MessageSquare className="h-3 w-3 mt-0.5 flex-shrink-0" />
                                           <span className="font-medium">Feedback:</span> {ques.feedback}
                                         </p>
                                       </div>
@@ -285,7 +286,7 @@ const TaskPopupInner = memo(({ task, onClose, specificStudentId, specificQuestio
 
         {/* ---------- FOOTER ---------- */}
         <DialogFooter className="p-4 border-t">
-          <Button onClick={onClose} variant="outline">
+          <Button onClick={onClose} variant="outline" className="w-full sm:w-auto">
             Close
           </Button>
         </DialogFooter>
@@ -383,10 +384,10 @@ const AdminDashboard = () => {
   console.log(activities)
   return (
     <div className="space-y-4 w-full">
-      <div className="flex flex-wrap gap-2 items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+      <div className="flex flex-col sm:flex-row flex-wrap gap-2 items-start sm:items-center justify-between">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h2>
         <div className="flex items-center space-x-2">
-          <Button>
+          <Button size="sm" className="sm:min-w-[140px]">
             <Calendar className="mr-2 h-4 w-4" /> {new Date().toLocaleDateString()}
           </Button>
         </div>
@@ -395,14 +396,14 @@ const AdminDashboard = () => {
       {error ? (
         <div className="text-center text-red-500">{error}</div>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-4 sm:gap-6">
           {/* Stats Row */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {loading.stats ? (
               <>
                 {[1, 2, 3, 4].map(i => (
                   <Card key={i}>
-                    <CardContent className="pt-6 pb-4">
+                    <CardContent className="pt-4 sm:pt-6 pb-3 sm:pb-4">
                       <div className="text-center text-muted-foreground py-4">Loading...</div>
                     </CardContent>
                   </Card>
@@ -411,36 +412,36 @@ const AdminDashboard = () => {
             ) : (
               <>
                 <Card onClick={() => navigate('/admin/students')} className='cursor-pointer'>
-                  <CardContent className="pt-6 pb-4">
+                  <CardContent className="pt-4 sm:pt-6 pb-3 sm:pb-4">
                     <div className="text-xs text-muted-foreground font-medium">Total Students</div>
-                    <div className="text-3xl font-bold mt-1">
+                    <div className="text-2xl sm:text-3xl font-bold mt-1">
                       {stats.totalStudents}
                     </div>
                     
                   </CardContent>
                 </Card>
                 {/* <Card>
-                  <CardContent className="pt-6 pb-4">
+                  <CardContent className="pt-4 sm:pt-6 pb-3 sm:pb-4">
                     <div className="text-xs text-muted-foreground font-medium">Active Applications</div>
-                    <div className="text-3xl font-bold mt-1">
+                    <div className="text-2xl sm:text-3xl font-bold mt-1">
                       {stats.totalActiveApplications}
                     </div>
                    
                   </CardContent>
                 </Card> */}
                 <Card onClick={() => navigate('/admin/tasks')} className='cursor-pointer'>
-                  <CardContent className="pt-6 pb-4">
+                  <CardContent className="pt-4 sm:pt-6 pb-3 sm:pb-4">
                     <div className="text-xs text-muted-foreground font-medium">Pending Tasks</div>
-                    <div className="text-3xl font-bold mt-1">
+                    <div className="text-2xl sm:text-3xl font-bold mt-1">
                       {stats.totalPendingTasks}
                     </div>
                     
                   </CardContent>
                 </Card>
                 <Card onClick={() => navigate('/admin/tasks')} className='cursor-pointer'>
-                  <CardContent className="pt-6 pb-4">
+                  <CardContent className="pt-4 sm:pt-6 pb-3 sm:pb-4">
                     <div className="text-xs text-muted-foreground font-medium">Completed Tasks</div>
-                    <div className="text-3xl font-bold mt-1">
+                    <div className="text-2xl sm:text-3xl font-bold mt-1">
                       {stats.totalCompletedTasks}
                     </div>
                     
@@ -451,10 +452,10 @@ const AdminDashboard = () => {
           </div>
 
           {/* Main Content Row */}
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
             {/* Recent Activity */}
-            <div className="col-span-2 bg-white rounded-lg shadow-sm p-6 max-md:p-3">
-              <div className="font-semibold text-lg mb-4">Recent Activity</div>
+            <div className="lg:col-span-2 bg-white rounded-lg shadow-sm p-3 sm:p-6 max-md:p-3">
+              <div className="font-semibold text-base sm:text-lg mb-4 line-clamp-1">Recent Activity</div>
               <div className="divide-y">
                 {loading.activities ? (
                   <div className="text-center text-muted-foreground py-8">Loading activities...</div>
@@ -488,19 +489,19 @@ const AdminDashboard = () => {
                     return (
                       <div 
                         key={activity._id} 
-                        className={`flex items-center py-4 gap-4 ${highlightClass} ${isSubmission ? 'cursor-pointer hover:bg-gray-50 transition-colors' : activity.isRead ? '' : 'cursor-pointer hover:bg-yellow-100 transition-colors'}`}
+                        className={`flex flex-col sm:flex-row sm:items-center py-3 sm:py-4 gap-3 sm:gap-4 ${highlightClass} ${isSubmission ? 'cursor-pointer hover:bg-gray-50 transition-colors' : activity.isRead ? '' : 'cursor-pointer hover:bg-yellow-100 transition-colors'}`}
                         onClick={handleClick}
                       >
                         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-base font-bold text-gray-600">
                           {getInitials(activity.student?.name || activity.student?.email || 'U')}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-gray-900">{activity.student?.name || activity.student?.email || 'Unknown Student'}</div>
-                          <div className="text-sm text-muted-foreground">{activity.message}</div>
+                          <div className="font-medium text-gray-900 truncate">{activity.student?.name || activity.student?.email || 'Unknown Student'}</div>
+                          <div className="text-sm text-muted-foreground line-clamp-2 break-words">{activity.message}</div>
                         </div>
-                        <div className="flex flex-col items-end min-w-[100px]">
-                          <span className="text-xs text-gray-500">{new Date(activity.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                          <span className={`mt-1 text-xs px-2 py-0.5 rounded-full font-semibold ${activity.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : activity.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{activity.status?.toLowerCase()}</span>
+                        <div className="flex flex-row sm:flex-col items-end justify-between sm:justify-end min-w-0 sm:min-w-[80px]">
+                          <span className="text-xs text-gray-500 truncate sm:block">{new Date(activity.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span className={`mt-1 sm:mt-0 text-xs px-2 py-0.5 rounded-full font-semibold ${activity.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : activity.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{activity.status?.toLowerCase()}</span>
                         </div>
                       </div>
                     );
@@ -510,6 +511,7 @@ const AdminDashboard = () => {
               <div className="flex justify-end mt-4">
                 <Button
                   variant="ghost"
+                  size="sm"
                   className="text-primary-600"
                   onClick={() => {
 
@@ -524,8 +526,8 @@ const AdminDashboard = () => {
             </div>
 
             {/* Upcoming Deadlines */}
-            <div className="bg-white max-lg:col-span-2 rounded-lg shadow-sm p-6 max-md:p-3">
-              <div className="font-semibold text-lg mb-4">Upcoming Deadlines</div>
+            <div className="bg-white max-lg:col-span-2 rounded-lg shadow-sm p-3 sm:p-6 max-md:p-3">
+              <div className="font-semibold text-base sm:text-lg mb-4 line-clamp-1">Upcoming Deadlines</div>
               <div className="space-y-4">
                 {loading.deadlines ? (
                   <div className="text-center text-muted-foreground py-8">Loading deadlines...</div>
@@ -533,8 +535,8 @@ const AdminDashboard = () => {
                   <div className="text-center text-muted-foreground py-8">Not available</div>
                 ) : (
                   deadlines.map((deadline, i) => (
-                    <div key={deadline._id || i} className="flex items-center gap-3">
-                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
+                    <div key={deadline._id || i} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0 ${
                         deadline.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : 
                         deadline.status === 'ACTIVE' ? 'bg-blue-100 text-blue-700' : 
                         deadline.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 
@@ -542,11 +544,11 @@ const AdminDashboard = () => {
                         {deadline.title?.[0] || 'T'}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900">{deadline.title || 'Not available'}</div>
-                        <div className="text-xs text-muted-foreground">{deadline.student?.name || deadline.student?.email || 'Not available'}</div>
+                        <div className="font-medium text-gray-900 truncate">{deadline.title || 'Not available'}</div>
+                        <div className="text-xs text-muted-foreground truncate">{deadline.student?.name || deadline.student?.email || 'Not available'}</div>
                       </div>
-                      <div className="flex flex-col items-end min-w-[90px]">
-                        <span className="text-xs text-gray-500">
+                      <div className="flex flex-col items-end min-w-0 sm:min-w-[90px]">
+                        <span className="text-xs text-gray-500 truncate">
                           {deadline.dueDate ? new Date(deadline.dueDate).toLocaleDateString() : 
                            deadline.assignedAt ? new Date(deadline.assignedAt).toLocaleDateString() : 
                            'Not set'}

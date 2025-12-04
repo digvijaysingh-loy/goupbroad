@@ -422,13 +422,13 @@ const ProfilePage = () => {
                     </div>
 
                     {/* Program + Contact (side-by-side) */}
-                    <div className="lg:col-span-7 flex flex-row justify-between space-y-4">
-                      <ProfileDetailsCard title="Program Details" canEdit={false} className="border-0 shadow-none flex-1">
-                        <DataField icon={<BriefcaseBusiness className="w-5 h-5" fill="#145044" />} label="Program" value={programDetails.program} />
+                    <div className="lg:col-span-7 flex flex-col sm:flex-row  justify-between space-y-4">
+                      <ProfileDetailsCard title="Program Details" canEdit={false} className="border-0 shadow-none flex-1  ">
+                        <DataField icon={<BriefcaseBusiness className="w-5 h-5 " fill="#145044" />} label="Program" value={programDetails.program} />
                         <DataField icon={<ClockIcon className="w-5 h-5" />} label="Validity" value={programDetails.validity} />
                       </ProfileDetailsCard>
 
-                      <ProfileDetailsCard title="Contact Details" canEdit={false} className="border-0 shadow-none flex-1">
+                      <ProfileDetailsCard title="Contact Details" canEdit={false} className="border-0 shadow-none flex-1 ">
                         <DataField icon={<PhoneIcon className="w-5 h-5" />} label="Phone" value={contactDetails.phoneNumber || 'Not set'} />
                         <DataField icon={<MailIcon className="w-5 h-5" />} label="E-mail" value={userData?.email || 'Not set'} />
                       </ProfileDetailsCard>

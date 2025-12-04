@@ -80,13 +80,13 @@ const Services = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4 bg-primary-700/20 text-primary-700 rounded-full border-primary-700/20">
+          <Badge variant="secondary" className="mb-4 bg-primary-700/20 text-primary-700  rounded-full border-primary-700/20">
             Comprehensive Platform
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">
             All the Tools You Need to Study Abroad, in One Place.
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-4xl  mx-auto sm:text-center text-justify">
             From finding your ideal university to calculating your GPA and connecting with peers
             abroad, Upbroad gives you everything to plan your U.S. journey confidently.
 
@@ -112,7 +112,7 @@ const Services = () => {
         <CardTitle className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-gray-800 transition-colors">
           {service.title}
         </CardTitle>
-        <CardDescription className="text-gray-600 leading-relaxed">
+        <CardDescription className="text-gray-600 leading-relaxed text-base">
           {service.description}
         </CardDescription>
       </CardHeader>
@@ -129,10 +129,10 @@ const Services = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="w-full group-hover:bg-primary group-hover:text-white transition-all duration-300"
+          className="w-full group-hover:bg-primary group-hover:text-white transition-all duration-300 text-lg border py-4 "
         >
           <Link to={service.route}>Start Exploring for Free</Link>
-          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </Button>
       </CardContent>
     </Card>
@@ -141,24 +141,23 @@ const Services = () => {
 
         {/* CTA Section */}
         <div className="text-center mt-16">
-          <Card className="max-w-2xl mx-auto bg-gradient-to-r from-primary to-primary-600 border-0 shadow-xl">
+          <Card className="max-w-3xl mx-auto bg-gradient-to-r from-primary to-primary-600 border-0 shadow-xl">
             <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold text-white mb-4">
+              <h3 className="sm:text-3xl text-xl font-bold text-white mb-4">
                Ready to Begin Your U.S. Study Journey?
               </h3>
-              <p className="text-primary-100 mb-6">
+              <p className="text-primary-100 mb-6 text-sm sm:text-lg ">
                Upbroad makes studying abroad simpler, transparent, and truly guided.
 
               </p>
               <Button
                 size="lg"
-                className="bg-white text-primary-700 hover:bg-gray-100 px-8 py-3 font-semibold rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
+                className="bg-white text-primary-700 w-[300px] sm:w-[250px] hover:bg-gray-100 px-8 py-6 text-lg rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
                 onClick={() => {
                   navigate('/signin')
                 }}
               >
                 Get Started Free
-                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </CardContent>
           </Card>

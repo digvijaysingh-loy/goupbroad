@@ -119,7 +119,7 @@ const App = () => {
       {/* <Route path="/dashboard/timeline" element={<ProtectedRoute><StudentTasks /></ProtectedRoute>} /> */}
       <Route path="/dashboard/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
       <Route path="/dashboard/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
-      <Route path="/dashboard/edu-loan" element={<ProtectedRoute><EduLoan /></ProtectedRoute>} />
+      {/* <Route path="/dashboard/edu-loan" element={<ProtectedRoute><EduLoan /></ProtectedRoute>} /> */}
       <Route path="/dashboard/checklist" element={<ProtectedRoute><Checklist /></ProtectedRoute>} />
       <Route path="/questionnaires/:taskId/:subtaskId" element={<ProtectedRoute><QuestionnaireList /></ProtectedRoute>} />
       <Route path="/questionnaire/:taskId/:subtaskId/:questionnaireId" element={<ProtectedRoute><Questionnaire /></ProtectedRoute>} />

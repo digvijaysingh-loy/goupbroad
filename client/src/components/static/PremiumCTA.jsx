@@ -16,18 +16,18 @@ const PremiumCTA = () => {
         <div className="absolute top-1/3 left-1/2 w-16 sm:w-24 md:w-32 h-16 sm:h-24 md:h-32 bg-primary-200/20 rounded-full blur-xl"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header Section */}
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
           <Badge className="bg-primary-700 rounded-full text-white px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
             🎓 Premium Application Service
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+          <h2 className="text-2xl sm:text-4xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
             Apply to Your Dream Universities, With Expert Guidance You Can Trust
-            <br className="hidden sm:block" />
-            <span className="text-primary-700">With Expert Guidance</span>
+           
+            <span className="text-primary-700 ml-2">With Expert Guidance</span>
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-2">
+          <p className="text-lg sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-2 sm:text-center text-justify">
             Do not face the U.S. admissions maze alone. Our expert counselors and real-time
             dashboard guide you step-by-step from shortlist to admit.
           </p>
@@ -187,7 +187,7 @@ const PremiumCTA = () => {
               </div>
             </div>
 
-            <div className="absolute -bottom-3 sm:-bottom-16 -left-2 sm:-left-8 bg-white rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-4 border">
+            <div className="absolute -bottom-12 sm:-bottom-16 -left-2 sm:-left-8 bg-white rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-4 border">
               <div className="text-center">
                 <div className="text-lg sm:text-2xl font-bold text-primary-700">200 Crore+</div>
                 <div className="text-[10px] sm:text-xs text-gray-600">Scholarships Won</div>
@@ -197,9 +197,9 @@ const PremiumCTA = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-8 sm:mt-12 md:mt-16">
+        <div className="text-center mt-16 sm:mt-12 md:mt-16">
           <div className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border max-w-4xl mx-auto">
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">
+            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">
               Transform Your Applications Today
             </h3>
             {/* <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-2">
@@ -208,7 +208,7 @@ const PremiumCTA = () => {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Button
                 size="default"
-                className="bg-primary-800   text-white px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-base w-full sm:w-auto"
+                className="bg-primary-800   text-white px-4 sm:px-8 py-2 sm:py-3 text-lg sm:text-xl w-full sm:w-auto"
                 onClick={() => navigate('/pricing')}
               >
                 View Plans
@@ -216,7 +216,7 @@ const PremiumCTA = () => {
               <Button
                 size="default"
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary/10 px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-base w-full sm:w-auto"
+                className="border-primary text-primary hover:bg-primary/10 px-4 sm:px-8 py-2 sm:py-3 text-lg sm:text-xl w-full sm:w-auto"
                 onClick={() => navigate('/signin')}
               >
                 Book Free Consultation

@@ -1085,7 +1085,7 @@ const Messages = () => {
                     className="w-10 h-10 rounded-full"
                 />
             </Avatar>
-{console.log(convo)}
+{/* {console.log(convo)} */}
             <div className="flex-1 overflow-hidden">
                 <h4 className="font-medium text-base truncate">
                     {convo.participants.student.name === "Student"

@@ -42,7 +42,7 @@ const AppSidebar = ({ isSidebarOpen }) => {
     // { id: 3, name: 'Timeline', icon: <ListChecks className="h-5 w-5" />, link: '/dashboard/timeline' },
     { id: 4, name: 'Checklist', icon: <CheckSquare className="h-5 w-5" />, link: '/dashboard/checklist' },
     { id: 5, name: 'Universities', icon: <School className="h-5 w-5" />, link: '/dashboard/universities' },
-    { id: 6, name: 'Edu Loan', icon: <BriefcaseBusiness className="h-5 w-5" />, link: '/dashboard/edu-loan' },
+    // { id: 6, name: 'Edu Loan', icon: <BriefcaseBusiness className="h-5 w-5" />, link: '/dashboard/edu-loan' },
     { id: 7, name: 'FAQs', icon: <HelpCircle className="h-5 w-5" />, link: '/dashboard/faq' },
     { id: 8, name: 'Documents', icon: <FileText className="h-5 w-5" />, link: '/dashboard/documents' },
     { id: 10, name: 'Messages', icon: <MessageSquare className="h-5 w-5" />, link: '/dashboard/chat' },
@@ -59,11 +59,11 @@ const AppSidebar = ({ isSidebarOpen }) => {
           </div>
         )} */}
 
-        <Link to="/" className="md:py-6 flex md:items-center md:space-x-3 px-1 "
+        <Link to="/" className="md:py-6 flex md:items-center md:space-x-3 px-1 mt-2 "
         >
           <>
             <img src="/logo.svg" height={40} width={40} />
-            <span className="text-2xl font-bold text-gray-900">Goupbroad</span>
+            <span className="text-2xl font-bold text-gray-900 ml-2 sm:ml-0">Goupbroad</span>
           </>
         </Link>
         {/* )} */}

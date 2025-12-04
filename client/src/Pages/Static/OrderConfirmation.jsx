@@ -275,7 +275,7 @@ const OrderConfirmation = () => {
             <CardContent>
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
+                  <div className="w-20 sm:w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
                     1
                   </div>
                   <div>
@@ -287,7 +287,7 @@ const OrderConfirmation = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
+                  <div className="w-16 sm:w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
                     2
                   </div>
                   <div>
@@ -299,7 +299,7 @@ const OrderConfirmation = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
+                  <div className="w-22 sm:w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
                     3
                   </div>
                   <div>
@@ -311,7 +311,7 @@ const OrderConfirmation = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
+                  <div className="w-12 sm:w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" style={{ backgroundColor: '#145044' }}>
                     4
                   </div>
                   <div>

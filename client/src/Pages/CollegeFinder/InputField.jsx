@@ -12,16 +12,30 @@ export const InputField = ({
   description = '',
   value,
   onChange,
-  hasError
+  hasError,
+  decimalAllowed = true // New prop: default true for number fields needing decimals (e.g., GPA)
 }) => {
   const inputRef = useRef(null);
 
   const handleInputChange = useCallback(
     (e) => {
-      const newValue = e.target.value;
+      let newValue = e.target.value;
+      // For number inputs, filter to allow only digits and optional decimal point
+      if (type === 'number') {
+        if (decimalAllowed) {
+          newValue = newValue.replace(/[^0-9.]/g, ''); // Allow digits and dots
+          // Ensure only one dot
+          const parts = newValue.split('.');
+          if (parts.length > 2) {
+            newValue = parts[0] + '.' + parts.slice(1).join('');
+          }
+        } else {
+          newValue = newValue.replace(/[^0-9]/g, ''); // Only digits, no decimals
+        }
+      }
       onChange(field, newValue);
     },
-    [field, onChange]
+    [field, onChange, type, decimalAllowed]
   );
 
   const handleRadioClick = useCallback(
@@ -41,9 +55,8 @@ export const InputField = ({
   // Always render description space (even if empty)
   const DescriptionBlock = () => (
     <p
-      className={`text-xs text-gray-500 min-h-[1.25rem] leading-tight transition-opacity duration-200 ${
-        description ? 'opacity-100' : 'opacity-0'
-      }`}
+      className={`text-xs text-gray-500 min-h-[1.25rem] leading-tight transition-opacity duration-200 ${description ? 'opacity-100' : 'opacity-0'
+        }`}
       aria-label={description || 'No description provided'}
     >
       {description || '\u00A0'} {/* Non-breaking space to maintain height */}
@@ -58,7 +71,7 @@ export const InputField = ({
         {hasError}
       </p>
     ) : (
-      <div className="h-[1.125rem]" /> 
+      <div className="h-[1.125rem]" />
     );
 
   // === SELECT ===
@@ -71,15 +84,16 @@ export const InputField = ({
           ref={inputRef}
           value={value || ''}
           onChange={handleInputChange}
-          className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors ${
-            hasError
+          className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors ${hasError
               ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
               : value
-              ? 'border-[#145044] focus:border-[#145044] focus:ring-[#145044]/20'
-              : 'border-gray-300 focus:border-[#145044] focus:ring-[#145044]/20'
-          }`}
+                ? 'border-[#145044] focus:border-[#145044] focus:ring-[#145044]/20'
+                : 'border-gray-300 focus:border-[#145044] focus:ring-[#145044]/20'
+            }`}
         >
-          <option value=""> {label}</option>
+          {/* <option value=""> {label}</option> */}
+          <option value=""> Select</option>
+
           {options?.map((opt) => (
             <option key={opt} value={opt}>
               {opt}
@@ -103,11 +117,10 @@ export const InputField = ({
               key={opt}
               type="button"
               onClick={() => handleRadioClick(opt)}
-              className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${
-                value === opt
+              className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${value === opt
                   ? 'border-[#145044] bg-[#145044] text-white'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-[#145044]'
-              }`}
+                }`}
             >
               {opt}
             </button>
@@ -143,7 +156,7 @@ export const InputField = ({
                 }}
                 className="h-4 w-4 text-[#145044] focus:ring-[#145044] border-gray-300 rounded"
               />
-              <label htmlFor={`${field}-${opt}`} className="ml-2given text-sm text-gray-700">
+              <label htmlFor={`${field}-${opt}`} className="ml-2 text-sm text-gray-700">
                 {opt}
               </label>
             </div>
@@ -162,17 +175,17 @@ export const InputField = ({
       <input
         ref={inputRef}
         type={type}
+        inputMode={type === 'number' ? (decimalAllowed ? 'decimal' : 'numeric') : undefined}
         value={value || ''}
         onChange={handleInputChange}
         placeholder={placeholder}
         autoComplete="off"
-        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors ${
-          hasError
+        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors ${hasError
             ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
             : value
-            ? 'border-[#145044] focus:border-[#145044] focus:ring-[#145044]/20'
-            : 'border-gray-300 focus:border-[#145044] focus:ring-[#145044]/20'
-        }`}
+              ? 'border-[#145044] focus:border-[#145044] focus:ring-[#145044]/20'
+              : 'border-gray-300 focus:border-[#145044] focus:ring-[#145044]/20'
+          }`}
       />
       <ErrorMessage />
     </div>
