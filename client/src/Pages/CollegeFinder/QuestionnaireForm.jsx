@@ -40,7 +40,7 @@ const QuestionnaireForm = () => {
   const [formData, setFormData] = useState({
     degreeLevel: '',
     program: '',
-    intakeMode: '',
+    intakeMode: 'Base Questions (Quick)',
     stemRequired: '',
     f1Required: '',
     gpa: '',
@@ -85,8 +85,9 @@ const QuestionnaireForm = () => {
 
   const [errors, setErrors] = useState({});
 
-  const isAdvanced = formData.intakeMode?.includes('Advanced');
-  const TOTAL_STEPS = useMemo(() => (isAdvanced ? 8 : 7), [isAdvanced]);
+  // const isAdvanced = formData.intakeMode?.includes('Advanced');
+  // const TOTAL_STEPS = useMemo(() => (isAdvanced ? 8 : 7), [isAdvanced]);
+  const TOTAL_STEPS = 6;
   const user = getUser();
   const getUserId = user?._id;
   const currentUserId = isAuthenticated() ? getUserId : 'guest';
@@ -211,13 +212,13 @@ const QuestionnaireForm = () => {
           isValid = false;
         }
         break;
+      // case 3:
+      //   if (!formData.intakeMode) {
+      //     newErrors.intakeMode = 'Required';
+      //     isValid = false;
+      //   }
+      //   break;
       case 3:
-        if (!formData.intakeMode) {
-          newErrors.intakeMode = 'Required';
-          isValid = false;
-        }
-        break;
-      case 4:
         if (isMaster) {
           if (!formData.stemRequired) newErrors.stemRequired = 'Required';
           if (!formData.f1Required) newErrors.f1Required = 'Required';
@@ -231,7 +232,7 @@ const QuestionnaireForm = () => {
           if (!formData.averageMarks) newErrors.averageMarks = 'Required';
         }
         break;
-      case 5:
+      case 4:
         if (isMaster) {
           if (!formData.universityTier) newErrors.universityTier = 'Required';
           if (!formData.undergradDegree) newErrors.undergradDegree = 'Required';
@@ -244,7 +245,7 @@ const QuestionnaireForm = () => {
           if (!formData.testTaken) newErrors.testTaken = 'Required';
         }
         break;
-      case 6:
+      case 5:
         if (!formData.englishTest) {
           newErrors.englishTest = 'Please select an option';
           isValid = false;
@@ -259,15 +260,15 @@ const QuestionnaireForm = () => {
           }
         }
         break;
-      case 7:
+      case 6:
         if (isBachelor) {
           if (!formData.extracurriculars) newErrors.extracurriculars = 'Required';
           if (!formData.intakeTarget) newErrors.intakeTarget = 'Required';
         }
         break;
-      case 8:
-        if (isMaster && !formData.intake) newErrors.intake = 'Required';
-        break;
+      // case 7:
+      //   if (isMaster && !formData.intake) newErrors.intake = 'Required';
+      //   break;
     }
 
     if (Object.keys(newErrors).length > 0) isValid = false;
@@ -275,15 +276,22 @@ const QuestionnaireForm = () => {
     return isValid;
   }, [currentStep, formData]);
 
+  // const nextStep = () => {
+  //   if (!validateStep()) return;
+  //   if (currentStep < TOTAL_STEPS) {
+  //     setCurrentStep(currentStep + 1);
+  //   } else {
+  //     handleGetUniversities();
+  //   }
+  // };
   const nextStep = () => {
     if (!validateStep()) return;
-    if (currentStep < TOTAL_STEPS) {
+    if (currentStep < 6) { // Always 6 steps
       setCurrentStep(currentStep + 1);
     } else {
       handleGetUniversities();
     }
   };
-
   const prevStep = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
@@ -373,13 +381,16 @@ const QuestionnaireForm = () => {
         degreeLength: isMaster
           ? formData.degreeLength === '3 years' ? '3 YEARS' : formData.degreeLength === '4 years' ? '4 YEARS' : null
           : null,
-        intakeMode: formData.intakeMode?.includes('Advanced') ? 'ADVANCED' : 'BASIC',
+        // intakeMode: formData.intakeMode?.includes('Advanced') ? 'ADVANCED' : 'BASIC',
+        intakeMode: 'BASIC',
         stemRequired: boolEnum(formData.stemRequired),
         f1Required: boolEnum(formData.f1Required),
         programDetails: {
           program: formData.program || null,
-          intake: formData.intake || formData.intakeTarget || null,
-          duration: formData.duration || null,
+          // intake: formData.intake || formData.intakeTarget || null,
+          intake: formData.intakeTarget || null,
+          // duration: formData.duration || null,
+          duration: null,
           validity: null,
         },
         schoolDetails: isBachelor
@@ -514,18 +525,18 @@ const QuestionnaireForm = () => {
             experienceIndustry: formData.experienceIndustry || null,
           }
           : { totalExperience: null, experienceIndustry: null },
-        leadershipActivities: formData.leadership?.has === 'Yes'
-          ? formData.leadership.details || 'Yes'
-          : formData.leadership?.has === 'No' ? 'No' : null,
-        researchPublications: formData.researchProjects || null,
-        certifications: formData.certifications?.has === 'Yes'
-          ? formData.certifications.details || 'Yes'
-          : formData.certifications?.has === 'No' ? 'No' : null,
-        visa: {
-          countriesPlanningToApply: ['USA'],
-          visaInterviewDate: null,
-          visaInterviewLocation: null,
-        },
+        // leadershipActivities: formData.leadership?.has === 'Yes'
+        //   ? formData.leadership.details || 'Yes'
+        //   : formData.leadership?.has === 'No' ? 'No' : null,
+        // researchPublications: formData.researchProjects || null,
+        // certifications: formData.certifications?.has === 'Yes'
+        //   ? formData.certifications.details || 'Yes'
+        //   : formData.certifications?.has === 'No' ? 'No' : null,
+        // visa: {
+        //   countriesPlanningToApply: ['USA'],
+        //   visaInterviewDate: null,
+        //   visaInterviewLocation: null,
+        // },
       };
 
       await updateUserProfile(transformedData);
