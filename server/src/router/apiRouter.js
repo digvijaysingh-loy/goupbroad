@@ -4,7 +4,7 @@ import universityController from '../controller/University/universityController.
 import apiController from '../controller/apiController/apiController.js'
 import { uploadFiles } from '../middleware/multerHandler.js'
 import authController from '../controller/authController/authController.js'
-import authentication, { paymentMiddleWare } from '../middleware/authentication.js'
+import authentication, { paymentMiddleWare, paymentMiddleWareForLLM } from '../middleware/authentication.js'
 import adminController from '../controller/adminController/adminController.js'
 import { adminEditorOnly, adminOnly, memberAccess } from '../middleware/rbacMiddleware.js'
 import categoryController from '../controller/faqController/categoryController.js'
@@ -60,8 +60,8 @@ router.route('/auth/failure').get(authController.oauthFailure)
 router.route('/payment/initiate').post(paymentMiddleWare, paymentController.initiatePayment);
 router.route('/payment/verify').post(paymentMiddleWare, paymentController.verifyPayment);
 
-router.route('/payment/initiateForLLMUpgrade').post(paymentMiddleWare, paymentController.initiatePaymentForLLMUpgrade);
-router.route('/payment/verifyForLLMUpgrade').post(paymentMiddleWare, paymentController.verifyPaymentForLLMUpgrade);
+router.route('/payment/initiateForLLMUpgrade').post(paymentMiddleWareForLLM, paymentController.initiatePaymentForLLMUpgrade);
+router.route('/payment/verifyForLLMUpgrade').post(paymentMiddleWareForLLM, paymentController.verifyPaymentForLLMUpgrade);
 
 
 // ******************** STUDENTS ROUTES ***********************************
