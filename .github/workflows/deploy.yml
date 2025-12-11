@@ -3,7 +3,7 @@ name: Deploy to VPS Server
 on:
   push:
     branches:
-      - goupbroad-dev
+      - goupbroad
   workflow_dispatch:
 
 jobs:
