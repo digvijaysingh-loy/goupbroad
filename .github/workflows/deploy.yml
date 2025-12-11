@@ -48,8 +48,8 @@ jobs:
             fi
 
             # Fetch and reset to match remote
-            git fetch origin goupbroad-dev
-            git reset --hard origin/goupbroad-dev
+            git fetch origin digvijay
+            git reset --hard origin/digvijay
 
             # Continue with deployment...
             if [ ! -f "docker-compose.prod.yml" ]; then
