@@ -3,7 +3,7 @@ name: Deploy to VPS Server
 on:
   push:
     branches:
-      - goupbroad
+      - digvijay
   workflow_dispatch:
 
 jobs:
