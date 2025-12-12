@@ -375,6 +375,7 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
     const a = document.createElement("a");
     a.href = url; a.download = "sample_transcript.csv"; a.click();
   };
+
   const validateCgpa = (value) => {
     setCgpa(value);
 
@@ -382,7 +383,6 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
       setCgpaError("CGPA is required");
       return false;
     }
-
     const num = parseFloat(value);
     if (isNaN(num)) {
       setCgpaError("Please enter a valid number");
@@ -392,7 +392,6 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
       setCgpaError("CGPA must be between 0 and 10");
       return false;
     }
-
     setCgpaError("");
     return true;
   };
@@ -431,7 +430,6 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
       toast.success("GPA calculated successfully!");
     }, 800);
   };
-
 
   const handleAuthSuccess = (token, user) => {
     setAuth({ accessToken: token, user });
@@ -510,7 +508,6 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
                   <p className="mt-2 text-sm text-red-600">{cgpaError}</p>
                 )}
               </div>
-
 
               <div className="flex justify-center space-x-4">
                 <Button onClick={handleCalculate} disabled={isCalculating || !!cgpaError || !cgpa} className="bg-[#145044] hover:bg-[#0f3c34]">
