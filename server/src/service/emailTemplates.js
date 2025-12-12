@@ -1,5 +1,5 @@
 export const OtpEmailTemplate = (otp) => {
-  const subject = 'Your Secure OTP Code - GoUpBroad';
+  const subject = 'Your Secure OTP Code - Goupbroad';
   const text = `Your OTP is: ${otp}. It is valid for the next 10 minutes. If you did not request this, please ignore this email.`;
 
   //const logoBase64 = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCA1NiA1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgPHJlY3Qgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iOCIgc3R5bGU9ImZpbGw6I0UxRkY5RTsiLz4KPC9zdmc+'; // (short placeholder ok)
@@ -12,7 +12,7 @@ export const OtpEmailTemplate = (otp) => {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>Verify Your OTP - GoUpBroad</title>
+    <title>Verify Your OTP - Goupbroad</title>
 
     <!--[if mso]>
       <style type="text/css">
@@ -141,7 +141,7 @@ export const OtpEmailTemplate = (otp) => {
                             <div class="notice">
                               <p style="margin:0;">
                                 <strong>Security Alert:</strong> Never share this OTP with anyone.
-                                The GoUpBroad team will <strong>never</strong> ask for your OTP via call, SMS, or email.
+                                The Goupbroad team will <strong>never</strong> ask for your OTP via call, SMS, or email.
                               </p>
                             </div>
                           </td>
@@ -179,7 +179,7 @@ export const OtpEmailTemplate = (otp) => {
                   <!-- Footer -->
                   <tr>
                     <td class="footer" style="background-color:#f4f7fb;">
-                      <p style="margin:6px 0;">© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                      <p style="margin:6px 0;">© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                       <p style="margin:6px 0;">This is an automated security email. Please do not reply.</p>
                       <p style="margin:6px 0;">
                         <a href="#">Unsubscribe</a> |
@@ -204,8 +204,8 @@ export const OtpEmailTemplate = (otp) => {
 };
 
 export const WelcomeEmailTemplate = (studentName ) => {
-  const subject = `Welcome to GoUpBroad, ${studentName || 'Student'}!`;
-  const text = `Hi ${studentName || 'Student'},\n\nWelcome to GoUpBroad! We're thrilled to have you on board.\n\nYour account is now active. Explore your dashboard, complete your first task, and start your learning journey.\n\nNeed help? We're here 24/7.\n\nBest regards,\nGoUpBroad Team`;
+  const subject = `Welcome to Goupbroad, ${studentName || 'Student'}!`;
+  const text = `Hi ${studentName || 'Student'},\n\nWelcome to Goupbroad! We're thrilled to have you on board.\n\nYour account is now active. Explore your dashboard, complete your first task, and start your learning journey.\n\nNeed help? We're here 24/7.\n\nBest regards,\nGoupbroad Team`;
 
   const html = `
   <!DOCTYPE html>
@@ -215,7 +215,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>Welcome to GoUpBroad!</title>
+    <title>Welcome to Goupbroad!</title>
 
     <!--[if mso]>
       <style type="text/css">
@@ -417,7 +417,7 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>New Submission Alert - GoUpBroad Admin</title>
+        <title>New Submission Alert - Goupbroad Admin</title>
         <style>
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -559,7 +559,7 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <h1 class="brand">GoUpBroad</h1>
+                <h1 class="brand">Goupbroad</h1>
                 <p>New Questionnaire Submission</p>
             </div>
 
@@ -592,7 +592,7 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
 
             <!-- Footer -->
             <div class="footer">
-                <p>© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                <p>© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                 <p>This is an automated admin alert.</p>
                 <p>
                     <a href="#">Unsubscribe</a> | 
@@ -608,8 +608,8 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
 };
 
 export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questionnaireTitle) => {
-    const subject = `Submission Received: ${questionnaireTitle} - GoUpBroad`;
-    const text = `Hi there,\n\nYour responses for "${questionnaireTitle}" under "${subtaskTitle}" in "${taskTitle}" have been successfully submitted.\n\nThank you for your participation!\n\nBest regards,\nGoUpBroad Team`;
+    const subject = `Submission Received: ${questionnaireTitle} - Goupbroad`;
+    const text = `Hi there,\n\nYour responses for "${questionnaireTitle}" under "${subtaskTitle}" in "${taskTitle}" have been successfully submitted.\n\nThank you for your participation!\n\nBest regards,\nGoupbroad Team`;
 
     const html = `
     <!DOCTYPE html>
@@ -617,7 +617,7 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Submission Confirmed - GoUpBroad</title>
+        <title>Submission Confirmed - Goupbroad</title>
         <style>
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -774,7 +774,7 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <h1 class="brand">GoUpBroad</h1>
+                <h1 class="brand">Goupbroad</h1>
                 <p>Questionnaire Submission Confirmed</p>
             </div>
 
@@ -811,7 +811,7 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
 
             <!-- Footer -->
             <div class="footer">
-                <p>© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                <p>© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                 <p>This is an automated confirmation email. Please do not reply.</p>
                 <p>
                     <a href="#">Unsubscribe</a> | 
@@ -828,8 +828,8 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
 };
 
 export const TaskAssignedTemplate = (studentName, taskTitle) => {
-    const subject = `New Task Assigned: ${taskTitle} - GoUpBroad`;
-    const text = `Hi ${studentName},\n\nA new task has been assigned to you!\n\nTask: ${taskTitle}\n\nHead over to your dashboard to view details and get started.\n\nBest regards,\nGoUpBroad Team`;
+    const subject = `New Task Assigned: ${taskTitle} - Goupbroad`;
+    const text = `Hi ${studentName},\n\nA new task has been assigned to you!\n\nTask: ${taskTitle}\n\nHead over to your dashboard to view details and get started.\n\nBest regards,\nGoupbroad Team`;
 
     const html = `
     <!DOCTYPE html>
@@ -837,7 +837,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>New Task Assigned - GoUpBroad</title>
+        <title>New Task Assigned - Goupbroad</title>
         <style>
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -1015,7 +1015,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <h1 class="brand">GoUpBroad</h1>
+                <h1 class="brand">Goupbroad</h1>
                 <p class="greeting">Hi ${studentName},</p>
             </div>
 
@@ -1054,7 +1054,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
 
             <!-- Footer -->
             <div class="footer">
-                <p>© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                <p>© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                 <p>This is an automated task assignment email.</p>
                 <p>
                     <a href="#">Unsubscribe</a> | 
