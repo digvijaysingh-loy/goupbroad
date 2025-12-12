@@ -376,25 +376,25 @@ Materials Lab,2019-Fall,1,Pass,passfail,`;
     a.href = url; a.download = "sample_transcript.csv"; a.click();
   };
 
-  const validateCgpa = (value) => {
-    setCgpa(value);
+  // const validateCgpa = (value) => {
+  //   setCgpa(value);
 
-    if (value === "") {
-      setCgpaError("CGPA is required");
-      return false;
-    }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
-      setCgpaError("Please enter a valid number");
-      return false;
-    }
-    if (num < 0 || num > 10) {
-      setCgpaError("CGPA must be between 0 and 10");
-      return false;
-    }
-    setCgpaError("");
-    return true;
-  };
+  //   if (value === "") {
+  //     setCgpaError("CGPA is required");
+  //     return false;
+  //   }
+  //   const num = parseFloat(value);
+  //   if (isNaN(num)) {
+  //     setCgpaError("Please enter a valid number");
+  //     return false;
+  //   }
+  //   if (num < 0 || num > 10) {
+  //     setCgpaError("CGPA must be between 0 and 10");
+  //     return false;
+  //   }
+  //   setCgpaError("");
+  //   return true;
+  // };
 
   const validateCgpa = (value) => {
     setCgpa(value);
