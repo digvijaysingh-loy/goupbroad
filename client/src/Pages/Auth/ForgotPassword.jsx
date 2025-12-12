@@ -158,7 +158,7 @@ const ForgotPassword = () => {
         {/* Left Side - Branding */}
         <div className="hidden lg:flex flex-col justify-center space-y-8 px-8">
           <div className="space-y-6">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
               <img src={logo} alt="Goupbroad Logo" className="w-[50px] h-[50px]" />
               <h1 className="text-3xl font-bold text-primary-700">Goupbroad</h1>
             </div>
@@ -187,7 +187,11 @@ const ForgotPassword = () => {
         </div>
 
         {/* Right Side - Form */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center flex-col justify-center">
+          <div className="flex mx-auto  md:hidden mb-4  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+            <img src={logo} alt="Goupbroadlogo" className='w-[40px] h-[40px] ' />
+            <h1 className="text-[26px] font-bold text-primary-700">Goupbroad</h1>
+          </div>
           <Card className="w-full max-w-md shadow-2xl border-0">
             <CardHeader className="space-y-2 text-center">
               <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
@@ -247,7 +251,7 @@ const ForgotPassword = () => {
               )}
 
               {/* STEP 2: OTP */}
-              {step === 'otp' && (
+              {/* {step === 'otp' && (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700">Verification Code</Label>
@@ -313,6 +317,83 @@ const ForgotPassword = () => {
                     disabled={isLoading || otp.length !== 6}
                   >
                     {isLoading ? 'Verifying...' : 'Verify'}
+                  </Button>
+                </form>
+              )} */}
+              {/* STEP 2: OTP */}
+              {step === 'otp' && (
+                <form onSubmit={handleVerifyOtp} className="space-y-6">
+                  <div className="space-y-4">
+                    <Label className="text-sm font-medium text-gray-700">Verification Code</Label>
+
+                    {/* Responsive OTP Container */}
+                    <div className="flex justify-center">
+                      <div className="w-full max-w-sm px-4">
+                        <OTPInput
+                          value={otp}
+                          onChange={setOtp}
+                          numInputs={6}
+                          renderInput={(props) => <input {...props} className="outline-none focus:ring-2 focus:ring-primary focus:border-primary" />}
+                          containerStyle={{ justifyContent: 'space-between', gap: '0.5rem' }}
+                          inputStyle={{
+                            width: '100%',
+                            maxWidth: '52px',
+                            height: '52px',
+                            fontSize: '1.25rem',
+                            border: '2px solid #e5e7eb',
+                            borderRadius: '0.5rem',
+                            textAlign: 'center',
+                          }}
+                          inputMode="numeric"
+                          shouldAutoFocus
+                        />
+                      </div>
+                    </div>
+
+                    {otpError && <p className="text-xs text-red-500 text-center -mt-2">{otpError}</p>}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 h-11"
+                      onClick={handleEditEmail}
+                    >
+                      <Edit2 className="h-4 w-4 mr-2" />
+                      Edit Email
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 h-11"
+                      onClick={handleResendOtp}
+                      disabled={isResendDisabled}
+                    >
+                      {isLoading ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : countdown > 0 ? (
+                        `Resend in ${countdown}s`
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Resend OTP
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-primary-800 text-white font-semibold"
+                    disabled={isLoading || otp.length !== 6}
+                  >
+                    {isLoading ? 'Verifying...' : 'Verify OTP'}
                   </Button>
                 </form>
               )}

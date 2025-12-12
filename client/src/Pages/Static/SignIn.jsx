@@ -307,10 +307,25 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
+  const [googleWidth, setGoogleWidth] = useState(320);
   const GOOGLE_CLIENT_ID =
     import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+ // match Google button width to card width (clamped 240–400)
+  useEffect(() => {
+    const updateWidth = () => {
+      const card = document.getElementById("auth-card-login");
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      const target = Math.round(rect.width);
+      console.log(target)
+      const clamped = Math.max(240, Math.min(400, target));
+      setGoogleWidth(clamped);
+    };
 
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
   useEffect(() => {
     // Clear any previous session data on component mount
     clearAuth();
@@ -437,9 +452,9 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-2">
 
-      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
+      <div  className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
         {/* Left Side - Branding & Info */}
         <div className="hidden lg:flex flex-col justify-center space-y-8 px-8">
           <div className="space-y-6">
@@ -478,8 +493,16 @@ const SignIn = () => {
         </div>
 
         {/* Right Side - Sign In Form */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center flex-col justify-center">
+          <div className="flex mx-auto -mt-24 md:hidden mb-4  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+            <img src={logo} alt="Goupbroadlogo" className='w-[40px] h-[40px] ' />
+            <h1 className="text-[26px] font-bold text-primary-700">Goupbroad</h1>
+          </div>
           <Card className="w-full max-w-md shadow-2xl border-0">
+            {/* <div className="flex mx-auto md:hidden  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+              <img src={logo} alt="Goupbroadlogo" className='w-[50px] h-[50px] ' />
+              <h1 className="text-3xl font-bold text-primary-700">Goupbroad</h1>
+            </div> */}
             <CardHeader className="space-y-2 text-center">
               <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
                 <div className="bg-primary p-2 rounded-lg">
@@ -582,20 +605,24 @@ const SignIn = () => {
                   <span className="bg-white px-2 text-gray-500">Or continue with</span>
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-3">
-                <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={handleGoogleFailure}
-                    ux_mode="popup"
-                    shape="rectangular"
-                    text="continue_with"
-                    size="large"
-                    theme="outline"
-                    width="100%"
-                  />
-                </GoogleOAuthProvider>
-              </div>
+             <div className="flex w-full justify-center">
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <div className="w-full">
+      <GoogleLogin
+        onSuccess={handleGoogleSuccess}
+        onError={handleGoogleFailure}
+        ux_mode="popup"
+        shape="rectangular"
+        text="continue_with"
+        width="100%"
+        containerProps={{
+          className: "w-full"
+        }}
+      />
+    </div>
+  </GoogleOAuthProvider>
+</div>
+
               <div className="text-center">
                 <span className="text-sm text-gray-600">
                   Don&apos;t have an account?{' '}

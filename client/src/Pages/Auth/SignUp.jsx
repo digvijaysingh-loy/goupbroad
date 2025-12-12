@@ -748,7 +748,7 @@ const SignUp = () => {
         {/* Left Side - Branding & Info */}
         <div className="hidden lg:flex flex-col justify-center space-y-8 px-8">
           <div className="space-y-6">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
               <img src={logo} alt="Goupbroadlogo" className='w-[50px] h-[50px] ' />
               <h1 className="text-3xl font-bold text-primary-700">Goupbroad</h1>
             </div>
@@ -786,7 +786,11 @@ const SignUp = () => {
         </div>
 
         {/* Right Side - Sign Up Form */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center flex-col justify-center">
+          <div className="flex mx-auto  md:hidden mb-2  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+            <img src={logo} alt="Goupbroadlogo" className='w-[40px] h-[40px] ' />
+            <h1 className="text-[26px] font-bold text-primary-700">Goupbroad</h1>
+          </div>
           <Card className="w-full max-w-md shadow-2xl border-0">
             <CardHeader className="space-y-2 text-center">
               <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
@@ -930,14 +934,14 @@ const SignUp = () => {
 
                 {/* Terms and Conditions - Only show if not otpSent or editing */}
                 {!otpSent || editingEmail ? (
-                  <div className="flex items-start space-x-2">
+                  <div className="flex items-start space-x-2" >
                     <Checkbox
                       id="terms"
                       checked={termsAccepted}
                       onCheckedChange={setTermsAccepted}
                     />
                     <Label htmlFor="terms" className="text-sm text-gray-600 leading-tight">
-                      I agree to the <Link to="#" className="text-primary hover:underline">Terms of Service</Link> and <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>
+                      <span> I agree to the <Link to="/terms-and-conditions" className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy-policy" className="text-primary hover:underline">Privacy Policy</Link></span>
                     </Label>
                   </div>
                 ) : null}
@@ -1002,30 +1006,22 @@ const SignUp = () => {
               </div>
 
               {/* Social Sign Up */}
-              <div className="grid grid-cols-1 gap-3">
+              <div className="flex w-full justify-center">
                 <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={handleGoogleFailure}
-                    ux_mode="popup"
-                    shape="rectangular"
-                    text="signup_with"
-                    size="large"
-                    theme="outline"
-                    width="100%"
-                  />
+                  <div className="w-full">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleFailure}
+                      ux_mode="popup"
+                      shape="rectangular"
+                      text="continue_with"
+                      width="100%"
+                      containerProps={{
+                        className: "w-full"
+                      }}
+                    />
+                  </div>
                 </GoogleOAuthProvider>
-                {/* <Button 
-                  variant="outline" 
-                  className="h-12"
-                  onClick={() => window.location.href = `${import.meta.env.VITE_SERVER_URL}/v1/auth/facebook`}
-                  type="button"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                  </svg>
-                  Facebook
-                </Button> */}
               </div>
 
               {/* Sign In Link */}
