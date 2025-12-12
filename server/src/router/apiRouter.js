@@ -4,7 +4,7 @@ import universityController from '../controller/University/universityController.
 import apiController from '../controller/apiController/apiController.js'
 import { uploadFiles } from '../middleware/multerHandler.js'
 import authController from '../controller/authController/authController.js'
-import authentication, { paymentMiddleWare } from '../middleware/authentication.js'
+import authentication, { paymentMiddleWare, paymentMiddleWareForLLM } from '../middleware/authentication.js'
 import adminController from '../controller/adminController/adminController.js'
 import { adminEditorOnly, adminOnly, memberAccess } from '../middleware/rbacMiddleware.js'
 import categoryController from '../controller/faqController/categoryController.js'
@@ -59,6 +59,9 @@ router.route('/auth/failure').get(authController.oauthFailure)
 // payment routes
 router.route('/payment/initiate').post(paymentMiddleWare, paymentController.initiatePayment);
 router.route('/payment/verify').post(paymentMiddleWare, paymentController.verifyPayment);
+
+router.route('/payment/initiateForLLMUpgrade').post(paymentMiddleWareForLLM, paymentController.initiatePaymentForLLMUpgrade);
+router.route('/payment/verifyForLLMUpgrade').post(paymentMiddleWareForLLM, paymentController.verifyPaymentForLLMUpgrade);
 
 
 // ******************** STUDENTS ROUTES ***********************************
@@ -214,6 +217,12 @@ router.route('/admin/tasks/:taskId')
 router.route('/admin/tasks/:taskId/responses')
     .get(memberAccess, taskController.getStudentQuestionnaireResponses);
 
+
+// route to update response
+
+router.route('/admin/tasks/:taskId/upload-documents')
+    .put(memberAccess, taskController.updateStudentQuestinnaireResponse);
+
 // Routes for managing subtasks (ADMIN only)
 router.route('/admin/tasks/:taskId/subtasks/add')
     .post(adminOnly, taskSubtaskAssignmentController.addSubtasksToTask);
@@ -274,6 +283,7 @@ router.route('/admin/student-university-assignments/:assignmentId')
 
 
 router.route('/admin/student-activities').get(memberAccess, adminController.getStudentActivities);
+router.route('/admin/student-activities/:activityId/mark-read').put(memberAccess, adminController.markStudentActivityAsRead);
 // ******************** ADMIN STUDENT UNIVERSITY ASSIGNMENT ROUTES END ***********************************
 
 // ********************  STUDENT UNIVERSITY ASSIGNMENT ROUTES  ***********************************

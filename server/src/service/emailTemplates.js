@@ -1,5 +1,5 @@
 export const OtpEmailTemplate = (otp) => {
-  const subject = 'Your Secure OTP Code - GoUpBroad';
+  const subject = 'Your Secure OTP Code - Goupbroad';
   const text = `Your OTP is: ${otp}. It is valid for the next 10 minutes. If you did not request this, please ignore this email.`;
 
   //const logoBase64 = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCA1NiA1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgPHJlY3Qgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iOCIgc3R5bGU9ImZpbGw6I0UxRkY5RTsiLz4KPC9zdmc+'; // (short placeholder ok)
@@ -12,7 +12,7 @@ export const OtpEmailTemplate = (otp) => {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>Verify Your OTP - GoUpBroad</title>
+    <title>Verify Your OTP - Goupbroad</title>
 
     <!--[if mso]>
       <style type="text/css">
@@ -141,7 +141,7 @@ export const OtpEmailTemplate = (otp) => {
                             <div class="notice">
                               <p style="margin:0;">
                                 <strong>Security Alert:</strong> Never share this OTP with anyone.
-                                The GoUpBroad team will <strong>never</strong> ask for your OTP via call, SMS, or email.
+                                The Goupbroad team will <strong>never</strong> ask for your OTP via call, SMS, or email.
                               </p>
                             </div>
                           </td>
@@ -179,7 +179,7 @@ export const OtpEmailTemplate = (otp) => {
                   <!-- Footer -->
                   <tr>
                     <td class="footer" style="background-color:#f4f7fb;">
-                      <p style="margin:6px 0;">© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                      <p style="margin:6px 0;">© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                       <p style="margin:6px 0;">This is an automated security email. Please do not reply.</p>
                       <p style="margin:6px 0;">
                         <a href="#">Unsubscribe</a> |
@@ -203,11 +203,9 @@ export const OtpEmailTemplate = (otp) => {
   return { subject, text, html };
 };
 
-
-
 export const WelcomeEmailTemplate = (studentName ) => {
-  const subject = `Welcome to GoUpBroad, ${studentName || 'Student'}!`;
-  const text = `Hi ${studentName || 'Student'},\n\nWelcome to GoUpBroad! We're thrilled to have you on board.\n\nYour account is now active. Explore your dashboard, complete your first task, and start your learning journey.\n\nNeed help? We're here 24/7.\n\nBest regards,\nGoUpBroad Team`;
+  const subject = `Welcome to Goupbroad, ${studentName || 'Student'}!`;
+  const text = `Hi ${studentName || 'Student'},\n\nWelcome to Goupbroad! We're thrilled to have you on board.\n\nYour account is now active. Explore your dashboard, complete your first task, and start your learning journey.\n\nNeed help? We're here 24/7.\n\nBest regards,\nGoupbroad Team`;
 
   const html = `
   <!DOCTYPE html>
@@ -217,7 +215,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>Welcome to GoUpBroad!</title>
+    <title>Welcome to Goupbroad!</title>
 
     <!--[if mso]>
       <style type="text/css">
@@ -306,7 +304,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
   <body>
     <!-- Preheader (hidden preview text) -->
     <div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0;">
-      Welcome to GoUpBroad—your account is active. Jump into your dashboard and start your journey!
+      Welcome to Goupbroad—your account is active. Jump into your dashboard and start your journey!
     </div>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f7fb;">
@@ -319,7 +317,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
                   <!-- Header -->
                   <tr>
                     <td class="header">
-                      <h1 class="brand" style="margin:0 0 12px;">GoUpBroad</h1>
+                      <h1 class="brand" style="margin:0 0 12px;">Goupbroad</h1>
                       <p class="greeting" style="margin:0;">Hi ${studentName || 'Student'}, Welcome Aboard!</p>
                     </td>
                   </tr>
@@ -334,7 +332,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
                             <div class="welcome-icon" aria-hidden="true">🎉</div>
                             <h2 class="welcome-title">You're All Set!</h2>
                             <p class="welcome-message">
-                              Your GoUpBroad account is now active. Get ready to learn, grow, and achieve your goals with personalized tasks and real-time feedback.
+                              Your Goupbroad account is now active. Get ready to learn, grow, and achieve your goals with personalized tasks and real-time feedback.
                             </p>
                           </div>
                         </td></tr>
@@ -349,13 +347,13 @@ export const WelcomeEmailTemplate = (studentName ) => {
 
                             <!--[if mso]>
                               <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-                                href="https://app.goupbroad.com/login" style="height:44px;v-text-anchor:middle;width:240px;" arcsize="12%" strokecolor="#145044" fillcolor="#145044">
+                                href="https://goupbroad.com/dashboard" style="height:44px;v-text-anchor:middle;width:240px;" arcsize="12%" strokecolor="#145044" fillcolor="#145044">
                                 <w:anchorlock/>
                                 <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:700;">Go to Dashboard</center>
                               </v:roundrect>
                             <![endif]-->
                             <!--[if !mso]><!-- -->
-                              <a href="https://app.goupbroad.com/login"
+                              <a href="https://goupbroad.com/dashboard"
                                  style="display:inline-block;background:#145044;color:#ffffff;padding:14px 32px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 4px 12px rgba(20,80,68,0.2);">
                                  Go to Dashboard
                               </a>
@@ -384,8 +382,8 @@ export const WelcomeEmailTemplate = (studentName ) => {
                   <!-- Footer -->
                   <tr>
                     <td class="footer">
-                      <p style="margin:6px 0;">© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
-                      <p style="margin:6px 0;">You're receiving this email because you signed up at GoUpBroad.</p>
+                      <p style="margin:6px 0;">© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
+                      <p style="margin:6px 0;">You're receiving this email because you signed up at Goupbroad.</p>
                       <p style="margin:6px 0;">
                         <a href="#">Unsubscribe</a> |
                         <a href="#">Privacy Policy</a> |
@@ -409,7 +407,6 @@ export const WelcomeEmailTemplate = (studentName ) => {
   return { subject, text, html };
 };
 
-
 export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, taskTitle, subtaskTitle, questionnaireTitle) => {
     const subject = `New Submission: ${questionnaireTitle} by ${studentName}`;
     const text = `A new questionnaire has been submitted.\n\nStudent: ${studentName} (${studentEmail})\nQuestionnaire: ${questionnaireTitle}\nSubtask: ${subtaskTitle}\nTask: ${taskTitle}\n\nPlease review in the admin dashboard.`;
@@ -420,7 +417,7 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>New Submission Alert - GoUpBroad Admin</title>
+        <title>New Submission Alert - Goupbroad Admin</title>
         <style>
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -562,7 +559,7 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <h1 class="brand">GoUpBroad</h1>
+                <h1 class="brand">Goupbroad</h1>
                 <p>New Questionnaire Submission</p>
             </div>
 
@@ -595,7 +592,7 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
 
             <!-- Footer -->
             <div class="footer">
-                <p>© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                <p>© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                 <p>This is an automated admin alert.</p>
                 <p>
                     <a href="#">Unsubscribe</a> | 
@@ -610,11 +607,9 @@ export const AdminQuestionnaireSubmissionTemplate = (studentEmail, studentName, 
     return { subject, text, html };
 };
 
-
-
 export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questionnaireTitle) => {
-    const subject = `Submission Received: ${questionnaireTitle} - GoUpBroad`;
-    const text = `Hi there,\n\nYour responses for "${questionnaireTitle}" under "${subtaskTitle}" in "${taskTitle}" have been successfully submitted.\n\nThank you for your participation!\n\nBest regards,\nGoUpBroad Team`;
+    const subject = `Submission Received: ${questionnaireTitle} - Goupbroad`;
+    const text = `Hi there,\n\nYour responses for "${questionnaireTitle}" under "${subtaskTitle}" in "${taskTitle}" have been successfully submitted.\n\nThank you for your participation!\n\nBest regards,\nGoupbroad Team`;
 
     const html = `
     <!DOCTYPE html>
@@ -622,7 +617,7 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Submission Confirmed - GoUpBroad</title>
+        <title>Submission Confirmed - Goupbroad</title>
         <style>
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -779,7 +774,7 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <h1 class="brand">GoUpBroad</h1>
+                <h1 class="brand">Goupbroad</h1>
                 <p>Questionnaire Submission Confirmed</p>
             </div>
 
@@ -816,7 +811,7 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
 
             <!-- Footer -->
             <div class="footer">
-                <p>© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                <p>© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                 <p>This is an automated confirmation email. Please do not reply.</p>
                 <p>
                     <a href="#">Unsubscribe</a> | 
@@ -832,10 +827,9 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
     return { subject, text, html };
 };
 
-
 export const TaskAssignedTemplate = (studentName, taskTitle) => {
-    const subject = `New Task Assigned: ${taskTitle} - GoUpBroad`;
-    const text = `Hi ${studentName},\n\nA new task has been assigned to you!\n\nTask: ${taskTitle}\n\nHead over to your dashboard to view details and get started.\n\nBest regards,\nGoUpBroad Team`;
+    const subject = `New Task Assigned: ${taskTitle} - Goupbroad`;
+    const text = `Hi ${studentName},\n\nA new task has been assigned to you!\n\nTask: ${taskTitle}\n\nHead over to your dashboard to view details and get started.\n\nBest regards,\nGoupbroad Team`;
 
     const html = `
     <!DOCTYPE html>
@@ -843,7 +837,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>New Task Assigned - GoUpBroad</title>
+        <title>New Task Assigned - Goupbroad</title>
         <style>
             body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
             table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -1021,7 +1015,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <h1 class="brand">GoUpBroad</h1>
+                <h1 class="brand">Goupbroad</h1>
                 <p class="greeting">Hi ${studentName},</p>
             </div>
 
@@ -1060,7 +1054,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
 
             <!-- Footer -->
             <div class="footer">
-                <p>© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
+                <p>© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
                 <p>This is an automated task assignment email.</p>
                 <p>
                     <a href="#">Unsubscribe</a> | 
@@ -1074,4 +1068,241 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
     `;
 
     return { subject, text, html };
+};
+
+
+export const PaymentConfirmationEmailTemplate = (data) => {
+  const {
+    studentName,
+    studentEmail,
+    planName,
+    planPrice,
+    orderId,
+    paymentId,
+    features = [],
+    category,
+  } = data;
+
+  const subject = 'Payment Confirmation - UpBroad';
+  const text = `Hi ${studentName},
+
+Thank you for your payment!
+
+Plan: ${planName}
+Category: ${category}
+Amount: ₹${planPrice}
+Order ID: ${orderId}
+Payment ID: ${paymentId}
+
+Your plan is now active. Welcome to UpBroad!
+`;
+
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Payment Confirmation - UpBroad</title>
+      <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #145044; color: white; padding: 30px 20px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background-color: #f9f9f9; padding: 30px 20px; border-radius: 0 0 10px 10px; }
+          .success-icon { width: 60px; height: 60px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 32px; }
+          .order-details { background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .order-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+          .order-row:last-child { border-bottom: none; }
+          .features-list { background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .feature-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+          .feature-item:last-child { border-bottom: none; }
+          .next-steps { background-color: #e8f5f3; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .step { margin: 15px 0; padding: 15px; background-color: white; border-radius: 5px; }
+          .step-number { display: inline-block; width: 25px; height: 25px; background-color: #145044; color: white; border-radius: 50%; text-align: center; line-height: 25px; margin-right: 10px; font-size: 12px; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+          .price { font-size: 24px; font-weight: bold; color: #145044; }
+          .badge { background-color: #145044; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+      </style>
+  </head>
+  <body>
+      <div class="header">
+          <div class="success-icon">✓</div>
+          <h1>Payment Successful!</h1>
+          <p>Thank you for choosing UpBroad. Your journey to success starts now!</p>
+      </div>
+      
+      <div class="content">
+          <div class="order-details">
+              <h2 style="color: #145044; margin-top: 0;">Order Summary</h2>
+              <div style="margin-bottom: 20px;">
+                  <h3 style="margin: 0;">${planName}</h3>
+                  <span class="badge">${category
+                    .charAt(0)
+                    .toUpperCase() + category.slice(1)}</span>
+              </div>
+              <div class="price">₹${planPrice.toLocaleString('en-IN')}</div>
+              <div style="color: #666; margin-top: 5px;">Paid</div>
+              
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                  <div class="order-row">
+                      <span>Order ID:</span>
+                      <span style="font-family: monospace; font-weight: bold;">${orderId}</span>
+                  </div>
+                  <div class="order-row">
+                      <span>Payment ID:</span>
+                      <span style="font-family: monospace; font-weight: bold;">${paymentId}</span>
+                  </div>
+                  <div class="order-row">
+                      <span>Date:</span>
+                      <span>${new Date().toLocaleDateString('en-IN')}</span>
+                  </div>
+                  <div class="order-row">
+                      <span>Customer:</span>
+                      <span>${studentName} (${studentEmail})</span>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="features-list">
+              <h3 style="color: #145044; margin-top: 0;">What's Included in Your Plan</h3>
+              ${
+                features && features.length
+                  ? features
+                      .map(
+                        (feature) =>
+                          `<div class="feature-item">✓ ${feature}</div>`
+                      )
+                      .join('')
+                  : '<div class="feature-item">✓ Access to your selected plan</div>'
+              }
+          </div>
+          
+          <div class="next-steps">
+              <h3 style="color: #145044; margin-top: 0;">What Happens Next?</h3>
+              <div class="step">
+                  <span class="step-number">1</span>
+                  <strong>Confirmation Email</strong><br>
+                  <small>You're reading it! Keep this email for your records.</small>
+              </div>
+              <div class="step">
+                  <span class="step-number">2</span>
+                  <strong>Counselor Assignment</strong><br>
+                  <small>Our team will assign a dedicated counselor to your case within 24-48 hours.</small>
+              </div>
+              <div class="step">
+                  <span class="step-number">3</span>
+                  <strong>Initial Consultation</strong><br>
+                  <small>Your counselor will schedule an initial consultation call to understand your goals.</small>
+              </div>
+              <div class="step">
+                  <span class="step-number">4</span>
+                  <strong>Get Started</strong><br>
+                  <small>Begin your journey with expert guidance every step of the way!</small>
+              </div>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #f0f8f6; border-radius: 8px;">
+              <h3 style="color: #145044; margin-top: 0;">Need Help?</h3>
+              <p style="margin: 10px 0;">Our support team is here to assist you</p>
+              <p style="margin: 5px 0;">📧 support@upbroad.com</p>
+              <p style="margin: 5px 0;">📞 +91 98765 43210</p>
+          </div>
+      </div>
+      
+      <div class="footer">
+          <p>© 2024 UpBroad. All rights reserved.</p>
+          <p>This is an automated email. Please do not reply to this email.</p>
+      </div>
+  </body>
+  </html>
+  `;
+
+  return { subject, text, html };
+};
+
+export const PaymentInitiationAdminEmailTemplate = (data) => {
+  const {
+    studentName,
+    studentEmail,
+    planName,
+    planPrice,
+    orderId,
+    category,
+  } = data;
+
+  const subject = 'New Payment Initiated - UpBroad';
+  const text = `New payment initiated on UpBroad:
+
+Student: ${studentName} (${studentEmail})
+Plan: ${planName}
+Category: ${category}
+Amount: ₹${planPrice}
+Order ID: ${orderId}
+Date: ${new Date().toLocaleString('en-IN')}
+
+This is an initiation notification. Final status depends on verification and capture.`;
+
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Payment Initiated - UpBroad</title>
+      <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #145044; color: white; padding: 24px 20px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background-color: #f9f9f9; padding: 24px 20px; border-radius: 0 0 10px 10px; }
+          .order-details { background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .order-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+          .order-row:last-child { border-bottom: none; }
+          .badge { background-color: #145044; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+          .price { font-size: 20px; font-weight: bold; color: #145044; }
+          .footer { text-align: center; padding: 16px; color: #666; font-size: 13px; }
+      </style>
+  </head>
+  <body>
+      <div class="header">
+          <h2>New Payment Initiated</h2>
+          <p>A student has initiated a payment on UpBroad.</p>
+      </div>
+      <div class="content">
+          <div class="order-details">
+              <h3 style="margin-top:0;color:#145044;">Payment Details</h3>
+              <div class="order-row">
+                  <span>Student:</span>
+                  <span>${studentName} (${studentEmail})</span>
+              </div>
+              <div class="order-row">
+                  <span>Plan:</span>
+                  <span>${planName}</span>
+              </div>
+              <div class="order-row">
+                  <span>Category:</span>
+                  <span class="badge">${category
+                    .charAt(0)
+                    .toUpperCase() + category.slice(1)}</span>
+              </div>
+              <div class="order-row">
+                  <span>Order ID:</span>
+                  <span style="font-family: monospace;">${orderId}</span>
+              </div>
+              <div class="order-row">
+                  <span>Amount:</span>
+                  <span class="price">₹${planPrice.toLocaleString('en-IN')}</span>
+              </div>
+              <div class="order-row">
+                  <span>Date:</span>
+                  <span>${new Date().toLocaleDateString('en-IN')}</span>
+              </div>
+          </div>
+          <p>This is just an initiation notification. Final status will depend on the payment verification and capture.</p>
+      </div>
+      <div class="footer">
+          <p>© 2024 UpBroad. Internal notification email.</p>
+      </div>
+  </body>
+  </html>
+  `;
+
+  return { subject, text, html };
 };
