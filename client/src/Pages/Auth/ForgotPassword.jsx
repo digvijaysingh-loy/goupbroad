@@ -188,18 +188,19 @@ const ForgotPassword = () => {
 
         {/* Right Side - Form */}
         <div className="flex items-center flex-col justify-center">
-          <div className="flex mx-auto  md:hidden mb-4  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-            <img src={logo} alt="Goupbroadlogo" className='w-[40px] h-[40px] ' />
-            <h1 className="text-[26px] font-bold text-primary-700">Goupbroad</h1>
-          </div>
+
           <Card className="w-full max-w-md shadow-2xl border-0">
             <CardHeader className="space-y-2 text-center">
-              <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
+              <div className="flex mx-auto  md:hidden mb-4  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+                <img src={logo} alt="Goupbroadlogo" className='w-[40px] h-[40px] ' />
+                <h1 className="text-[26px] font-bold text-primary-700">Goupbroad</h1>
+              </div>
+              {/* <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
                 <div className="bg-primary p-2 rounded-lg">
                   <Lock className="h-6 w-6 text-white" />
                 </div>
                 <span className="text-xl font-bold text-primary">Reset Password</span>
-              </div>
+              </div> */}
               <CardTitle className="text-2xl font-bold text-gray-800">
                 {step === 'otp' ? 'Verify OTP' : step === 'newPassword' ? 'New Password' : 'Forgot Password'}
               </CardTitle>

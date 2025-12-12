@@ -495,22 +495,23 @@ const SignIn = () => {
 
           {/* Right Side - Sign In Form */}
           <div className="flex items-center flex-col justify-center">
-            <div className="flex mx-auto mt-2 md:hidden mb-4 items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-              <img src={logo} alt="Goupbroadlogo" className='w-[40px] h-[40px] ' />
-              <h1 className="text-[26px] font-bold text-primary-700">Goupbroad</h1>
-            </div>
+
             <Card id="signin-card" className="w-full max-w-md shadow-2xl border-0">
+              <div className="flex mx-auto mt-2 md:hidden  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+                <img src={logo} alt="Goupbroadlogo" className='w-[40px] h-[40px] ' />
+                <h1 className="text-[26px] font-bold text-primary-700">Goupbroad</h1>
+              </div>
               {/* <div className="flex mx-auto md:hidden  items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
               <img src={logo} alt="Goupbroadlogo" className='w-[50px] h-[50px] ' />
               <h1 className="text-3xl font-bold text-primary-700">Goupbroad</h1>
             </div> */}
               <CardHeader className="space-y-2 text-center">
-                <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
+                {/* <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
                   <div className="bg-primary p-2 rounded-lg">
                     <GraduationCap className="h-6 w-6 text-white" />
                   </div>
                   <span className="text-xl font-bold text-primary">StudyAbroad</span>
-                </div>
+                </div> */}
                 <CardTitle className="text-2xl font-bold text-gray-800">Sign In</CardTitle>
                 <CardDescription className="text-gray-600">
                   Enter your credentials to access your account
