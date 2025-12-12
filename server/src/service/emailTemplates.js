@@ -304,7 +304,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
   <body>
     <!-- Preheader (hidden preview text) -->
     <div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0;">
-      Welcome to GoUpBroad—your account is active. Jump into your dashboard and start your journey!
+      Welcome to Goupbroad—your account is active. Jump into your dashboard and start your journey!
     </div>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f7fb;">
@@ -317,7 +317,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
                   <!-- Header -->
                   <tr>
                     <td class="header">
-                      <h1 class="brand" style="margin:0 0 12px;">GoUpBroad</h1>
+                      <h1 class="brand" style="margin:0 0 12px;">Goupbroad</h1>
                       <p class="greeting" style="margin:0;">Hi ${studentName || 'Student'}, Welcome Aboard!</p>
                     </td>
                   </tr>
@@ -332,7 +332,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
                             <div class="welcome-icon" aria-hidden="true">🎉</div>
                             <h2 class="welcome-title">You're All Set!</h2>
                             <p class="welcome-message">
-                              Your GoUpBroad account is now active. Get ready to learn, grow, and achieve your goals with personalized tasks and real-time feedback.
+                              Your Goupbroad account is now active. Get ready to learn, grow, and achieve your goals with personalized tasks and real-time feedback.
                             </p>
                           </div>
                         </td></tr>
@@ -347,13 +347,13 @@ export const WelcomeEmailTemplate = (studentName ) => {
 
                             <!--[if mso]>
                               <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-                                href="https://app.goupbroad.com/login" style="height:44px;v-text-anchor:middle;width:240px;" arcsize="12%" strokecolor="#145044" fillcolor="#145044">
+                                href="https://goupbroad.com/dashboard" style="height:44px;v-text-anchor:middle;width:240px;" arcsize="12%" strokecolor="#145044" fillcolor="#145044">
                                 <w:anchorlock/>
                                 <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:700;">Go to Dashboard</center>
                               </v:roundrect>
                             <![endif]-->
                             <!--[if !mso]><!-- -->
-                              <a href="https://app.goupbroad.com/login"
+                              <a href="https://goupbroad.com/dashboard"
                                  style="display:inline-block;background:#145044;color:#ffffff;padding:14px 32px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 4px 12px rgba(20,80,68,0.2);">
                                  Go to Dashboard
                               </a>
@@ -382,8 +382,8 @@ export const WelcomeEmailTemplate = (studentName ) => {
                   <!-- Footer -->
                   <tr>
                     <td class="footer">
-                      <p style="margin:6px 0;">© 2025 <strong>GoUpBroad</strong>. All rights reserved.</p>
-                      <p style="margin:6px 0;">You're receiving this email because you signed up at GoUpBroad.</p>
+                      <p style="margin:6px 0;">© 2025 <strong>Goupbroad</strong>. All rights reserved.</p>
+                      <p style="margin:6px 0;">You're receiving this email because you signed up at Goupbroad.</p>
                       <p style="margin:6px 0;">
                         <a href="#">Unsubscribe</a> |
                         <a href="#">Privacy Policy</a> |
