@@ -168,7 +168,7 @@ export const OtpEmailTemplate = (otp) => {
                               <h3>Need Help?</h3>
                               <p>Our support team is here 24/7</p>
                               <p><a href="mailto:support@goupbroad.com">support@goupbroad.com</a></p>
-                              <p><a href="tel:+919876543210">+91 98765 43210</a></p>
+                              <p><a href="tel:+14156722765">+1 415 672 2765</a></p>
                             </div>
                           </td>
                         </tr>
@@ -372,7 +372,7 @@ export const WelcomeEmailTemplate = (studentName ) => {
                             <h3>We're Here to Help</h3>
                             <p>Any questions? Reach out anytime.</p>
                             <p><a href="mailto:support@goupbroad.com">support@goupbroad.com</a></p>
-                            <p><a href="tel:+919876543210">+91 98765 43210</a></p>
+                            <p><a href="tel:+14156722765">+1 415 672 2765</a></p>
                           </div>
                         </td></tr>
                       </table>
@@ -805,7 +805,7 @@ export const QuestionnaireSubmissionTemplate = (taskTitle, subtaskTitle, questio
                     <h3>Need Assistance?</h3>
                     <p>Our support team is here 24/7</p>
                     <p><a href="mailto:support@goupbroad.com">support@goupbroad.com</a></p>
-                    <p><a href="tel:+919876543210">+91 98765 43210</a></p>
+                    <p><a href="tel:+14156722765">+1 415 672 2765</a></p>
                 </div>
             </div>
 
@@ -1048,7 +1048,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
                     <h3>Need Help?</h3>
                     <p>We're here 24/7 to assist you</p>
                     <p><a href="mailto:support@goupbroad.com">support@goupbroad.com</a></p>
-                    <p><a href="tel:+919876543210">+91 98765 43210</a></p>
+                    <p><a href="tel:+14156722765">+1 415 672 2765</a></p>
                 </div>
             </div>
 
@@ -1204,7 +1204,7 @@ Your plan is now active. Welcome to UpBroad!
               <h3 style="color: #145044; margin-top: 0;">Need Help?</h3>
               <p style="margin: 10px 0;">Our support team is here to assist you</p>
               <p style="margin: 5px 0;">📧 support@upbroad.com</p>
-              <p style="margin: 5px 0;">📞 +91 98765 43210</p>
+              <p style="margin: 5px 0;">📞 +1 415 672 2765</p>
           </div>
       </div>
       
