@@ -14,10 +14,10 @@ const About = () => {
   const navigate = useNavigate()
 
   const impactStats = [
-    { number: '20,000+', label: 'Students Guided', icon: Users, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-    { number: '700+', label: 'Partner Universities', icon: University, color: 'text-green-600', bgColor: 'bg-green-50' },
-    { number: '₹100+ Cr', label: 'Scholarships Secured', icon: Award, color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
-    { number: '98%', label: 'Visa Success Rate', icon: CheckCircle, color: 'text-purple-600', bgColor: 'bg-purple-50' }
+    { number: '1k+', label: 'Students Helped', icon: Users, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+    { number: '500+', label: 'Mentors', icon: Users, color: 'text-green-600', bgColor: 'bg-green-50' },
+    { number: '200 Crores', label: 'Scholarships Secured', icon: Award, color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+    { number: '100%', label: 'Student Success Rate', icon: CheckCircle, color: 'text-purple-600', bgColor: 'bg-purple-50' }
   ];
 
   const values = [
@@ -42,27 +42,26 @@ const About = () => {
                 About Goupbroad
               </Badge>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                To bring everyone&apos;s{' '}
-                <span className="text-primary">study abroad dream</span>{' '}
-                to life
+              <h1 className="text-2xl sm:text-4xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                100% Unbiased Admissions Guidance. No Tie-Ups. No Agendas.
               </h1>
 
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                Goupbroad is an all-in-one platform for aspirants to connect and collaborate
-                with fellow students and counselling experts creating a community that strives
-                to make every study abroad aspiration a dream come true.
+                At Upbroad, we guide you to the best-fit university for you—
+                not the ones consultants are paid to promote. We have zero
+                partner universities, ensuring our recommendations are 100%
+                unbiased.
               </p>
 
               {/* Mobile Stats */}
               <div className="grid grid-cols-2 gap-4 sm:gap-6 py-4">
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-primary">20,000+</div>
-                  <div className="text-sm text-gray-600">Students Guided</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-primary">1k+</div>
+                  <div className="text-sm text-gray-600">Students Helped</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-primary">700+</div>
-                  <div className="text-sm text-gray-600">Partner Universities</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-primary">100%</div>
+                  <div className="text-sm text-gray-600">Students Success Rate </div>
                 </div>
               </div>
 
@@ -82,15 +81,15 @@ const About = () => {
                 className="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg shadow-lg"
               />
 
-              <Card className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 bg-white/95 backdrop-blur-sm border-0 shadow-lg w-11/12 sm:w-auto">
+              <Card className="absolute bottom-2 right-4 sm:bottom-6 sm:right-4 bg-white/95 backdrop-blur-sm border-0 shadow-lg w-auto sm:w-auto">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-primary" />
+                      <Users className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-gray-900">Global Community</div>
-                      <div className="text-xs text-gray-600">25+ Countries Connected</div>
+                      <div className="text-sm font-semibold text-gray-900">500+</div>
+                      <div className="text-xs text-gray-600">Mentors</div>
                     </div>
                   </div>
                 </CardContent>
@@ -133,16 +132,20 @@ const About = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div className="space-y-5 order-2 lg:order-1">
               <Badge variant="outline" className="mb-3 border-primary-700 rounded-full text-primary-700 text-sm">Our Story</Badge>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">15+ Years of Excellence in Global Education</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">We Were Misled. Now We Lead—1,000+ Students,
+                ₹200 Cr+ Scholarships.</h2>
               <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed">
                 <p>
-                  Goupbroad was founded with a vision to democratize access to world-class education for Indian students.
-                  What started as a mission to help a few students has grown into India&apos;s most trusted study abroad consultancy.
+                  What began as our response to being misled by consultancies has
+                  grown into a mission to support students transparently. Today,
+                  we’ve guided 1,000+ students to over ₹200 crore in scholarships
+                  and admits to institutions like Harvard, Wharton, Columbia, MIT,
+                  and Northwestern.
                 </p>
-                <p>
+                {/* <p>
                   With a team of experienced counselors and a network spanning across the globe,
                   we continue to innovate and evolve our services to meet the changing landscape of international education.
-                </p>
+                </p> */}
               </div>
             </div>
             <div className="order-1 lg:order-2">
@@ -167,8 +170,8 @@ const About = () => {
 
           <Tabs defaultValue="anushk" className="max-w-4xl mx-auto">
             <TabsList className="grid w-full grid-cols-2 mb-6 text-sm sm:text-base">
-              <TabsTrigger value="anushk">Anushk Sharma</TabsTrigger>
-              <TabsTrigger value="shrey">Shrey Choksi</TabsTrigger>
+              <TabsTrigger value="anushk" className="cursor-pointer">Anushk Sharma</TabsTrigger>
+              <TabsTrigger value="shrey" className="cursor-pointer">Shrey Choksi</TabsTrigger>
             </TabsList>
 
             <TabsContent value="anushk" className="mt-4">
@@ -184,16 +187,21 @@ const About = () => {
                         <p className="text-primary font-medium">Co-Founder & CEO</p>
                       </div>
                     </div>
-                    <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed">
-                      <p>Anushk completed his bachelor&apos;s degree in Mechanical Engineering from Medi Caps University in India...</p>
-                      <p>In his quest for admission, Anushk sought assistance from a &quot;reputed local consultancy service in Indore&quot;...</p>
+                    <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed text-justify">
+                      <p>Anushk completed his bachelor’s from a Tier-3 university in India
+                        and was misled by multiple consultancies, which led him to
+                        handle his master’s applications himself. He secured admits from
+                        Kellogg, Columbia, and Notre Dame, ultimately choosing Notre
+                        Dame with a substantial scholarship. Today, he also creates
+                        content focused on immigrant journeys and life in the U.S.</p>
+                      {/* <p>In his quest for admission, Anushk sought assistance from a &quot;reputed local consultancy service in Indore&quot;...</p> */}
                     </div>
-                    <div className="mt-5 flex flex-wrap gap-2">
+                    <div className="mt-5 flex flex-col gap-2">
                       <Badge variant="secondary" className="bg-blue-50 text-blue-700 text-xs sm:text-sm">University of Notre Dame</Badge>
-                      <Badge variant="secondary" className="bg-green-50 text-green-700 text-xs sm:text-sm">Mechanical Engineering</Badge>
+                      <Badge variant="secondary" className="bg-green-50 text-green-700 text-xs sm:text-sm">Master’s in Management</Badge>
                     </div>
                   </div>
-                  <div className="bg-gray-50 p-8 flex items-center justify-center order-1 lg:order-2">
+                  <div className=" p-8 flex items-center justify-center order-1 lg:order-2">
                     <img
                       src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&w=300&h=300&fit=crop&crop=face"
                       alt="Anushk Sharma"
@@ -217,16 +225,22 @@ const About = () => {
                         <p className="text-primary font-medium">Co-Founder & CTO</p>
                       </div>
                     </div>
-                    <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed">
-                      <p>After completing his Bachelor&apos;s in Electronics and Communication, Shrey embarked on a transformative journey...</p>
-                      <p>Like many students, Shrey initially sought help from traditional agencies...</p>
+                    <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed text-justify">
+                      <p>Shrey completed his bachelor’s in Electronics and
+                        Communication Engineering and decided to pursue a master’s
+                        in the U.S. After facing a poor experience with Indian
+                        consultancies, he handled the entire application process
+                        himself and secured admits from UC Berkeley, UMass Amherst,
+                        and Florida State University—with a full tuition waiver. He
+                        ultimately chose Florida State University.</p>
+                      {/* <p>Like many students, Shrey initially sought help from traditional agencies...</p> */}
                     </div>
-                    <div className="mt-5 flex flex-wrap gap-2">
+                    <div className="mt-5 flex flex-col gap-2">
                       <Badge variant="secondary" className="bg-purple-50 text-purple-700 text-xs sm:text-sm">Florida State University</Badge>
                       <Badge variant="secondary" className="bg-orange-50 text-orange-700 text-xs sm:text-sm">Computer Science</Badge>
                     </div>
                   </div>
-                  <div className="bg-gray-50 p-8 flex items-center justify-center order-1 lg:order-2">
+                  <div className=" p-8 flex items-center justify-center order-1 lg:order-2">
                     <img
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=300&h=300&fit=crop&crop=face"
                       alt="Shrey Choksi"

@@ -10,7 +10,7 @@ const CTA = () => {
   const highlights = [
     // { icon: CheckCircle, text: 'Free Platform Access', color: 'text-green-400' },
     { icon: Users, text: 'Expert Guidance Available', color: 'text-blue-400' },
-    { icon: Globe, text: 'Global University Network', color: 'text-purple-400' },
+    { icon: Globe, text: 'Global Alumni Network', color: 'text-purple-400' },
     { icon: Award, text: 'Scholarship Opportunities', color: 'text-yellow-400' }
   ];
 
@@ -39,15 +39,17 @@ const CTA = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link to="/signin">
-              <Button
-                size="lg"
-                className="bg-white text-primary-700 hover:bg-gray-100 w-[320px] sm:w-[350px] px-8 py-6 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
-              >
-                Book My Free Consultation
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
+
+            <Button
+              size="lg"
+              className="bg-white text-primary-700 hover:bg-gray-100 w-[320px] sm:w-[350px] cursor-pointer px-8 py-6 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
+              onClick={() => window.open('https://linktr.ee/goupbroad', '_blank', 'noopener,noreferrer')}
+
+            >
+              Book My Free Consultation
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+
             {/* <Link to="/signin">
               <Button
                 variant="outline"
@@ -78,19 +80,19 @@ const CTA = () => {
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">98%</div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">100%</div>
                 <div className="text-primary-100 text-sm">Success Rate</div>
                 <div className="text-xs text-primary-200 mt-1">Students get admitted</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">$50M+</div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">200 Crores</div>
                 <div className="text-primary-100 text-sm">Scholarships Found</div>
                 <div className="text-xs text-primary-200 mt-1">Total funding secured</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">25+</div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">Alumni in 10+</div>
                 <div className="text-primary-100 text-sm">Countries</div>
-                <div className="text-xs text-primary-200 mt-1">Universities available</div>
+                {/* <div className="text-xs text-primary-200 mt-1">Universities available</div> */}
               </div>
             </div>
           </CardContent>

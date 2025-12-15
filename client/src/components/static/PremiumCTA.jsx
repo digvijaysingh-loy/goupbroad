@@ -208,7 +208,7 @@ const PremiumCTA = () => {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Button
                 size="default"
-                className="bg-primary-800   text-white px-4 sm:px-8 py-2 sm:py-3 text-lg sm:text-xl w-full sm:w-auto"
+                className="bg-primary-800   text-white px-4 cursor-pointer sm:px-8 py-2 sm:py-3 text-lg sm:text-xl w-full sm:w-auto"
                 onClick={() => navigate('/pricing')}
               >
                 View Plans
@@ -216,8 +216,8 @@ const PremiumCTA = () => {
               <Button
                 size="default"
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary/10 px-4 sm:px-8 py-2 sm:py-3 text-lg sm:text-xl w-full sm:w-auto"
-                onClick={() => navigate('/signin')}
+                className="border-primary text-primary hover:bg-primary/10 cursor-pointer px-4 sm:px-8 py-2 sm:py-3 text-lg sm:text-xl w-full sm:w-auto"
+                onClick={() => window.open('https://linktr.ee/goupbroad', '_blank', 'noopener,noreferrer')}
               >
                 Book Free Consultation
               </Button>

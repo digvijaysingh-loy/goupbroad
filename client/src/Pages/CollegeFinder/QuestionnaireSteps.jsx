@@ -61,7 +61,7 @@ const Step2 = memo(({ formData, errors, handleInputChange }) => {
         field="program"
         type="select"
         options={isMaster
-          ? ['MSCS', 'MBA', 'MS Finance', 'MS Marketing', 'MS Data Science', 'Engineering', 'MS Business Analytics', 'MS Management', 'MS Accounting']
+          ? ['MS in Computer Science', 'MS in Data Science', 'MS in Business Analytics', 'MS in Artificial Intelligence', 'MS in Cybersecurity', 'MS in Information Systems', 'MS in Software Engineering', 'MS in Electrical Engineering', 'MS in Mechanical Engineering','MS in Industrial Engineering','MS in Civil Engineering','MS in Computer Engineering','MS in Engineering Management','MS in Finance','MS in Accounting','MS in Economics','MS in Public Health','MS in Biotechnology','MS in Environmental Science','MS in Marketing Analytics','MBA']
           : ['Computer Science', 'Business', 'Biology', 'Design']}
         required
         value={formData.program}
@@ -136,12 +136,12 @@ const Step5Master = memo(({ formData, errors, handleInputChange }) => (
     </div>
     <Field label="Q7. What is the tier of your university?" field="universityTier" type="select" options={['IIT', 'NIT', 'Tier-1', 'Tier-2', 'Tier-3']} required value={formData.universityTier} onChange={handleInputChange} hasError={!!errors.universityTier} />
     <Field label="Q8. What is the name of your undergraduate degree?" field="undergradDegree" placeholder="e.g., Computer Science" required value={formData.undergradDegree} onChange={handleInputChange} hasError={!!errors.undergradDegree} />
-    {(formData.program === 'MSCS' || formData.program === 'MS Data Science') && (
+    {/* {(formData.program === 'MSCS' || formData.program === 'MS Data Science') && (
       <Field label="Q9. Did your degree include Mathematics, Programming, and Statistics coursework?" field="mathProgrammingStats" type="radio" options={['Yes', 'No']} required value={formData.mathProgrammingStats} onChange={handleInputChange} hasError={!!errors.mathProgrammingStats} />
-    )}
+    )} */}
     <div className="grid md:grid-cols-2 gap-4">
-      <Field label="Q10. Was your undergraduate program 3 years or 4 years?" field="degreeLength" type="select" options={['3 years', '4 years']} required value={formData.degreeLength} onChange={handleInputChange} hasError={!!errors.degreeLength} />
-      <Field label="Q11. Have you completed any master's degree?" field="mastersDegree" type="radio" options={['Yes', 'No']} required value={formData.mastersDegree} onChange={handleInputChange} hasError={!!errors.mastersDegree} />
+      <Field label="Q9. Was your undergraduate program 3 years or 4 years?" field="degreeLength" type="select" options={['3 years', '4 years']} required value={formData.degreeLength} onChange={handleInputChange} hasError={!!errors.degreeLength} />
+      <Field label="Q10. Have you completed any master's degree?" field="mastersDegree" type="radio" options={['Yes', 'No']} required value={formData.mastersDegree} onChange={handleInputChange} hasError={!!errors.mastersDegree} />
     </div>
   </div>
 ));
@@ -170,7 +170,7 @@ const Step5Bachelor = memo(({ formData, errors, handleInputChange }) => (
 ));
 const Step6EnglishTests = memo(({ formData, errors, handleInputChange, setErrors, isMaster }) => { // Destructure isMaster
   const canEdit = formData.englishTest === 'Yes';
-  const englishQNumber = isMaster ? 12 : 10; // Dynamic: 12 for Master (after Q11), 10 for Bachelor (after Q9)
+  const englishQNumber = isMaster ? 11 : 10; // Dynamic: 12 for Master (after Q11), 10 for Bachelor (after Q9)
 
   const handleTestChange = (field, value) => {
     handleInputChange(field, value);
@@ -430,21 +430,21 @@ const Step7Final = memo(({ formData, errors, handleInputChange, isLastStep, data
         <p className="text-gray-600 text-sm">GRE / GMAT and professional background</p>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <Field label="Q13. GRE Quant" field="greQuant" type="number" placeholder="e.g., 165" value={formData.greQuant} onChange={handleInputChange} />
-        <Field label="Q14.GRE Verbal" field="greVerbal" type="number" placeholder="e.g., 155" value={formData.greVerbal} onChange={handleInputChange} />
+        <Field label="Q12. GRE Quant" field="greQuant" type="number" placeholder="e.g., 165" value={formData.greQuant} onChange={handleInputChange} />
+        <Field label="Q13.GRE Verbal" field="greVerbal" type="number" placeholder="e.g., 155" value={formData.greVerbal} onChange={handleInputChange} />
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <Field label="Q15.GRE AWA" field="greAWA" type="number" placeholder="e.g., 4.0" value={formData.greAWA} onChange={handleInputChange} />
-        <Field label="Q16.GMAT Total" field="gmatTotal" type="number" placeholder="e.g., 650" value={formData.gmatTotal} onChange={handleInputChange} />
+        <Field label="Q14.GRE AWA" field="greAWA" type="number" placeholder="e.g., 4.0" value={formData.greAWA} onChange={handleInputChange} />
+        <Field label="Q15.GMAT Total" field="gmatTotal" type="number" placeholder="e.g., 650" value={formData.gmatTotal} onChange={handleInputChange} />
       </div>
       {/* GMAT full width section */}
       <div className="grid grid-cols-1 gap-4">
-        <Field label="Q17. GMAT Quant" field="gmatQuant" type="number" placeholder="e.g., 45" value={formData.gmatQuant} onChange={handleInputChange} />
+        <Field label="Q16. GMAT Quant" field="gmatQuant" type="number" placeholder="e.g., 45" value={formData.gmatQuant} onChange={handleInputChange} />
       </div>
       {/* Work experience and industry in one line below */}
       <div className="grid md:grid-cols-2 gap-4">
-        <Field label="Q18. Years of work experience" field="experienceYears" type="number" placeholder="e.g., 2" value={formData.experienceYears} onChange={handleInputChange} />
-        <Field label="Q19. Work experience industry" field="experienceIndustry" type="text" placeholder="e.g., Tech" value={formData.experienceIndustry} onChange={handleInputChange} />
+        <Field label="Q17. Years of work experience" field="experienceYears" type="number" placeholder="e.g., 2" value={formData.experienceYears} onChange={handleInputChange} />
+        <Field label="Q18. Work experience industry" field="experienceIndustry" type="text" placeholder="e.g., Tech" value={formData.experienceIndustry} onChange={handleInputChange} />
       </div>
       {isLastStep && <ReadyBox dataValidation={dataValidation} />}
     </div>

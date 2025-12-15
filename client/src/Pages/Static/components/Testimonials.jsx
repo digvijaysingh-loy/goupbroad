@@ -1,64 +1,60 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star } from 'lucide-react';
+import { Star, User } from 'lucide-react';
 
 const Testimonials = () => {
   const testimonials = [
     {
-      name: 'Priya Sharma',
-      university: 'University of Toronto, Canada',
-      course: 'Computer Science',
-      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=150&h=150&fit=crop&crop=face',
-      text: 'Goupbroad made my dream of studying in Canada a reality. Their personalized university matching helped me find the perfect program, and I secured a $15,000 scholarship through their platform!',
+      name: 'Kritik Shrivastava',
+      // university: 'University of Toronto, Canada',
+      course: 'MBA - UC Riverside',
+      // image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=150&h=150&fit=crop&crop=face',
+      text: `Anushk and his team were exceptional.
+Their guidance helped me secure admits
+to Columbia, Emory, and other top
+universities, along with a $100K
+scholarship from UC Riverside. I highly
+recommend Anushk and his team for end-to-end support throughout the application
+process.`,
       rating: 5,
-      achievement: 'Secured $15K Scholarship'
+      // achievement: 'Secured $15K Scholarship'
     },
     {
-      name: 'Rahul Patel',
-      university: 'University of Melbourne, Australia',
-      course: 'Business Administration',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      text: 'The application tracker was a game-changer! I was able to manage applications to 8 universities simultaneously and never missed a deadline. Now I\'m pursuing my MBA in Australia.',
+      name: 'Prachi Agarwal',
+      // university: 'University of Melbourne, Australia',
+      course: 'MEM - Northwestern',
+      // image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      text: `I was initially skeptical about trusting Upbroad,
+having had poor experiences with two
+consultancies in my previous application cycle. One
+counselor from LeapScholar repeatedly pushed
+universities I never asked for, calling them ‘backups.’
+My call with Anushk changed everything. It was
+clear they work for the student—not for universities.
+The team was highly responsive, delivered strong
+SOPs across applications, and revised them
+whenever I wasn’t fully satisfied.`,
       rating: 5,
-      achievement: '8 University Applications'
+      // achievement: '8 University Applications'
     },
     {
-      name: 'Ananya Singh',
-      university: 'Technical University of Munich, Germany',
-      course: 'Mechanical Engineering',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-      text: 'The community forum connected me with seniors already studying in Germany. Their guidance was invaluable in my preparation and helped me get admission with a full scholarship.',
+      name: 'Amulya',
+      // university: 'Technical University of Munich, Germany',
+      course: 'Ms Finance - UC San Diego',
+      // image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+      text: `Hi, I’m Amulya, MS in Finance from UC San
+Diego’s Rady School of Management. Working
+with Anushk and his team was a great decision.
+They understood every detail of the admissions
+process and helped me craft strong SOPs and
+LORs. The entire process was smooth and well-structured. I’ve already recommended them to a
+friend and will continue referring others
+planning to study in the U.S.
+Amulya`,
       rating: 5,
-      achievement: 'Full Scholarship Recipient'
+      // achievement: 'Full Scholarship Recipient'
     },
-    {
-      name: 'Arjun Kumar',
-      university: 'Stanford University, USA',
-      course: 'Data Science',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      text: 'The test score calculator helped me strategize my GRE preparation perfectly. I knew exactly what score I needed and achieved it, securing admission to my dream university!',
-      rating: 5,
-      achievement: 'Stanford Admission'
-    },
-    {
-      name: 'Kavya Reddy',
-      university: 'University of Edinburgh, UK',
-      course: 'International Relations',
-      image: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=150&h=150&fit=crop&crop=face',
-      text: 'Goupbroad\'s scholarship finder helped me discover funding opportunities I never knew existed. I\'m now studying in the UK with 70% of my tuition covered!',
-      rating: 5,
-      achievement: '70% Tuition Covered'
-    },
-    {
-      name: 'Vikram Mehta',
-      university: 'University of British Columbia, Canada',
-      course: 'Environmental Engineering',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      text: 'From university selection to visa guidance, Goupbroad supported me at every step. Their comprehensive approach made what seemed impossible, possible!',
-      rating: 5,
-      achievement: 'End-to-End Support'
-    }
   ];
 
   return (
@@ -76,8 +72,11 @@ const Testimonials = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-100">
-              <CardContent className="p-6">
+            <Card
+              key={index}
+              className="hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-100 flex flex-col h-full"
+            >
+              <CardContent className="p-6 flex flex-col flex-1">
                 {/* Rating */}
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -85,25 +84,46 @@ const Testimonials = () => {
                   ))}
                 </div>
 
-                {/* Testimonial Text */}
-                <p className="text-gray-600 mb-6 italic">"{testimonial.text}"</p>
+                {/* Testimonial Text - takes available space but doesn't push footer down too far */}
+                <p className="text-gray-600 mb-6 italic flex-1 text-justify ">
+                  "{testimonial.text}"
+                </p>
 
-                {/* Achievement Badge */}
-                <div className="bg-primary-50 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full inline-block mb-4">
-                  {testimonial.achievement}
-                </div>
+                {/* Achievement Badge - optional, only show if exists */}
+                {testimonial.achievement && (
+                  <div className="bg-primary-50 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full inline-block mb-4">
+                    {testimonial.achievement}
+                  </div>
+                )}
 
-                {/* Student Info */}
-                <div className="flex items-center">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full mr-4 object-cover"
-                  />
+                {/* Student Info - always stuck to bottom */}
+                <div className="flex items-center mt-auto">
+                  <div className="relative w-12 h-12 rounded-full mr-4 overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
+                    {/* Only render img if image exists */}
+                    {testimonial.image ? (
+                      <img
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement
+                            .querySelector('.fallback-user')
+                            ?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+
+                    {/* Lucide User Icon - fallback */}
+                    <User className="w-8 h-8 text-gray-500 fallback-user" />
+                  </div>
+
                   <div>
                     <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
                     <p className="text-sm text-gray-500">{testimonial.course}</p>
-                    <p className="text-sm text-primary font-medium">{testimonial.university}</p>
+                    {testimonial.university && (
+                      <p className="text-sm text-primary font-medium">{testimonial.university}</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
