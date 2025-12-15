@@ -27,27 +27,31 @@ const SignUpModal = ({ onSuccess }) => {
   });
   const [otp, setOtp] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
-const continueBtnRef = useRef(null);
-  // Same dynamic width as in SignUp.jsx
+  const continueBtnRef = useRef(null);
+
+  // Dynamic Google button width — same logic as SignUp.jsx / SignIn.jsx
   const [googleWidth, setGoogleWidth] = useState(320);
 
   const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
 
-  // IDENTICAL width calculation from your working SignUp.jsx
+  // Fixed: Measure the actual modal content container (not a missing card)
   useEffect(() => {
-  const updateWidth = () => {
-    const card = document.getElementById("signup-card");
-    if (!card) return;
+    const updateWidth = () => {
+      // Target the modal's content area (common in shadcn/ui Dialog)
+      const modalContainer = document.querySelector('[role="dialog"]')
+        || document.querySelector('.space-y-6') // fallback to our root container
+        || document.body;
 
-    const rect = card.getBoundingClientRect();
-    const clamped = Math.max(280, Math.min(400, Math.floor(rect.width - 48)));
-    setGoogleWidth(clamped);
-  };
+      const rect = modalContainer.getBoundingClientRect();
+      // Same clamping logic as in your main SignUp.jsx / SignIn.jsx
+      const clamped = Math.max(280, Math.min(400, Math.floor(rect.width - 48)));
+      setGoogleWidth(clamped);
+    };
 
-  updateWidth();
-  window.addEventListener("resize", updateWidth);
-  return () => window.removeEventListener("resize", updateWidth);
-}, []);
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   // OTP countdown
   useEffect(() => {
@@ -193,8 +197,8 @@ const continueBtnRef = useRef(null);
   const isResendDisabled = isLoading || countdown > 0;
 
   return (
-    // This div is the "card" equivalent — id is required for width calculation
-    <div id="signup-card" className="w-full max-w-md mx-auto space-y-6">
+    // Root container — used as fallback for width measurement
+    <div className="w-full max-w-md mx-auto space-y-6">
       {apiError && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
           {apiError}
@@ -331,12 +335,16 @@ const continueBtnRef = useRef(null);
         ) : null}
 
         {/* Continue Button */}
-        <Button type="submit" className="w-full h-12 bg-primary-800 text-white font-semibold" disabled={isLoading}>
+        <Button
+          type="submit"
+          className="w-full h-12 bg-primary-800 text-white font-semibold"
+          disabled={isLoading}
+        >
           {isLoading ? (otpSent ? 'Verifying...' : 'Sending OTP...') : (otpSent ? 'Verify & Create Account' : 'Continue')}
         </Button>
       </form>
 
-      {/* Google Button — EXACT SAME as in SignUp.jsx */}
+      {/* Google Button — Now matches main SignUp.jsx exactly */}
       {(!otpSent || editingEmail) && (
         <>
           <div className="relative">
@@ -348,7 +356,7 @@ const continueBtnRef = useRef(null);
             </div>
           </div>
 
-          <div className="w-full overflow-hidden mb-6">
+          <div className="w-full overflow-hidden">
             <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
               <div className="w-full flex justify-center overflow-hidden">
                 <GoogleLogin
@@ -357,7 +365,10 @@ const continueBtnRef = useRef(null);
                   ux_mode="popup"
                   shape="rectangular"
                   text="continue_with"
-                  width={googleWidth}   // ← same calculated width as Continue button
+                  size="large"
+                  theme="outline"
+                  width={googleWidth}
+                  disabled={isLoading}
                   containerProps={{
                     className: "w-full flex justify-center overflow-hidden"
                   }}
