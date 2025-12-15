@@ -1,5 +1,5 @@
 // src/components/questionnaire/SignUpModal.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,11 +27,29 @@ const SignUpModal = ({ onSuccess }) => {
   });
   const [otp, setOtp] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+const continueBtnRef = useRef(null);
+  // Same dynamic width as in SignUp.jsx
+  const [googleWidth, setGoogleWidth] = useState(320);
 
-  const GOOGLE_CLIENT_ID =
-    import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+  const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
 
-  // Countdown effect
+  // IDENTICAL width calculation from your working SignUp.jsx
+  useEffect(() => {
+  const updateWidth = () => {
+    const card = document.getElementById("signup-card");
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const clamped = Math.max(280, Math.min(400, Math.floor(rect.width - 48)));
+    setGoogleWidth(clamped);
+  };
+
+  updateWidth();
+  window.addEventListener("resize", updateWidth);
+  return () => window.removeEventListener("resize", updateWidth);
+}, []);
+
+  // OTP countdown
   useEffect(() => {
     if (otpSent && !editingEmail) {
       setCountdown(30);
@@ -52,17 +70,9 @@ const SignUpModal = ({ onSuccess }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    if (name === 'password' || name === 'confirmPassword') {
-      setPasswordError('');
-    }
-    if (apiError) {
-      setApiError('');
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'password' || name === 'confirmPassword') setPasswordError('');
+    if (apiError) setApiError('');
   };
 
   const handleResendOtp = async () => {
@@ -91,18 +101,15 @@ const SignUpModal = ({ onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setPasswordError('');
     setOtpError('');
     setApiError('');
 
     if (!otpSent) {
-      // Step 1: Validate and send OTP
       if (formData.password !== formData.confirmPassword) {
         setPasswordError('Passwords do not match');
         return;
       }
-
       const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
       if (!passwordRegex.test(formData.password)) {
         setPasswordError('Password must be at least 8 characters with a number and a special character');
@@ -129,7 +136,6 @@ const SignUpModal = ({ onSuccess }) => {
         setIsLoading(false);
       }
     } else {
-      // Step 2: Validate OTP and register
       if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
         setOtpError('Please enter a valid 6-digit OTP');
         return;
@@ -137,12 +143,7 @@ const SignUpModal = ({ onSuccess }) => {
 
       try {
         setIsLoading(true);
-        const userData = {
-          email: formData.email,
-          password: formData.password,
-          otp: otp,
-        };
-
+        const userData = { email: formData.email, password: formData.password, otp };
         const registerResult = await registerUser(userData);
         if (registerResult.success && registerResult.data?.data?.accessToken) {
           onSuccess(registerResult.data.data.accessToken, registerResult.data.data.user);
@@ -152,11 +153,7 @@ const SignUpModal = ({ onSuccess }) => {
         }
       } catch (error) {
         console.error('Signup failed:', error);
-        if (error.response && error.response.data) {
-          setApiError(error.response?.data?.message || 'Signup failed. Please try again.');
-        } else {
-          setApiError('Network error. Please check your connection and try again.');
-        }
+        setApiError(error.response?.data?.message || 'Signup failed. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -173,7 +170,6 @@ const SignUpModal = ({ onSuccess }) => {
 
       setIsLoading(true);
       setApiError('');
-
       const userData = { google_credential: googleToken };
       const registerResult = await registerUser(userData);
       if (registerResult.success && registerResult.data?.data?.accessToken) {
@@ -184,11 +180,7 @@ const SignUpModal = ({ onSuccess }) => {
       }
     } catch (error) {
       console.error('Google signup failed:', error);
-      if (error.response && error.response.data) {
-        setApiError(error.response?.data?.message || 'Google signup failed. Please try again.');
-      } else {
-        setApiError('Network error. Please check your connection and try again.');
-      }
+      setApiError(error.response?.data?.message || 'Google signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -201,7 +193,8 @@ const SignUpModal = ({ onSuccess }) => {
   const isResendDisabled = isLoading || countdown > 0;
 
   return (
-    <div className="space-y-6">
+    // This div is the "card" equivalent — id is required for width calculation
+    <div id="signup-card" className="w-full max-w-md mx-auto space-y-6">
       {apiError && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
           {apiError}
@@ -209,81 +202,70 @@ const SignUpModal = ({ onSuccess }) => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Email Field */}
+        {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-            Email Address
-          </Label>
+          <Label>Email Address</Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              id="email"
               name="email"
               type="email"
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              className="pl-10 pr-10 h-12 border-gray-200 focus:border-primary"
+              className="pl-10 h-12"
               required
               disabled={otpSent && !editingEmail}
             />
           </div>
         </div>
 
-        {/* Password Field */}
+        {/* Password & Confirm */}
         {!otpSent || editingEmail ? (
           <>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password
-              </Label>
+              <Label>Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="pl-10 pr-10 h-12 border-gray-200 focus:border-primary"
+                  className="pl-10 pr-10 h-12"
                   required
                   disabled={otpSent && !editingEmail}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   disabled={otpSent && !editingEmail}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-500">
-                Password must be at least 8 characters with a number and a special character
-              </p>
+              <p className="text-xs text-gray-500">At least 8 characters with number & special character</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                Confirm Password
-              </Label>
+              <Label>Confirm Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="pl-10 pr-10 h-12 border-gray-200 focus:border-primary"
+                  className="pl-10 pr-10 h-12"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -292,11 +274,7 @@ const SignUpModal = ({ onSuccess }) => {
             </div>
 
             <div className="flex items-start space-x-2">
-              <Checkbox
-                id="terms"
-                checked={termsAccepted}
-                onCheckedChange={setTermsAccepted}
-              />
+              <Checkbox id="terms" checked={termsAccepted} onCheckedChange={setTermsAccepted} />
               <Label htmlFor="terms" className="text-sm text-gray-600 leading-tight">
                 I agree to the Terms of Service and Privacy Policy
               </Label>
@@ -304,111 +282,91 @@ const SignUpModal = ({ onSuccess }) => {
           </>
         ) : null}
 
-        {/* OTP Field */}
+        {/* OTP */}
         {otpSent && !editingEmail ? (
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Verification Code
-            </Label>
-            <div className="flex justify-center mb-4 w-full overflow-x-auto px-4">
-              <OTPInput
-                value={otp}
-                onChange={setOtp}
-                numInputs={6}
-                inputStyle={{
-                  width: '2.5rem',
-                  height: '3rem',
-                  margin: '0 0.25rem',
-                  fontSize: '1rem',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '0.5rem',
-                  textAlign: 'center',
-                  outline: 'none',
-                  minWidth: '2.5rem',
-                }}
-                inputType="tel"
-                containerStyle={{ justifyContent: 'center', minWidth: 'max-content' }}
-                inputMode="numeric"
-                renderInput={(props) => <input {...props} />}
-              />
+            <Label>Verification Code</Label>
+            <div className="w-full overflow-hidden">
+              <div className="flex justify-center">
+                <OTPInput
+                  value={otp}
+                  onChange={setOtp}
+                  numInputs={6}
+                  renderInput={(props) => <input {...props} />}
+                  containerStyle={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    flexWrap: 'wrap',
+                    maxWidth: '100%',
+                  }}
+                  inputStyle={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    fontSize: '1.1rem',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    textAlign: 'center',
+                    outline: 'none',
+                  }}
+                  inputMode="numeric"
+                />
+              </div>
             </div>
             {otpError && <p className="text-xs text-red-500 text-center">{otpError}</p>}
           </div>
         ) : null}
 
-        {/* Edit Email and Resend OTP Buttons */}
+        {/* Edit & Resend */}
         {otpSent && !editingEmail ? (
           <div className="flex justify-between items-center space-x-4">
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1 justify-start h-10 px-2 text-primary hover:bg-primary/5"
-              onClick={handleEditEmail}
-            >
-              <Edit2 className="h-4 w-4 mr-2" />
-              Edit Email
+            <Button type="button" variant="ghost" onClick={handleEditEmail} className="flex-1 justify-start">
+              <Edit2 className="h-4 w-4 mr-2" /> Edit Email
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1 h-10"
-              onClick={handleResendOtp}
-              disabled={isResendDisabled}
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Sending...
-                </>
-              ) : isResendDisabled ? (
-                `Resend in ${countdown}s`
-              ) : (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Resend OTP
-                </>
-              )}
+            <Button type="button" variant="ghost" onClick={handleResendOtp} disabled={isResendDisabled} className="flex-1">
+              {isLoading ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+              {isResendDisabled ? `Resend in ${countdown}s` : 'Resend OTP'}
             </Button>
           </div>
         ) : null}
 
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          className="w-full h-12 bg-primary-800 text-white font-semibold"
-          disabled={isLoading}
-        >
-          {isLoading 
-            ? (otpSent ? 'Verifying...' : 'Sending OTP...') 
-            : (otpSent ? 'Verify & Create Account' : 'Continue')
-          }
+        {/* Continue Button */}
+        <Button type="submit" className="w-full h-12 bg-primary-800 text-white font-semibold" disabled={isLoading}>
+          {isLoading ? (otpSent ? 'Verifying...' : 'Sending OTP...') : (otpSent ? 'Verify & Create Account' : 'Continue')}
         </Button>
       </form>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-gray-200" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-gray-500">Or sign up with</span>
-        </div>
-      </div>
+      {/* Google Button — EXACT SAME as in SignUp.jsx */}
+      {(!otpSent || editingEmail) && (
+        <>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Or sign up with</span>
+            </div>
+          </div>
 
-      <div className="grid grid-cols-1 gap-3">
-        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleFailure}
-            ux_mode="popup"
-            shape="rectangular"
-            text="signup_with"
-            size="large"
-            theme="outline"
-            width="100%"
-            disabled={isLoading}
-          />
-        </GoogleOAuthProvider>
-      </div>
+          <div className="w-full overflow-hidden mb-6">
+            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+              <div className="w-full flex justify-center overflow-hidden">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleFailure}
+                  ux_mode="popup"
+                  shape="rectangular"
+                  text="continue_with"
+                  width={googleWidth}   // ← same calculated width as Continue button
+                  containerProps={{
+                    className: "w-full flex justify-center overflow-hidden"
+                  }}
+                />
+              </div>
+            </GoogleOAuthProvider>
+          </div>
+        </>
+      )}
     </div>
   );
 };

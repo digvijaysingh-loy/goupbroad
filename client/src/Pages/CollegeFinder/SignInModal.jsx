@@ -1,5 +1,5 @@
 // src/components/questionnaire/SignInModal.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,8 +17,36 @@ const SignInModal = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
 
+  // Exactly the same dynamic width logic as in SignIn.jsx
+  const [googleWidth, setGoogleWidth] = useState(320);
+
   const GOOGLE_CLIENT_ID =
     import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+
+  // Identical useEffect from SignIn.jsx — measures the modal container
+  useEffect(() => {
+    const updateWidth = () => {
+      // In a modal (shadcn Dialog), the content is usually inside a div with role="dialog"
+      // We target the closest parent container that holds the form
+      const modalContent = document.querySelector('[role="dialog"]') 
+        || document.querySelector('.space-y-4'); // fallback to our root div
+
+      if (!modalContent) {
+        setGoogleWidth(320);
+        return;
+      }
+
+      const rect = modalContent.getBoundingClientRect();
+      // Exact same clamping as SignIn.jsx: min 280, max 400, subtract ~48px padding
+      const clamped = Math.max(280, Math.min(400, Math.floor(rect.width - 48)));
+      setGoogleWidth(clamped);
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,16 +56,13 @@ const SignInModal = ({ onSuccess }) => {
     try {
       const userData = { email, password };
       const response = await loginUser(userData);
-      // console.log('Login response:', response); 
       
       if (response.success) {
-        // Handle wrapped response: response.data = { accessToken, user }
         const { accessToken, user } = response.data;
         if (accessToken && user) {
           onSuccess(accessToken, user);
           toast.success('Welcome back!');
         } else {
-          // Fallback if structure differs
           const fallbackToken = response.data?.accessToken || response.accessToken;
           const fallbackUser = response.data?.user || response.user;
           if (fallbackToken && fallbackUser) {
@@ -75,16 +100,13 @@ const SignInModal = ({ onSuccess }) => {
 
       const userData = { google_credential: googleToken };
       const response = await loginUser(userData);
-      console.log('Google login response:', response);
       
       if (response.success) {
-        // Handle wrapped response: response.data = { accessToken, user }
         const { accessToken, user } = response.data;
         if (accessToken && user) {
           onSuccess(accessToken, user);
           toast.success('Welcome back!');
         } else {
-          // Fallback if structure differs
           const fallbackToken = response.data?.accessToken || response.accessToken;
           const fallbackUser = response.data?.user || response.user;
           if (fallbackToken && fallbackUser) {
@@ -198,19 +220,25 @@ const SignInModal = ({ onSuccess }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3">
+      {/* EXACT SAME Google button structure and logic as SignIn.jsx */}
+      <div className="w-full overflow-hidden">
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleFailure}
-            ux_mode="popup"
-            shape="rectangular"
-            text="continue_with"
-            size="large"
-            theme="outline"
-            width="100%"
-            disabled={isLoading}
-          />
+          <div className="w-full flex justify-center overflow-hidden">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleFailure}
+              ux_mode="popup"
+              shape="rectangular"
+              text="continue_with"
+              size="large"
+              theme="outline"
+              width={googleWidth}  
+              disabled={isLoading}
+              containerProps={{
+                className: "w-full flex justify-center overflow-hidden"
+              }}
+            />
+          </div>
         </GoogleOAuthProvider>
       </div>
     </div>

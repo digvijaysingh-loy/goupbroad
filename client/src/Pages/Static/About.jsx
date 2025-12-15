@@ -65,11 +65,13 @@ const About = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-primary hover:bg-primary/90 text-white px-6 py-5 text-base sm:text-lg rounded-lg">
-                  <Link to='/signin'>Learn More</Link>
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+              <div className="flex flex-col sm:flex-row gap-4 ">
+                <Link to="/signin" className="flex flex-col sm:flex-row gap-4 ">
+                  <Button className="bg-primary hover:bg-primary/90 cursor-pointer text-white px-6 py-5 text-base sm:text-lg rounded-lg flex items-center">
+                    Learn More
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </div>
 
