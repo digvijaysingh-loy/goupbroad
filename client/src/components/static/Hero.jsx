@@ -106,7 +106,7 @@ const Hero = () => {
           <div className="relative flex justify-center items-center max-lg:h-[350px] max-sm:h-[300px] max-lg:mx-[60px] max-sm:mx-[40px] max-lg:mt-10 pb-10">
             {/* Main University Image - Rectangular with Academic Frame */}
             <div className="relative">
-              <div className="w-96 h-96 max-sm:w-60 max-sm:h-60 max-lg:w-72 max-lg:h-72 shadow-2xl  -ml-2  rounded-full overflow-hidden  border-8 border-white bg-white transform rotate-2 hover:rotate-0 transition-transform duration-500">
+              <div className="w-96 h-96 max-sm:w-60 max-sm:h-60 max-lg:w-72 max-lg:h-72 shadow-2xl  -ml-2  rounded-full overflow-hidden  border-8 border-white bg-white     ">
                 <img
                   // src="https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                   src={Heroimg}
@@ -114,7 +114,7 @@ const Hero = () => {
                   className="w-full h-full object-cover  "
                 />
                 {/* Overlay for university atmosphere */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"></div>
+                
               </div>
 
               {/* Academic Frame Effect */}
@@ -135,7 +135,7 @@ const Hero = () => {
             </Card>
 
             {/* Top Right - Global Recognition */}
-            <Card className="absolute sm:-top-6 sm:-right-8 -top-3 -right-4  max-sm:p-3 max-w-48 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+            <Card className="absolute sm:-top-6 sm:-right-4 -top-3 -right-4  max-sm:p-3 max-w-48 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '1s' }}>
               <CardContent className=" text-center max-sm:px-0">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Globe className="w-4 h-4 text-blue-500" />
@@ -171,7 +171,7 @@ const Hero = () => {
             </Card>
 
             {/* Bottom Left - Scholarships */}
-            <Card className="absolute -bottom-16 max-lg:bottom-1 max-sm:bottom-2 max-w-48 sm:-left-0 -left-2 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '4s' }}>
+            <Card className="absolute -bottom-16 max-lg:bottom-1 max-sm:bottom-2 max-w-48 sm:left-48 left-22 max-sm:p-3 bg-white/95 backdrop-blur-sm border-0 shadow-lg animate-float" style={{ animationDelay: '4s' }}>
               <CardContent className=" text-center max-sm:px-0">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <FaUserGraduate className="w-4 h-4 text-orange-500" />
