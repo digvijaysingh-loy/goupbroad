@@ -1040,7 +1040,7 @@ export const TaskAssignedTemplate = (studentName, taskTitle) => {
                 <div class="cta-card">
                     <h3>Ready to Start?</h3>
                     <p>View task details, submit responses, and track your progress</p>
-                    <a href="https://app.goupbroad.com/dashboard" class="cta-btn">Go to Dashboard</a>
+                    <a href="https://goupbroad.com/dashboard" class="cta-btn">Go to Dashboard</a>
                 </div>
 
                 <!-- Support -->
