@@ -50,8 +50,7 @@ They understood every detail of the admissions
 process and helped me craft strong SOPs and
 LORs. The entire process was smooth and well-structured. I’ve already recommended them to a
 friend and will continue referring others
-planning to study in the U.S.
-Amulya`,
+planning to study in the U.S.`,
       rating: 5,
       // achievement: 'Full Scholarship Recipient'
     },
