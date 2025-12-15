@@ -28,7 +28,7 @@ const SignInModal = ({ onSuccess }) => {
     try {
       const userData = { email, password };
       const response = await loginUser(userData);
-      console.log('Login response:', response); // Debug log
+      // console.log('Login response:', response); 
       
       if (response.success) {
         // Handle wrapped response: response.data = { accessToken, user }

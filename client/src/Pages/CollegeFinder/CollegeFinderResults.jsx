@@ -343,7 +343,7 @@ const CollegeCard = ({ college }) => {
         <div className="grid grid-cols-2 gap-4">
           {[
             { icon: Clock, label: 'Duration', value: college.length || 'N/A' },
-            { icon: DollarSign, label: 'Tuition', value: college.tuition ? `$${college.tuition.toLocaleString()}` : 'N/A' },
+            { icon: DollarSign, label: 'Tuition', value: college.tuition ? `${college.tuition.toLocaleString()}` : 'N/A' },
             { icon: Award, label: 'Ranking', value: college.ranking?.national ? `#${college.ranking.national}` : 'N/A' },
             { icon: Users2, label: 'Acceptance Rate', value: college.acceptanceRate ? `${college.acceptanceRate}%` : 'N/A' }
           ].map((item, i) => (
@@ -476,34 +476,34 @@ const CollegeFinderResults = () => {
     }
   }, []);
 
-const handleProfileSubmit = async () => {
-  try {
-    const payload = {
-      name: profileForm.name.trim(),
-      personalDetails: {
-        dob: new Date(profileForm.dob).toISOString(),
-        gender: profileForm.gender,
-        address: profileForm.address.trim()
-      },
-      howDidYouHear: profileForm.howDidYouHear
-    };
-    const res = await updateUserProfile(payload);
-    if (res.success) {
-      toast.success('Profile updated successfully!');
-      await fetchUserProfile();
-      setShowProfileCompletion(false);
+  const handleProfileSubmit = async () => {
+    try {
+      const payload = {
+        name: profileForm.name.trim(),
+        personalDetails: {
+          dob: new Date(profileForm.dob).toISOString(),
+          gender: profileForm.gender,
+          address: profileForm.address.trim()
+        },
+        howDidYouHear: profileForm.howDidYouHear
+      };
+      const res = await updateUserProfile(payload);
+      if (res.success) {
+        toast.success('Profile updated successfully!');
+        await fetchUserProfile();
+        setShowProfileCompletion(false);
 
-      // LLM might already be running → start visual progress now from 0
-      if (isLoading) {
-        startProgress();
+        // LLM might already be running → start visual progress now from 0
+        if (isLoading) {
+          startProgress();
+        }
+      } else {
+        toast.error('Failed to update profile');
       }
-    } else {
+    } catch (err) {
       toast.error('Failed to update profile');
     }
-  } catch (err) {
-    toast.error('Failed to update profile');
-  }
-};
+  };
 
 
 
@@ -771,11 +771,11 @@ const handleProfileSubmit = async () => {
                 </Button>
 
                 <Button
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => window.open('https://linktr.ee/goupbroad', '_blank', 'noopener,noreferrer')}
                   className="w-full md:w-auto bg-gradient-to-r from-[#145044] to-[#0f3c34] text-white font-semibold text-base rounded-md shadow-2xl cursor-pointer hover:scale-105 transition-all flex items-center justify-center"
                 >
                   <Sparkles className="h-4 w-4 mr-2 hidden md:block" />
-                  Start Applying Now
+                  Book a Consultation
                 </Button>
 
                 <div className="w-full md:w-auto bg-gradient-to-r from-[#145044] to-[#0f3c34] border-2 border-[#145044] rounded-md px-5 py-0 shadow-md flex items-center justify-between md:justify-center">
@@ -834,10 +834,11 @@ const handleProfileSubmit = async () => {
             <Button
               size="lg"
               className="w-full sm:w-1/2 mx-auto flex cursor-pointer mt-6 bg-gradient-to-r from-[#145044] to-[#0f3c34] hover:from-[#0f3c34] hover:to-[#0b3029] text-white font-bold text-xl py-6 sm:py-8 rounded-2xl shadow-xl"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => window.open('https://linktr.ee/goupbroad', '_blank', 'noopener,noreferrer')}
+
             >
               <Sparkles className="h-7 w-7 mr-3" />
-              Start Applying Now
+              Book a Consultation
             </Button>
           </section>
 
@@ -869,11 +870,12 @@ const handleProfileSubmit = async () => {
                   className="w-full cursor-pointer bg-gradient-to-r from-[#145044] to-[#0f3c34] hover:from-[#0f3c34] hover:to-[#0b3029] text-white font-bold text-xl py-8 rounded-2xl shadow-xl"
                   onClick={() => {
                     setShowApplyPopup(false);
-                    navigate('/dashboard');
+                    window.open('https://linktr.ee/goupbroad', '_blank', 'noopener,noreferrer');
                   }}
+
                 >
                   <Sparkles className="h-7 w-7 mr-3" />
-                  Start Applying Now
+                  Book a Consultation
                 </Button>
               </div>
             </div>
