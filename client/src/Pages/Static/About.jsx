@@ -46,7 +46,7 @@ const About = () => {
                 100% Unbiased Admissions Guidance. No Tie-Ups. No Agendas.
               </h1>
 
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-justify">
                 At Upbroad, we guide you to the best-fit university for you—
                 not the ones consultants are paid to promote. We have zero
                 partner universities, ensuring our recommendations are 100%
@@ -134,9 +134,9 @@ const About = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div className="space-y-5 order-2 lg:order-1">
               <Badge variant="outline" className="mb-3 border-primary-700 rounded-full text-primary-700 text-sm">Our Story</Badge>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">We Were Misled. Now We Lead—1,000+ Students,
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 ">We Were Misled. Now We Lead—1,000+ Students,
                 ₹200 Cr+ Scholarships.</h2>
-              <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed">
+              <div className="space-y-4 text-gray-700 text-sm sm:text-base leading-relaxed text-justify">
                 <p>
                   What began as our response to being misled by consultancies has
                   grown into a mission to support students transparently. Today,

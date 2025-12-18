@@ -81,10 +81,10 @@ const NewCollegeFinder = () => {
   ];
 
   const stats = [
-    { number: "10,000+", label: "Students Guided" },
-    { number: "500+", label: "Universities" },
-    { number: "95%", label: "Success Rate" },
-    { number: "50+", label: "Countries" },
+    { number: "1k+", label: "Students Helped" },
+    { number: "150+", label: "Universities" },
+    { number: "100%", label: "Success Rate" },
+    { number: "200 Crores", label: "Scholarships Secured" },
   ];
 
   return (

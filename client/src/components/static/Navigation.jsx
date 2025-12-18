@@ -30,7 +30,7 @@ const Navigation = () => {
   ];
 
   const buttonText = isLoggedIn ? 'Dashboard' : 'Get Started';
-  const buttonPath = isLoggedIn ? '/dashboard' : '/signin';
+  const buttonPath = isLoggedIn ? '/dashboard' : '/signup';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
@@ -74,12 +74,22 @@ const Navigation = () => {
           </div>
 
           {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* CTA Buttons - Desktop */}
+          <div className="hidden md:flex items-center gap-4">
+                {!isLoggedIn && (
+              <Link to="/signin">
+                <Button variant="outline" className="border-primary-700 text-primary-700 cursor-pointer ">
+                  Sign In
+                </Button>
+              </Link>
+            )}
             <Link to={buttonPath}>
-              <Button className="bg-primary-700  text-white">
+              <Button className="bg-primary-700 text-white cursor-pointer">
                 {buttonText}
               </Button>
             </Link>
+
+        
           </div>
 
           {/* Mobile menu button */}
@@ -119,11 +129,20 @@ const Navigation = () => {
                 )
               ))}
               <div className="pt-2">
+                 {/* Login Button in Mobile - Always if not logged in */}
+                {!isLoggedIn && (
+                  <Link to="/signin" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-primary-700 mb-2 text-primary-700 hover:bg-primary-100 hover:text-white">
+                      Sign In
+                    </Button>
+                  </Link>
+                )}
                 <Link to={buttonPath}>
                   <Button className="w-full bg-primary-700 text-white">
                     {buttonText}
                   </Button>
                 </Link>
+               
               </div>
             </div>
           </div>

@@ -468,7 +468,7 @@ const SignIn = () => {
                   Welcome Back to Your
                   <span className="text-primary-700 block">Study Journey</span>
                 </h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                <p className="text-lg text-gray-600 leading-relaxed text-justify">
                   Continue exploring thousands of universities worldwide and connect with a global community of students pursuing their dreams.
                 </p>
               </div>

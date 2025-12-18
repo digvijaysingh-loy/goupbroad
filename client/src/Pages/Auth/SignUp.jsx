@@ -773,7 +773,7 @@ const SignUp = () => {
                   Begin Your
                   <span className="text-primary-700 block">Global Education Journey</span>
                 </h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                <p className="text-lg text-gray-600 leading-relaxed text-justify">
                   Join thousands of students worldwide who have found their perfect university match and started their international education adventure.
                 </p>
               </div>
@@ -782,16 +782,16 @@ const SignUp = () => {
             {/* Features */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-2xl font-bold text-primary-700">10,000+</div>
+                <div className="text-2xl font-bold text-primary-700">150+</div>
                 <div className="text-sm text-gray-600">Universities</div>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-2xl font-bold text-primary-700">50+</div>
+                <div className="text-2xl font-bold text-primary-700">Alumni in 10+</div>
                 <div className="text-sm text-gray-600">Countries</div>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm">
-                <div className="text-2xl font-bold text-primary-700">100k+</div>
-                <div className="text-sm text-gray-600">Students</div>
+                <div className="text-2xl font-bold text-primary-700">1k+</div>
+                <div className="text-sm text-gray-600">Students Helped</div>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="text-2xl font-bold text-primary-700">24/7</div>
