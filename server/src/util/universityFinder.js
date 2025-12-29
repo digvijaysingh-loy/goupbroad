@@ -224,7 +224,7 @@ async function callResponsesModel({ model, system, user, withWeb = false }) {
 /* ===========
  * Public API
  * =========== */
-export async function getUniversitiesFast(student, { degreeKind = "Masters" } = {}) {
+export async function getUniversitiesFast(student,  degreeKind) {
   const profile = mapStudentToProfile(student);
   const system = Prompts.buildFastSystem(profile, degreeKind);
   const user = Prompts.buildFastUser();
