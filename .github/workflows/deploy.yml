@@ -83,8 +83,8 @@ jobs:
             sleep 5
 
             # SSL Certificate Setup with Certbot (now that port 80 is free)
-            echo '🔒 Checking/Updating SSL certificates...'
-            certbot certonly --standalone -d qa.goupbroad.com --non-interactive --agree-tos -m goupbroad0907@gmail.com || { echo '❌ Certbot failed'; exit 1; }
+            #echo '🔒 Checking/Updating SSL certificates...'
+            #certbot certonly --standalone -d qa.goupbroad.com --non-interactive --agree-tos -m goupbroad0907@gmail.com || { echo '❌ Certbot failed'; exit 1; }
 
             # Build and deploy with Docker Compose
             echo '🏗️ Building and deploying with Docker Compose...'
