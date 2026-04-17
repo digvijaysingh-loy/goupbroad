@@ -536,9 +536,9 @@ const CollegeFinderResults = () => {
     setIsLoading(true);
 
     // Start / restart progress animation when LLM begins
-    // if (!showProfileCompletion) {
-    //   startProgress();
-    // }
+    if (!showProfileCompletion) {
+      startProgress();
+    }
 
     llmPromiseRef.current = getAssignedUniversities()
       .then(res => {
